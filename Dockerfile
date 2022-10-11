@@ -1,12 +1,12 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Constants
 ARG VERSION_RUST="nightly-2022-08-23"
-ARG VERSION_BINARYEN="version_105"
-ARG VERSION_WABT="1.0.27"
+ARG VERSION_BINARYEN="105-1"
+ARG VERSION_WABT="1.0.27-1"
 
 RUN apt-get update && apt-get install wget -y
-RUN apt-get update && apt-get install python3.8 python-is-python3 -y
+RUN apt-get update && apt-get install python3.10 python-is-python3 -y
 RUN apt-get update && apt-get install build-essential -y
 
 # Install rust
@@ -16,17 +16,10 @@ RUN wget -O rustup.sh https://sh.rustup.rs && \
     rm rustup.sh
 
 # Install wasm-opt
-RUN wget -O binaryen.tar.gz https://github.com/WebAssembly/binaryen/releases/download/${VERSION_BINARYEN}/binaryen-${VERSION_BINARYEN}-x86_64-linux.tar.gz && \
-    tar -xf binaryen.tar.gz && mv binaryen-${VERSION_BINARYEN}/bin/wasm-opt /usr/bin && \
-    rm binaryen.tar.gz && \
-    rm -rf binaryen-${VERSION_BINARYEN}
+RUN apt-get update && apt-get install binaryen=${VERSION_BINARYEN}
 
 # Install wabt
-RUN wget -O wabt.tar.gz https://github.com/WebAssembly/wabt/releases/download/${VERSION_WABT}/wabt-${VERSION_WABT}-ubuntu.tar.gz && \
-    tar -xf wabt.tar.gz && mv wabt-${VERSION_WABT}/bin/wasm2wat /usr/bin && mv wabt-${VERSION_WABT}/bin/wasm-objdump /usr/bin && \
-    rm wabt.tar.gz && \
-    rm -rf wabt-${VERSION_WABT}
-
+RUN apt-get update && apt-get install wabt=${VERSION_WABT}
 
 COPY "./build_within_docker.py" "/build.py"
 
@@ -47,4 +40,3 @@ LABEL frozen="yes"
 LABEL rust=${VERSION_RUST}
 LABEL wasm-opt-binaryen=${VERSION_BINARYEN}
 LABEL wabt=${VERSION_WABT}
-
