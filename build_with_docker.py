@@ -42,12 +42,12 @@ def main(cli_args: List[str]):
 
 def run_docker(image: str, docker_interactive: bool, docker_tty: bool, project_path: Path, output_path: Path, cargo_target_dir: Union[Path, None], no_wasm_opt: bool):
     docker_mount_args = [
-        "--mount", f"type=bind,source={project_path},destination=/project",
-        "--mount", f"type=bind,source={output_path},destination=/output"
+        "--volume", f"{project_path}:/project",
+        "--volume", f"{output_path}:/output"
     ]
 
     if cargo_target_dir:
-        docker_mount_args += ["--mount", f"type=bind,source={cargo_target_dir},destination=/cargo-target-dir"]
+        docker_mount_args += ["--volume", f"{cargo_target_dir}:/cargo-target-dir"]
 
     docker_args = ["docker", "run"]
 
@@ -57,12 +57,10 @@ def run_docker(image: str, docker_interactive: bool, docker_tty: bool, project_p
         docker_args += ["--tty"]
 
     docker_args += docker_mount_args
+    docker_args += ["--user", f"{str(os.getuid())}:{str(os.getgid())}"]
     docker_args += ["--rm", image]
 
-    entrypoint_args = [
-        "--output-owner-id", str(os.getuid()),
-        "--output-group-id", str(os.getgid())
-    ]
+    entrypoint_args: List[str] = []
 
     if no_wasm_opt:
         entrypoint_args.append("--no-wasm-opt")
