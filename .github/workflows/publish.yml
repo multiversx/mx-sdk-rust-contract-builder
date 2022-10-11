@@ -35,4 +35,4 @@ jobs:
           context: .
           push: true
           file: ./Dockerfile
-          tags: elrondnetwork/build-contract-rust:${GITHUB_REF_NAME}
+          tags: elrondnetwork/build-contract-rust:${{ github.ref_name }}
