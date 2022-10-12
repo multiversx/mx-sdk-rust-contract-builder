@@ -1,6 +1,6 @@
 # elrond-sdk-images-build-contract-rust
 
-Docker image (and wrappers) for reproducible contract builds (Rust).
+Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.elrond.com](https://docs.elrond.com/developers/reproducible-contract-builds/).
 
 ## Build the Docker image
 
@@ -35,8 +35,6 @@ This is useful for useful for testing, debugging and reviewing the script.
 export PROJECT=${HOME}/contracts/reproducible-contract-build-example
 export OUTPUT=${HOME}/contracts/output
 export CARGO_TARGET_DIR=${HOME}/cargo-target-dir
-export OWNER_ID=$(id -u)
-export GROUP_ID=$(id -g)
 export PATH=${HOME}/elrondsdk/vendor-rust/bin:${HOME}/elrondsdk/wabt/latest/bin:${PATH}
 export RUSTUP_HOME=${HOME}/elrondsdk/vendor-rust
 export CARGO_HOME=${HOME}/elrondsdk/vendor-rust
@@ -46,7 +44,5 @@ Build a project:
 
 ```
 python3 ./build_within_docker.py --project=${PROJECT} --output=${OUTPUT} \
-    --cargo-target-dir=${CARGO_TARGET_DIR} \
-    --output-owner-id=${OWNER_ID} \
-    --output-group-id=${GROUP_ID}
+    --cargo-target-dir=${CARGO_TARGET_DIR}
 ```

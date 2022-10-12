@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from argparse import ArgumentParser
 from hashlib import blake2b
 from pathlib import Path
@@ -55,6 +56,8 @@ class BuildArtifactsAccumulator:
 def main(cli_args: List[str]):
     logging.basicConfig(level=logging.DEBUG)
 
+    start_time = time.time()
+
     artifacts_accumulator = BuildArtifactsAccumulator()
 
     parser = ArgumentParser()
@@ -62,14 +65,10 @@ def main(cli_args: List[str]):
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
     parser.add_argument("--cargo-target-dir", type=str, required=True, help="Cargo's target-dir")
-    parser.add_argument("--output-owner-id", type=int, required=True, help="set owner of output folder")
-    parser.add_argument("--output-group-id", type=int, required=True, help="set group of output folder")
 
     parsed_args = parser.parse_args(cli_args)
     project_path = Path(parsed_args.project).expanduser()
     parent_output_directory = Path(parsed_args.output)
-    owner_id = parsed_args.output_owner_id
-    group_id = parsed_args.output_group_id
 
     contracts_directories = get_contracts_directories(project_path)
 
@@ -96,7 +95,7 @@ def main(cli_args: List[str]):
         # The archive will also include the "output" folder (useful for debugging)
         clean(build_directory, clean_output=False)
 
-        promote_cargo_lock_to_contract_directory(build_directory, contract_directory, owner_id, group_id)
+        promote_cargo_lock_to_contract_directory(build_directory, contract_directory)
 
         # The archive is created after build, so that Cargo.lock files are included, as well (useful for debugging)
         archive_source_code(contract_name, contract_version, build_directory, output_subdirectory)
@@ -104,7 +103,10 @@ def main(cli_args: List[str]):
         artifacts_accumulator.gather_artifacts(contract_name, output_subdirectory)
 
     artifacts_accumulator.dump_to_file(parent_output_directory / "artifacts.json")
-    adjust_output_ownership(parent_output_directory, owner_id, group_id)
+
+    end_time = time.time()
+    time_elapsed = end_time - start_time
+    logger.info(f"Built in {time_elapsed} seconds, as user = {os.getuid()}, group = {os.getgid()}")
 
 
 def get_contracts_directories(project_path: Path) -> List[Path]:
@@ -168,11 +170,10 @@ def build(context: BuildContext):
     shutil.copytree(cargo_output_directory, context.output_directory, dirs_exist_ok=True)
 
 
-def promote_cargo_lock_to_contract_directory(build_directory: Path, contract_directory: Path, owner_id: int, group_id: int):
+def promote_cargo_lock_to_contract_directory(build_directory: Path, contract_directory: Path):
     from_path = build_directory / "wasm" / "Cargo.lock"
     to_path = contract_directory / "wasm" / "Cargo.lock"
     shutil.copy(from_path, to_path)
-    os.chown(to_path, owner_id, group_id)
 
 
 def generate_wabt_artifacts(wasm_file: Path):
@@ -231,16 +232,6 @@ def archive_source_code(contract_name: str, contract_version: str, input_directo
     shutil.make_archive(str(archive_file), "zip", input_directory)
 
     logger.info(f"Created archive: {archive_file}")
-
-
-def adjust_output_ownership(output_directory: Path, owner_id: int, group_id: int):
-    logger.info(f"Adjust ownership of output directory: directory = {output_directory}, owner = {owner_id}, group = {group_id}")
-
-    for root, dirs, files in os.walk(output_directory):
-        for item in dirs:
-            os.chown(Path(root) / item, owner_id, group_id)
-        for item in files:
-            os.chown(Path(root) / item, owner_id, group_id)
 
 
 if __name__ == "__main__":
