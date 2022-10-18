@@ -35,11 +35,14 @@ class BuildArtifactsAccumulator:
         self.contracts: Dict[str, Dict[str, str]] = dict()
 
     def gather_artifacts(self, contract_name: str, output_subdirectory: Path):
+        with open(find_file_in_folder(output_subdirectory, "*.codehash.txt")) as file:
+            code_hash = file.read()
+
         self.add_artifact(contract_name, "bytecode", find_file_in_folder(output_subdirectory, "*.wasm").name)
         self.add_artifact(contract_name, "text", find_file_in_folder(output_subdirectory, "*.wat").name)
         self.add_artifact(contract_name, "abi", find_file_in_folder(output_subdirectory, "*.abi.json").name)
         self.add_artifact(contract_name, "imports", find_file_in_folder(output_subdirectory, "*.imports.json").name)
-        self.add_artifact(contract_name, "codehash", find_file_in_folder(output_subdirectory, "*.codehash.txt").name)
+        self.add_artifact(contract_name, "codehash", code_hash)
         self.add_artifact(contract_name, "src", find_file_in_folder(output_subdirectory, "*.zip").name)
 
     def add_artifact(self, contract_name: str, kind: str, value: str):
@@ -72,13 +75,18 @@ def main(cli_args: List[str]):
 
     contracts_directories = get_contracts_directories(project_path)
 
+    # We copy the whole project folder to the build path, to ensure that all local dependencies are available.
+    project_within_build_directory = copy_project_directory_to_build_directory(project_path)
+
     for contract_directory in sorted(contracts_directories):
         contract_name, contract_version = get_contract_name_and_version(contract_directory)
         logger.info(f"Contract = {contract_name}, version = {contract_version}")
 
         output_subdirectory = parent_output_directory / f"{contract_name}"
         output_subdirectory.mkdir(parents=True, exist_ok=True)
-        build_directory = copy_contract_directory_to_build_directory(contract_directory)
+
+        relative_contract_directory = contract_directory.relative_to(project_path)
+        build_directory = project_within_build_directory / relative_contract_directory
 
         context = BuildContext(
             contract_name=contract_name,
@@ -128,10 +136,10 @@ def get_contract_name_and_version(contract_directory: Path) -> Tuple[str, str]:
     return name, version
 
 
-def copy_contract_directory_to_build_directory(contract_directory: Path):
+def copy_project_directory_to_build_directory(project_directory: Path):
     shutil.rmtree(HARDCODED_BUILD_DIRECTORY, ignore_errors=True)
     HARDCODED_BUILD_DIRECTORY.mkdir()
-    shutil.copytree(contract_directory, HARDCODED_BUILD_DIRECTORY, dirs_exist_ok=True)
+    shutil.copytree(project_directory, HARDCODED_BUILD_DIRECTORY, dirs_exist_ok=True)
     return HARDCODED_BUILD_DIRECTORY
 
 
