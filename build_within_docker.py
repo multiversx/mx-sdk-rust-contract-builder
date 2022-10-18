@@ -72,13 +72,18 @@ def main(cli_args: List[str]):
 
     contracts_directories = get_contracts_directories(project_path)
 
+    # We copy the whole project folder to the build path, to ensure that all local dependencies are available.
+    project_within_build_directory = copy_project_directory_to_build_directory(project_path)
+
     for contract_directory in sorted(contracts_directories):
         contract_name, contract_version = get_contract_name_and_version(contract_directory)
         logger.info(f"Contract = {contract_name}, version = {contract_version}")
 
         output_subdirectory = parent_output_directory / f"{contract_name}"
         output_subdirectory.mkdir(parents=True, exist_ok=True)
-        build_directory = copy_contract_directory_to_build_directory(contract_directory)
+
+        relative_contract_directory = contract_directory.relative_to(project_path)
+        build_directory = project_within_build_directory / relative_contract_directory
 
         context = BuildContext(
             contract_name=contract_name,
@@ -128,10 +133,10 @@ def get_contract_name_and_version(contract_directory: Path) -> Tuple[str, str]:
     return name, version
 
 
-def copy_contract_directory_to_build_directory(contract_directory: Path):
+def copy_project_directory_to_build_directory(project_directory: Path):
     shutil.rmtree(HARDCODED_BUILD_DIRECTORY, ignore_errors=True)
     HARDCODED_BUILD_DIRECTORY.mkdir()
-    shutil.copytree(contract_directory, HARDCODED_BUILD_DIRECTORY, dirs_exist_ok=True)
+    shutil.copytree(project_directory, HARDCODED_BUILD_DIRECTORY, dirs_exist_ok=True)
     return HARDCODED_BUILD_DIRECTORY
 
 
