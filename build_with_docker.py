@@ -17,6 +17,7 @@ def main(cli_args: List[str]):
     parser.add_argument("--no-docker-interactive", action="store_true", default=False)
     parser.add_argument("--no-docker-tty", action="store_true", default=False)
     parser.add_argument("--project", type=str)
+    parser.add_argument("--contract", type=str)
     parser.add_argument("--output", type=str, default=Path(os.getcwd()) / "output")
     # Providing this parameter
     #   (a) *might* (should, but it doesn't) speed up (subsequent) builds, but
@@ -30,17 +31,18 @@ def main(cli_args: List[str]):
     docker_interactive = not parsed_args.no_docker_interactive
     docker_tty = not parsed_args.no_docker_tty
     project_path = Path(parsed_args.project).expanduser().resolve()
+    contract_path = parsed_args.contract
     output_path = Path(parsed_args.output).expanduser().resolve()
     cargo_target_dir = Path(parsed_args.cargo_target_dir).expanduser().resolve() if parsed_args.cargo_target_dir else None
     no_wasm_opt = parsed_args.no_wasm_opt
 
     output_path.mkdir(parents=True, exist_ok=True)
 
-    return_code = run_docker(image, docker_interactive, docker_tty, project_path, output_path, cargo_target_dir, no_wasm_opt)
+    return_code = run_docker(image, docker_interactive, docker_tty, project_path, contract_path, output_path, cargo_target_dir, no_wasm_opt)
     return return_code
 
 
-def run_docker(image: str, docker_interactive: bool, docker_tty: bool, project_path: Path, output_path: Path, cargo_target_dir: Union[Path, None], no_wasm_opt: bool):
+def run_docker(image: str, docker_interactive: bool, docker_tty: bool, project_path: Path, contract_path: str, output_path: Path, cargo_target_dir: Union[Path, None], no_wasm_opt: bool):
     docker_mount_args = [
         "--volume", f"{project_path}:/project",
         "--volume", f"{output_path}:/output"
@@ -64,6 +66,9 @@ def run_docker(image: str, docker_interactive: bool, docker_tty: bool, project_p
 
     if no_wasm_opt:
         entrypoint_args.append("--no-wasm-opt")
+
+    if contract_path:
+        entrypoint_args.extend(["--contract", contract_path])
 
     args = docker_args + entrypoint_args
     logger.info(f"Running docker: {args}")
