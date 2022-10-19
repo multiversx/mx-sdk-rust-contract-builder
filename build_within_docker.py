@@ -89,7 +89,8 @@ def main(cli_args: List[str]):
         relative_contract_directory = contract_directory.relative_to(project_path)
         build_directory = project_within_build_directory / relative_contract_directory
 
-        if parsed_args.contract and relative_contract_directory != parsed_args.contract:
+        if parsed_args.contract and contract_name != parsed_args.contract:
+            logger.info(f"Skipping {contract_name}.")
             continue
 
         context = BuildContext(
