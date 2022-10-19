@@ -65,6 +65,7 @@ def main(cli_args: List[str]):
 
     parser = ArgumentParser()
     parser.add_argument("--project", type=str, required=True, help="source code directory")
+    parser.add_argument("--contract", type=str, required=False, help="contract to build from within the source code directory; should be relative to the project path")
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
     parser.add_argument("--cargo-target-dir", type=str, required=True, help="Cargo's target-dir")
@@ -87,6 +88,9 @@ def main(cli_args: List[str]):
 
         relative_contract_directory = contract_directory.relative_to(project_path)
         build_directory = project_within_build_directory / relative_contract_directory
+
+        if parsed_args.contract and relative_contract_directory != parsed_args.contract:
+            continue
 
         context = BuildContext(
             contract_name=contract_name,
