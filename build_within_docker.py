@@ -16,8 +16,8 @@ logger = logging.getLogger("build-within-docker")
 
 HARDCODED_BUILD_DIRECTORY = Path("/tmp/elrond-contract-rust")
 ONE_KB_IN_BYTES = 1024
-MAX_SOURCE_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 64
-# The output archive contains not only the *.wasm, but also *.wat, *.abi.json etc.
+MAX_SOURCE_CODE_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 64
+# The output archive contains not only the *.wasm, but also *.wat, *.abi.json files etc.
 MAX_OUTPUT_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 1024
 
 
@@ -115,8 +115,8 @@ def main(cli_args: List[str]):
 
         promote_cargo_lock_to_contract_directory(build_directory, contract_directory)
 
-        # The archive is created after build, so that Cargo.lock files are included, as well (useful for debugging)
-        create_archive(contract_name, contract_version, build_directory, output_subdirectory)
+        # The archives are created after build, so that Cargo.lock files are included, as well (useful for debugging)
+        create_archives(contract_name, contract_version, build_directory, output_subdirectory)
 
         artifacts_accumulator.gather_artifacts(contract_name, output_subdirectory)
 
@@ -244,20 +244,20 @@ def find_file_in_folder(folder: Path, pattern: str) -> Path:
     return Path(file).resolve()
 
 
-def create_archive(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
-    source_archive_file = output_directory / f"{contract_name}-src-{contract_version}.zip"
+def create_archives(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
+    source_code_archive_file = output_directory / f"{contract_name}-src-{contract_version}.zip"
     output_archive_file = output_directory / f"{contract_name}-output-{contract_version}.zip"
 
-    archive_directory(source_archive_file, input_directory, should_include_in_source_code_archive)
+    archive_directory(source_code_archive_file, input_directory, should_include_in_source_code_archive)
     archive_directory(output_archive_file, input_directory / "output")
 
-    size_of_source_archive = source_archive_file.stat().st_size
+    size_of_source_code_archive = source_code_archive_file.stat().st_size
     size_of_output_archive = output_archive_file.stat().st_size
 
-    if size_of_source_archive > MAX_SOURCE_ARCHIVE_SIZE:
-        raise FileTooLargeException(source_archive_file, size_of_source_archive, MAX_SOURCE_ARCHIVE_SIZE)
+    if size_of_source_code_archive > MAX_SOURCE_CODE_ARCHIVE_SIZE:
+        raise ErrFileTooLarge(source_code_archive_file, size_of_source_code_archive, MAX_SOURCE_CODE_ARCHIVE_SIZE)
     if size_of_output_archive > MAX_OUTPUT_ARCHIVE_SIZE:
-        raise FileTooLargeException(output_archive_file, size_of_output_archive, MAX_OUTPUT_ARCHIVE_SIZE)
+        raise ErrFileTooLarge(output_archive_file, size_of_output_archive, MAX_OUTPUT_ARCHIVE_SIZE)
 
 
 def archive_directory(archive_file: Path, directory: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
@@ -288,7 +288,12 @@ def should_include_in_source_code_archive(path: Path):
     return False
 
 
-class FileTooLargeException(Exception):
+class ErrKnown(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+
+class ErrFileTooLarge(ErrKnown):
     def __init__(self, path: Path, size: int, max_size: int) -> None:
         super().__init__(f"File too large: file = {path}, size = {size}, maximum size = {max_size}")
 
@@ -296,7 +301,6 @@ class FileTooLargeException(Exception):
 if __name__ == "__main__":
     try:
         main(sys.argv[1:])
-    except Exception as err:
+    except ErrKnown as err:
         print("An error occurred.")
         print(err)
-        exit(1)
