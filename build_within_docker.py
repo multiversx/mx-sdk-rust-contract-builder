@@ -9,6 +9,7 @@ from argparse import ArgumentParser
 from hashlib import blake2b
 from pathlib import Path
 from typing import Dict, List, Tuple
+from zipfile import ZIP_DEFLATED, ZipFile
 
 logger = logging.getLogger("build-within-docker")
 
@@ -240,9 +241,19 @@ def find_file_in_folder(folder: Path, pattern: str) -> Path:
 
 
 def archive_source_code(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
-    archive_file = output_directory / f"{contract_name}-{contract_version}"
+    archive_file = output_directory / f"{contract_name}-{contract_version}.zip"
 
-    shutil.make_archive(str(archive_file), "zip", input_directory)
+    with ZipFile(archive_file, "w", ZIP_DEFLATED) as archive:
+        for root, _, files in os.walk(input_directory):
+            root_path = Path(root)
+            for file in files:
+                file_path = Path(file)
+                full_path = root_path / file_path
+
+                if file_path.is_dir():
+                    continue
+
+                archive.write(full_path, full_path.relative_to(input_directory))
 
     logger.info(f"Created archive: {archive_file}")
 
