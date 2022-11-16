@@ -18,7 +18,7 @@ HARDCODED_BUILD_DIRECTORY = Path("/tmp/elrond-contract-rust")
 ONE_KB_IN_BYTES = 1024
 MAX_SOURCE_CODE_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 64
 # The output archive contains not only the *.wasm, but also *.wat, *.abi.json files etc.
-MAX_OUTPUT_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 1024
+MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 1024
 
 
 class BuildContext:
@@ -246,18 +246,18 @@ def find_file_in_folder(folder: Path, pattern: str) -> Path:
 
 def create_archives(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
     source_code_archive_file = output_directory / f"{contract_name}-src-{contract_version}.zip"
-    output_archive_file = output_directory / f"{contract_name}-output-{contract_version}.zip"
+    output_artifacts_archive_file = output_directory / f"{contract_name}-output-{contract_version}.zip"
 
     archive_directory(source_code_archive_file, input_directory, should_include_in_source_code_archive)
-    archive_directory(output_archive_file, input_directory / "output")
+    archive_directory(output_artifacts_archive_file, input_directory / "output")
 
     size_of_source_code_archive = source_code_archive_file.stat().st_size
-    size_of_output_archive = output_archive_file.stat().st_size
+    size_of_output_artifacts_archive = output_artifacts_archive_file.stat().st_size
 
     if size_of_source_code_archive > MAX_SOURCE_CODE_ARCHIVE_SIZE:
         raise ErrFileTooLarge(source_code_archive_file, size_of_source_code_archive, MAX_SOURCE_CODE_ARCHIVE_SIZE)
-    if size_of_output_archive > MAX_OUTPUT_ARCHIVE_SIZE:
-        raise ErrFileTooLarge(output_archive_file, size_of_output_archive, MAX_OUTPUT_ARCHIVE_SIZE)
+    if size_of_output_artifacts_archive > MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE:
+        raise ErrFileTooLarge(output_artifacts_archive_file, size_of_output_artifacts_archive, MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE)
 
 
 def archive_directory(archive_file: Path, directory: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
