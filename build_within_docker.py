@@ -8,7 +8,7 @@ import time
 from argparse import ArgumentParser
 from hashlib import blake2b
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple, Union
 from zipfile import ZIP_DEFLATED, ZipFile
 
 logger = logging.getLogger("build-within-docker")
@@ -112,7 +112,7 @@ def main(cli_args: List[str]):
         promote_cargo_lock_to_contract_directory(build_directory, contract_directory)
 
         # The archive is created after build, so that Cargo.lock files are included, as well (useful for debugging)
-        archive_source_code(contract_name, contract_version, build_directory, output_subdirectory)
+        create_archive(contract_name, contract_version, build_directory, output_subdirectory)
 
         artifacts_accumulator.gather_artifacts(contract_name, output_subdirectory)
 
@@ -240,11 +240,19 @@ def find_file_in_folder(folder: Path, pattern: str) -> Path:
     return Path(file).resolve()
 
 
-def archive_source_code(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
-    archive_file = output_directory / f"{contract_name}-{contract_version}.zip"
+def create_archive(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
+    source_archive_file = output_directory / f"{contract_name}-src-{contract_version}.zip"
+    output_archive_file = output_directory / f"{contract_name}-output-{contract_version}.zip"
+
+    archive_directory(source_archive_file, input_directory, should_include_in_source_code_archive)
+    archive_directory(output_archive_file, input_directory / "output")
+
+
+def archive_directory(archive_file: Path, directory: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
+    should_include_file = should_include_file or (lambda _: True)
 
     with ZipFile(archive_file, "w", ZIP_DEFLATED) as archive:
-        for root, _, files in os.walk(input_directory):
+        for root, _, files in os.walk(directory):
             root_path = Path(root)
             for file in files:
                 file_path = Path(file)
@@ -252,10 +260,20 @@ def archive_source_code(contract_name: str, contract_version: str, input_directo
 
                 if file_path.is_dir():
                     continue
+                if not should_include_file(file_path):
+                    continue
 
-                archive.write(full_path, full_path.relative_to(input_directory))
+                archive.write(full_path, full_path.relative_to(directory))
 
     logger.info(f"Created archive: {archive_file}")
+
+
+def should_include_in_source_code_archive(path: Path):
+    if path.suffix == ".rs":
+        return True
+    if path.name in ["Cargo.toml", "Cargo.lock", "elrond.json"]:
+        return True
+    return False
 
 
 if __name__ == "__main__":
