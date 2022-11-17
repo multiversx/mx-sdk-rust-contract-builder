@@ -16,7 +16,7 @@ logger = logging.getLogger("build-within-docker")
 
 HARDCODED_BUILD_DIRECTORY = Path("/tmp/elrond-contract-rust")
 ONE_KB_IN_BYTES = 1024
-MAX_SOURCE_CODE_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 64
+MAX_SOURCE_CODE_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 1024
 # The output archive contains not only the *.wasm, but also *.wat, *.abi.json files etc.
 MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 1024
 
