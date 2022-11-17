@@ -48,7 +48,8 @@ class BuildArtifactsAccumulator:
         self.add_artifact(contract_name, "abi", find_file_in_folder(output_subdirectory, "*.abi.json").name)
         self.add_artifact(contract_name, "imports", find_file_in_folder(output_subdirectory, "*.imports.json").name)
         self.add_artifact(contract_name, "codehash", code_hash)
-        self.add_artifact(contract_name, "src", find_file_in_folder(output_subdirectory, "*.zip").name)
+        self.add_artifact(contract_name, "src", find_file_in_folder(output_subdirectory, "*-src-*.zip").name)
+        self.add_artifact(contract_name, "output", find_file_in_folder(output_subdirectory, "*-output-*.zip").name)
 
     def add_artifact(self, contract_name: str, kind: str, value: str):
         if contract_name not in self.contracts:
@@ -255,9 +256,14 @@ def create_archives(contract_name: str, contract_version: str, input_directory: 
     size_of_output_artifacts_archive = output_artifacts_archive_file.stat().st_size
 
     if size_of_source_code_archive > MAX_SOURCE_CODE_ARCHIVE_SIZE:
-        raise ErrFileTooLarge(source_code_archive_file, size_of_source_code_archive, MAX_SOURCE_CODE_ARCHIVE_SIZE)
+        warn_file_too_large(source_code_archive_file, size_of_source_code_archive, MAX_SOURCE_CODE_ARCHIVE_SIZE)
     if size_of_output_artifacts_archive > MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE:
-        raise ErrFileTooLarge(output_artifacts_archive_file, size_of_output_artifacts_archive, MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE)
+        warn_file_too_large(output_artifacts_archive_file, size_of_output_artifacts_archive, MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE)
+
+
+def warn_file_too_large(path: Path, size: int, max_size: int):
+    logger.warning(f"""File is too large (this might cause issues with using downstream applications, such as the contract build verification services): 
+file = {path}, size = {size}, maximum size = {max_size}""")
 
 
 def archive_directory(archive_file: Path, directory: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
@@ -291,11 +297,6 @@ def should_include_in_source_code_archive(path: Path):
 class ErrKnown(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
-
-
-class ErrFileTooLarge(ErrKnown):
-    def __init__(self, path: Path, size: int, max_size: int) -> None:
-        super().__init__(f"File too large: file = {path}, size = {size}, maximum size = {max_size}")
 
 
 if __name__ == "__main__":
