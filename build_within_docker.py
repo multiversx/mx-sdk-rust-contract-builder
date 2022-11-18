@@ -118,6 +118,7 @@ def main(cli_args: List[str]):
 
         # The archives are created after build, so that Cargo.lock files are included, as well (useful for debugging)
         create_archives(contract_name, contract_version, build_directory, output_subdirectory)
+        create_src_tree(contract_name, contract_version, build_directory, output_subdirectory)
 
         artifacts_accumulator.gather_artifacts(contract_name, output_subdirectory)
 
@@ -292,6 +293,19 @@ def should_include_in_source_code_archive(path: Path):
     if path.name in ["Cargo.toml", "Cargo.lock", "elrond.json"]:
         return True
     return False
+
+
+def create_src_tree(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
+    for root, _, files in os.walk(input_directory):
+        root_path = Path(root)
+        for file in files:
+            file_path = Path(file)
+            full_path = root_path / file_path
+
+            if file_path.is_dir():
+                continue
+
+            print(full_path.relative_to(input_directory))
 
 
 class ErrKnown(Exception):
