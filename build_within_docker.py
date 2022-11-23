@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 import os
@@ -296,6 +297,8 @@ def should_include_in_source_code_archive(path: Path):
 
 
 def create_src_tree(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
+    src_tree: List[Dict[str, str]] = []
+
     for root, _, files in os.walk(input_directory):
         root_path = Path(root)
         for file in files:
@@ -304,8 +307,23 @@ def create_src_tree(contract_name: str, contract_version: str, input_directory: 
 
             if file_path.is_dir():
                 continue
+            if not should_include_in_source_code_archive(file_path):
+                continue
 
-            print(full_path.relative_to(input_directory))
+            with open(full_path, "rb") as f:
+                content = f.read()
+
+            relative_path = full_path.relative_to(input_directory)
+            content_base64 = base64.b64encode(content)
+
+            src_tree.append({
+                "path": str(relative_path),
+                "content": content_base64.decode()
+            })
+
+    src_tree_filename = f"{contract_name}-{contract_version}.source.json"
+    with open(output_directory / src_tree_filename, "w") as f:
+        json.dump(src_tree, f, indent=4)
 
 
 class ErrKnown(Exception):
