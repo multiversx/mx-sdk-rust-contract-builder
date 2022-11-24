@@ -23,20 +23,6 @@ MAX_SOURCE_CODE_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 1024
 MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 1024
 
 
-class BuildContext:
-    def __init__(self,
-                 contract_name: str,
-                 build_directory: Path,
-                 output_directory: Path,
-                 no_wasm_opt: bool,
-                 cargo_target_dir: str) -> None:
-        self.contract_name = contract_name
-        self.build_directory = build_directory
-        self.output_directory = output_directory
-        self.no_wasm_opt = no_wasm_opt
-        self.cargo_target_dir = cargo_target_dir
-
-
 class BuildArtifactsAccumulator:
     def __init__(self):
         self.contracts: Dict[str, Dict[str, str]] = dict()
@@ -167,14 +153,18 @@ def main(cli_args: List[str]):
     project_path = Path(parsed_args.project).expanduser() if parsed_args.project else None
     packaged_project_path = Path(parsed_args.packaged_project).expanduser() if parsed_args.packaged_project else None
     parent_output_directory = Path(parsed_args.output)
+    cargo_target_dir = parsed_args.cargo_target_dir
+    no_wasm_opt = parsed_args.no_wasm_opt
 
     if not project_path and not packaged_project_path:
         raise Exception("One of the following must be provided: --project, --packaged-project")
 
+    if not project_path:
+        project_path = HARDCODED_UNWRAP_DIRECTORY
+
     if packaged_project_path:
         packaged = PackagedProject.load_from_package(packaged_project_path)
         packaged.unwrap_to_folder(HARDCODED_UNWRAP_DIRECTORY)
-        project_path = Path(HARDCODED_UNWRAP_DIRECTORY)
 
     contracts_directories = get_contracts_directories(project_path)
 
@@ -195,18 +185,9 @@ def main(cli_args: List[str]):
             logger.info(f"Skipping {contract_name}.")
             continue
 
-        # TODO: perhaps remove this class
-        context = BuildContext(
-            contract_name=contract_name,
-            build_directory=build_directory,
-            output_directory=output_subdirectory,
-            no_wasm_opt=parsed_args.no_wasm_opt,
-            cargo_target_dir=parsed_args.cargo_target_dir
-        )
-
         # Clean directory - useful if it contains externally-generated build artifacts
         clean(build_directory)
-        build(context)
+        build(build_directory, output_subdirectory, cargo_target_dir, no_wasm_opt)
 
         # The archive will also include the "output" folder (useful for debugging)
         clean(build_directory, clean_output=False)
@@ -263,14 +244,14 @@ def clean(directory: Path, clean_output: bool = True):
         shutil.rmtree(directory / "output", ignore_errors=True)
 
 
-def build(context: BuildContext):
-    cargo_output_directory = context.build_directory / "output"
-    meta_directory = context.build_directory / "meta"
-    cargo_lock = context.build_directory / "wasm" / "Cargo.lock"
+def build(build_directory: Path, output_directory: Path, cargo_target_dir: Path, no_wasm_opt: bool):
+    cargo_output_directory = build_directory / "output"
+    meta_directory = build_directory / "meta"
+    cargo_lock = build_directory / "wasm" / "Cargo.lock"
 
     args = ["cargo", "run", "build"]
-    args.extend(["--target-dir", context.cargo_target_dir])
-    args.extend(["--no-wasm-opt"] if context.no_wasm_opt else [])
+    args.extend(["--target-dir", str(cargo_target_dir)])
+    args.extend(["--no-wasm-opt"] if no_wasm_opt else [])
     # If the lock file is missing, or it needs to be updated, Cargo will exit with an error.
     # See: https://doc.rust-lang.org/cargo/commands/cargo-build.html
     args.extend(["--locked"] if cargo_lock.exists() else [])
@@ -284,7 +265,7 @@ def build(context: BuildContext):
     generate_wabt_artifacts(wasm_file)
     generate_code_hash_artifact(wasm_file)
 
-    shutil.copytree(cargo_output_directory, context.output_directory, dirs_exist_ok=True)
+    shutil.copytree(cargo_output_directory, output_directory, dirs_exist_ok=True)
 
 
 def promote_cargo_lock_to_contract_directory(build_directory: Path, contract_directory: Path):
