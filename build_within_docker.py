@@ -9,13 +9,14 @@ import time
 from argparse import ArgumentParser
 from hashlib import blake2b
 from pathlib import Path
-from typing import Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple, Union
 from zipfile import ZIP_DEFLATED, ZipFile
 
 logger = logging.getLogger("build-within-docker")
 
 
-HARDCODED_BUILD_DIRECTORY = Path("/tmp/elrond-contract-rust")
+HARDCODED_BUILD_DIRECTORY = Path("/tmp/contract")
+HARDCODED_UNWRAP_DIRECTORY = Path("/tmp/unwrapped")
 ONE_KB_IN_BYTES = 1024
 MAX_SOURCE_CODE_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 1024
 # The output archive contains not only the *.wasm, but also *.wat, *.abi.json files etc.
@@ -63,6 +64,90 @@ class BuildArtifactsAccumulator:
             json.dump(self.contracts, f, indent=4)
 
 
+class PackagedProjectEntry:
+    def __init__(self, path: Path, content: bytes) -> None:
+        self.path = path
+        self.content = content
+
+    @classmethod
+    def from_dict(cls, dict: Dict[str, Any]) -> 'PackagedProjectEntry':
+        path = Path(dict.get("path", ""))
+        content = base64.b64decode(dict.get("content", ""))
+        return PackagedProjectEntry(path, content)
+
+    def to_dict(self) -> Dict[str, Any]:
+        data = {
+            "path": str(self.path),
+            "content": base64.b64encode(self.content).decode()
+        }
+
+        return data
+
+
+class PackagedProject:
+    def __init__(self, name: str, version: str, entries: List[PackagedProjectEntry]) -> None:
+        self.name = name
+        self.version = version
+        self.entries = entries
+
+    @classmethod
+    def load_from_package(cls, path: Path) -> 'PackagedProject':
+        with open(path, "r") as f:
+            data: Dict[str, Any] = json.load(f)
+
+        return PackagedProject.from_dict(data)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'PackagedProject':
+        name = data.get("name", "untitled")
+        version = data.get("version", "0.0.0")
+        entries_raw: List[Dict[str, Any]] = data.get("entries", [])
+        entries = [PackagedProjectEntry.from_dict(entry) for entry in entries_raw]
+        return PackagedProject(name, version, entries)
+
+    @classmethod
+    def create_from_folder(cls, folder: Path) -> 'PackagedProject':
+        entries = cls.create_entries_from_folder(folder)
+        name, version = get_contract_name_and_version(folder)
+        return PackagedProject(name, version, entries)
+
+    @classmethod
+    def create_entries_from_folder(cls, folder: Path) -> List[PackagedProjectEntry]:
+        files = get_files_recursively(folder, is_source_code_file)
+        entries: List[PackagedProjectEntry] = []
+
+        for full_path in files:
+            with open(full_path, "rb") as f:
+                content = f.read()
+
+            relative_path = full_path.relative_to(folder)
+            entries.append(PackagedProjectEntry(relative_path, content))
+
+        return entries
+
+    def unwrap_to_folder(self, folder: Path):
+        for entry in self.entries:
+            full_path = folder / entry.path
+            full_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(full_path, "wb") as f:
+                f.write(entry.content)
+
+    def save_to_package(self, path: Path):
+        data = self.to_dict()
+
+        with open(path, "w") as f:
+            json.dump(data, f, indent=4)
+
+    def to_dict(self) -> Dict[str, Any]:
+        entries = [entry.to_dict() for entry in self.entries]
+
+        return {
+            "name": self.name,
+            "version": self.version,
+            "entries": entries
+        }
+
+
 def main(cli_args: List[str]):
     logging.basicConfig(level=logging.DEBUG)
 
@@ -71,15 +156,25 @@ def main(cli_args: List[str]):
     artifacts_accumulator = BuildArtifactsAccumulator()
 
     parser = ArgumentParser()
-    parser.add_argument("--project", type=str, required=True, help="source code directory")
+    parser.add_argument("--project", type=str, required=False, help="source code directory")
+    parser.add_argument("--packaged-project", type=str, required=False, help="source code packaged in a JSON file")
     parser.add_argument("--contract", type=str, required=False, help="contract to build from within the source code directory; should be relative to the project path")
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
     parser.add_argument("--cargo-target-dir", type=str, required=True, help="Cargo's target-dir")
 
     parsed_args = parser.parse_args(cli_args)
-    project_path = Path(parsed_args.project).expanduser()
+    project_path = Path(parsed_args.project).expanduser() if parsed_args.project else None
+    packaged_project_path = Path(parsed_args.packaged_project).expanduser() if parsed_args.packaged_project else None
     parent_output_directory = Path(parsed_args.output)
+
+    if not project_path and not packaged_project_path:
+        raise Exception("One of the following must be provided: --project, --packaged-project")
+
+    if packaged_project_path:
+        packaged = PackagedProject.load_from_package(packaged_project_path)
+        packaged.unwrap_to_folder(HARDCODED_UNWRAP_DIRECTORY)
+        project_path = Path(HARDCODED_UNWRAP_DIRECTORY)
 
     contracts_directories = get_contracts_directories(project_path)
 
@@ -100,6 +195,7 @@ def main(cli_args: List[str]):
             logger.info(f"Skipping {contract_name}.")
             continue
 
+        # TODO: perhaps remove this class
         context = BuildContext(
             contract_name=contract_name,
             build_directory=build_directory,
@@ -119,7 +215,7 @@ def main(cli_args: List[str]):
 
         # The archives are created after build, so that Cargo.lock files are included, as well (useful for debugging)
         create_archives(contract_name, contract_version, build_directory, output_subdirectory)
-        create_src_tree(contract_name, contract_version, build_directory, output_subdirectory)
+        create_packaged_project(contract_name, contract_version, build_directory, output_subdirectory)
 
         artifacts_accumulator.gather_artifacts(contract_name, output_subdirectory)
 
@@ -251,7 +347,7 @@ def create_archives(contract_name: str, contract_version: str, input_directory: 
     source_code_archive_file = output_directory / f"{contract_name}-src-{contract_version}.zip"
     output_artifacts_archive_file = output_directory / f"{contract_name}-output-{contract_version}.zip"
 
-    archive_directory(source_code_archive_file, input_directory, should_include_in_source_code_archive)
+    archive_directory(source_code_archive_file, input_directory, is_source_code_file)
     archive_directory(output_artifacts_archive_file, input_directory / "output")
 
     size_of_source_code_archive = source_code_archive_file.stat().st_size
@@ -269,37 +365,20 @@ file = {path}, size = {size}, maximum size = {max_size}""")
 
 
 def archive_directory(archive_file: Path, directory: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
-    should_include_file = should_include_file or (lambda _: True)
+    files = get_files_recursively(directory, should_include_file)
 
     with ZipFile(archive_file, "w", ZIP_DEFLATED) as archive:
-        for root, _, files in os.walk(directory):
-            root_path = Path(root)
-            for file in files:
-                file_path = Path(file)
-                full_path = root_path / file_path
-
-                if file_path.is_dir():
-                    continue
-                if not should_include_file(file_path):
-                    continue
-
-                archive.write(full_path, full_path.relative_to(directory))
+        for full_path in files:
+            archive.write(full_path, full_path.relative_to(directory))
 
     logger.info(f"Created archive: file = {archive_file}, with size = {archive_file.stat().st_size} bytes")
 
 
-def should_include_in_source_code_archive(path: Path):
-    if path.suffix == ".rs":
-        return True
-    if path.name in ["Cargo.toml", "Cargo.lock", "elrond.json"]:
-        return True
-    return False
+def get_files_recursively(directory: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
+    should_include_file = should_include_file or (lambda _: True)
+    paths: List[Path] = []
 
-
-def create_src_tree(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
-    src_tree: List[Dict[str, str]] = []
-
-    for root, _, files in os.walk(input_directory):
+    for root, _, files in os.walk(directory):
         root_path = Path(root)
         for file in files:
             file_path = Path(file)
@@ -307,23 +386,26 @@ def create_src_tree(contract_name: str, contract_version: str, input_directory: 
 
             if file_path.is_dir():
                 continue
-            if not should_include_in_source_code_archive(file_path):
+            if not should_include_file(file_path):
                 continue
 
-            with open(full_path, "rb") as f:
-                content = f.read()
+            paths.append(full_path)
 
-            relative_path = full_path.relative_to(input_directory)
-            content_base64 = base64.b64encode(content)
+    return paths
 
-            src_tree.append({
-                "path": str(relative_path),
-                "content": content_base64.decode()
-            })
 
-    src_tree_filename = f"{contract_name}-{contract_version}.source.json"
-    with open(output_directory / src_tree_filename, "w") as f:
-        json.dump(src_tree, f, indent=4)
+def is_source_code_file(path: Path):
+    if path.suffix == ".rs":
+        return True
+    if path.name in ["Cargo.toml", "Cargo.lock", "elrond.json"]:
+        return True
+    return False
+
+
+def create_packaged_project(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
+    package = PackagedProject.create_from_folder(input_directory)
+    package_path = output_directory / f"{contract_name}-{contract_version}.source.json"
+    package.save_to_package(package_path)
 
 
 class ErrKnown(Exception):
