@@ -9,7 +9,7 @@ from typing import List
 from build_contract_rust import builder
 from build_contract_rust.constants import HARDCODED_UNWRAP_DIRECTORY
 from build_contract_rust.errors import ErrKnown
-from build_contract_rust.packaged_project import PackagedSourceCode
+from build_contract_rust.packaged_source_code import PackagedSourceCode
 
 
 def main(cli_args: List[str]):
@@ -42,7 +42,8 @@ def main(cli_args: List[str]):
         packaged = PackagedSourceCode.from_file(packaged_src_path)
         packaged.unwrap_to_folder(HARDCODED_UNWRAP_DIRECTORY)
 
-    builder.build_project(project_path, parent_output_directory, specific_contract, cargo_target_dir, no_wasm_opt)
+    outcome = builder.build_project(project_path, parent_output_directory, specific_contract, cargo_target_dir, no_wasm_opt)
+    outcome.save_to_file(parent_output_directory / "artifacts.json")
 
     end_time = time.time()
     time_elapsed = end_time - start_time
