@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[project]
+name = "build_contract_rust"
+version = "0.1.0"
+authors = [
+  { name="MultiversX" },
+]
+description = "build_contract_rust"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[tool.hatch.build]
+exclude = [
+  "testdata/**"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/ElrondNetwork/elrond-sdk-images-build-contract-rust"
