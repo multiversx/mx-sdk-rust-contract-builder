@@ -25,8 +25,12 @@ def build_project(
         parent_output_directory: Path,
         specific_contract: Union[Path, None],
         cargo_target_dir: Path,
-        no_wasm_opt: bool):
-    artifacts_accumulator = ArtifactsAccumulator()
+        no_wasm_opt: bool) -> BuildOutcome:
+    project_path = project_path.resolve()
+    parent_output_directory = parent_output_directory.resolve()
+    cargo_target_dir = cargo_target_dir.resolve()
+
+    outcome = BuildOutcome()
     contracts_directories = get_contracts_directories(project_path)
 
     # We copy the whole project folder to the build path, to ensure that all local dependencies are available.
@@ -92,6 +96,10 @@ def build_contract(build_directory: Path, output_directory: Path, cargo_target_d
     meta_directory = build_directory / "meta"
     cargo_lock = build_directory / "wasm" / "Cargo.lock"
 
+    # Best-effort on passing CARGO_TARGET_DIR: both as environment variable and as meta-crate parameter.
+    env = os.environ.copy()
+    env["CARGO_TARGET_DIR"] = str(cargo_target_dir)
+
     args = ["cargo", "run", "build"]
     args.extend(["--target-dir", str(cargo_target_dir)])
     args.extend(["--no-wasm-opt"] if no_wasm_opt else [])
@@ -100,7 +108,7 @@ def build_contract(build_directory: Path, output_directory: Path, cargo_target_d
     args.extend(["--locked"] if cargo_lock.exists() else [])
 
     logging.info(f"Building: {args}")
-    return_code = subprocess.run(args, cwd=meta_directory).returncode
+    return_code = subprocess.run(args, cwd=meta_directory, env=env).returncode
     if return_code != 0:
         exit(return_code)
 
