@@ -22,7 +22,7 @@ def main(cli_args: List[str]):
     # Providing this parameter
     #   (a) *might* (should, but it doesn't) speed up (subsequent) builds, but
     #   (b) *might* (with a *very low* probability) break build determinism.
-    # As of September 2022, both (a) and (b) are still open points.
+    # As of November 2022, both (a) and (b) are still open points.
     parser.add_argument("--cargo-target-dir", type=str)
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
 

@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 import os
@@ -8,31 +9,18 @@ import time
 from argparse import ArgumentParser
 from hashlib import blake2b
 from pathlib import Path
-from typing import Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple, Union
 from zipfile import ZIP_DEFLATED, ZipFile
 
 logger = logging.getLogger("build-within-docker")
 
 
-HARDCODED_BUILD_DIRECTORY = Path("/tmp/elrond-contract-rust")
+HARDCODED_BUILD_DIRECTORY = Path("/tmp/contract")
+HARDCODED_UNWRAP_DIRECTORY = Path("/tmp/unwrapped")
 ONE_KB_IN_BYTES = 1024
 MAX_SOURCE_CODE_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 1024
 # The output archive contains not only the *.wasm, but also *.wat, *.abi.json files etc.
 MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE = ONE_KB_IN_BYTES * 1024
-
-
-class BuildContext:
-    def __init__(self,
-                 contract_name: str,
-                 build_directory: Path,
-                 output_directory: Path,
-                 no_wasm_opt: bool,
-                 cargo_target_dir: str) -> None:
-        self.contract_name = contract_name
-        self.build_directory = build_directory
-        self.output_directory = output_directory
-        self.no_wasm_opt = no_wasm_opt
-        self.cargo_target_dir = cargo_target_dir
 
 
 class BuildArtifactsAccumulator:
@@ -48,7 +36,8 @@ class BuildArtifactsAccumulator:
         self.add_artifact(contract_name, "abi", find_file_in_folder(output_subdirectory, "*.abi.json").name)
         self.add_artifact(contract_name, "imports", find_file_in_folder(output_subdirectory, "*.imports.json").name)
         self.add_artifact(contract_name, "codehash", code_hash)
-        self.add_artifact(contract_name, "src", find_file_in_folder(output_subdirectory, "*-src-*.zip").name)
+        self.add_artifact(contract_name, "srcPackage", find_file_in_folder(output_subdirectory, "*.source.json").name)
+        self.add_artifact(contract_name, "srcArchive", find_file_in_folder(output_subdirectory, "*-src-*.zip").name)
         self.add_artifact(contract_name, "output", find_file_in_folder(output_subdirectory, "*-output-*.zip").name)
 
     def add_artifact(self, contract_name: str, kind: str, value: str):
@@ -62,6 +51,90 @@ class BuildArtifactsAccumulator:
             json.dump(self.contracts, f, indent=4)
 
 
+class PackagedProjectEntry:
+    def __init__(self, path: Path, content: bytes) -> None:
+        self.path = path
+        self.content = content
+
+    @classmethod
+    def from_dict(cls, dict: Dict[str, Any]) -> 'PackagedProjectEntry':
+        path = Path(dict.get("path", ""))
+        content = base64.b64decode(dict.get("content", ""))
+        return PackagedProjectEntry(path, content)
+
+    def to_dict(self) -> Dict[str, Any]:
+        data = {
+            "path": str(self.path),
+            "content": base64.b64encode(self.content).decode()
+        }
+
+        return data
+
+
+class PackagedProject:
+    def __init__(self, name: str, version: str, entries: List[PackagedProjectEntry]) -> None:
+        self.name = name
+        self.version = version
+        self.entries = entries
+
+    @classmethod
+    def from_file(cls, path: Path) -> 'PackagedProject':
+        with open(path, "r") as f:
+            data: Dict[str, Any] = json.load(f)
+
+        return PackagedProject.from_dict(data)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'PackagedProject':
+        name = data.get("name", "untitled")
+        version = data.get("version", "0.0.0")
+        entries_raw: List[Dict[str, Any]] = data.get("entries", [])
+        entries = [PackagedProjectEntry.from_dict(entry) for entry in entries_raw]
+        return PackagedProject(name, version, entries)
+
+    @classmethod
+    def from_folder(cls, folder: Path) -> 'PackagedProject':
+        entries = cls._create_entries_from_folder(folder)
+        name, version = get_contract_name_and_version(folder)
+        return PackagedProject(name, version, entries)
+
+    @classmethod
+    def _create_entries_from_folder(cls, folder: Path) -> List[PackagedProjectEntry]:
+        files = get_files_recursively(folder, is_source_code_file)
+        entries: List[PackagedProjectEntry] = []
+
+        for full_path in files:
+            with open(full_path, "rb") as f:
+                content = f.read()
+
+            relative_path = full_path.relative_to(folder)
+            entries.append(PackagedProjectEntry(relative_path, content))
+
+        return entries
+
+    def unwrap_to_folder(self, folder: Path):
+        for entry in self.entries:
+            full_path = folder / entry.path
+            full_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(full_path, "wb") as f:
+                f.write(entry.content)
+
+    def save_to_file(self, path: Path):
+        data = self.to_dict()
+
+        with open(path, "w") as f:
+            json.dump(data, f, indent=4)
+
+    def to_dict(self) -> Dict[str, Any]:
+        entries = [entry.to_dict() for entry in self.entries]
+
+        return {
+            "name": self.name,
+            "version": self.version,
+            "entries": entries
+        }
+
+
 def main(cli_args: List[str]):
     logging.basicConfig(level=logging.DEBUG)
 
@@ -70,15 +143,28 @@ def main(cli_args: List[str]):
     artifacts_accumulator = BuildArtifactsAccumulator()
 
     parser = ArgumentParser()
-    parser.add_argument("--project", type=str, required=True, help="source code directory")
+    parser.add_argument("--project", type=str, required=False, help="source code directory")
+    parser.add_argument("--packaged-project", type=str, required=False, help="source code packaged in a JSON file")
     parser.add_argument("--contract", type=str, required=False, help="contract to build from within the source code directory; should be relative to the project path")
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
     parser.add_argument("--cargo-target-dir", type=str, required=True, help="Cargo's target-dir")
 
     parsed_args = parser.parse_args(cli_args)
-    project_path = Path(parsed_args.project).expanduser()
+    project_path = Path(parsed_args.project).expanduser() if parsed_args.project else None
+    packaged_project_path = Path(parsed_args.packaged_project).expanduser() if parsed_args.packaged_project else None
     parent_output_directory = Path(parsed_args.output)
+    cargo_target_dir = parsed_args.cargo_target_dir
+    no_wasm_opt = parsed_args.no_wasm_opt
+
+    if not project_path:
+        if not packaged_project_path:
+            raise ErrKnown("One of the following must be provided: --project, --packaged-project")
+
+        # We have to unwrap a packaged project (JSON)
+        project_path = HARDCODED_UNWRAP_DIRECTORY
+        packaged = PackagedProject.from_file(packaged_project_path)
+        packaged.unwrap_to_folder(HARDCODED_UNWRAP_DIRECTORY)
 
     contracts_directories = get_contracts_directories(project_path)
 
@@ -99,17 +185,9 @@ def main(cli_args: List[str]):
             logger.info(f"Skipping {contract_name}.")
             continue
 
-        context = BuildContext(
-            contract_name=contract_name,
-            build_directory=build_directory,
-            output_directory=output_subdirectory,
-            no_wasm_opt=parsed_args.no_wasm_opt,
-            cargo_target_dir=parsed_args.cargo_target_dir
-        )
-
         # Clean directory - useful if it contains externally-generated build artifacts
         clean(build_directory)
-        build(context)
+        build(build_directory, output_subdirectory, cargo_target_dir, no_wasm_opt)
 
         # The archive will also include the "output" folder (useful for debugging)
         clean(build_directory, clean_output=False)
@@ -118,6 +196,7 @@ def main(cli_args: List[str]):
 
         # The archives are created after build, so that Cargo.lock files are included, as well (useful for debugging)
         create_archives(contract_name, contract_version, build_directory, output_subdirectory)
+        create_packaged_project(contract_name, contract_version, build_directory, output_subdirectory)
 
         artifacts_accumulator.gather_artifacts(contract_name, output_subdirectory)
 
@@ -165,14 +244,14 @@ def clean(directory: Path, clean_output: bool = True):
         shutil.rmtree(directory / "output", ignore_errors=True)
 
 
-def build(context: BuildContext):
-    cargo_output_directory = context.build_directory / "output"
-    meta_directory = context.build_directory / "meta"
-    cargo_lock = context.build_directory / "wasm" / "Cargo.lock"
+def build(build_directory: Path, output_directory: Path, cargo_target_dir: Path, no_wasm_opt: bool):
+    cargo_output_directory = build_directory / "output"
+    meta_directory = build_directory / "meta"
+    cargo_lock = build_directory / "wasm" / "Cargo.lock"
 
     args = ["cargo", "run", "build"]
-    args.extend(["--target-dir", context.cargo_target_dir])
-    args.extend(["--no-wasm-opt"] if context.no_wasm_opt else [])
+    args.extend(["--target-dir", str(cargo_target_dir)])
+    args.extend(["--no-wasm-opt"] if no_wasm_opt else [])
     # If the lock file is missing, or it needs to be updated, Cargo will exit with an error.
     # See: https://doc.rust-lang.org/cargo/commands/cargo-build.html
     args.extend(["--locked"] if cargo_lock.exists() else [])
@@ -186,7 +265,7 @@ def build(context: BuildContext):
     generate_wabt_artifacts(wasm_file)
     generate_code_hash_artifact(wasm_file)
 
-    shutil.copytree(cargo_output_directory, context.output_directory, dirs_exist_ok=True)
+    shutil.copytree(cargo_output_directory, output_directory, dirs_exist_ok=True)
 
 
 def promote_cargo_lock_to_contract_directory(build_directory: Path, contract_directory: Path):
@@ -249,7 +328,7 @@ def create_archives(contract_name: str, contract_version: str, input_directory: 
     source_code_archive_file = output_directory / f"{contract_name}-src-{contract_version}.zip"
     output_artifacts_archive_file = output_directory / f"{contract_name}-output-{contract_version}.zip"
 
-    archive_directory(source_code_archive_file, input_directory, should_include_in_source_code_archive)
+    archive_directory(source_code_archive_file, input_directory, is_source_code_file)
     archive_directory(output_artifacts_archive_file, input_directory / "output")
 
     size_of_source_code_archive = source_code_archive_file.stat().st_size
@@ -267,31 +346,47 @@ file = {path}, size = {size}, maximum size = {max_size}""")
 
 
 def archive_directory(archive_file: Path, directory: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
-    should_include_file = should_include_file or (lambda _: True)
+    files = get_files_recursively(directory, should_include_file)
 
     with ZipFile(archive_file, "w", ZIP_DEFLATED) as archive:
-        for root, _, files in os.walk(directory):
-            root_path = Path(root)
-            for file in files:
-                file_path = Path(file)
-                full_path = root_path / file_path
-
-                if file_path.is_dir():
-                    continue
-                if not should_include_file(file_path):
-                    continue
-
-                archive.write(full_path, full_path.relative_to(directory))
+        for full_path in files:
+            archive.write(full_path, full_path.relative_to(directory))
 
     logger.info(f"Created archive: file = {archive_file}, with size = {archive_file.stat().st_size} bytes")
 
 
-def should_include_in_source_code_archive(path: Path):
+def get_files_recursively(directory: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
+    should_include_file = should_include_file or (lambda _: True)
+    paths: List[Path] = []
+
+    for root, _, files in os.walk(directory):
+        root_path = Path(root)
+        for file in files:
+            file_path = Path(file)
+            full_path = root_path / file_path
+
+            if file_path.is_dir():
+                continue
+            if not should_include_file(file_path):
+                continue
+
+            paths.append(full_path)
+
+    return paths
+
+
+def is_source_code_file(path: Path):
     if path.suffix == ".rs":
         return True
     if path.name in ["Cargo.toml", "Cargo.lock", "elrond.json"]:
         return True
     return False
+
+
+def create_packaged_project(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
+    package = PackagedProject.from_folder(input_directory)
+    package_path = output_directory / f"{contract_name}-{contract_version}.source.json"
+    package.save_to_file(package_path)
 
 
 class ErrKnown(Exception):
