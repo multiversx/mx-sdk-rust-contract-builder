@@ -36,7 +36,8 @@ class BuildArtifactsAccumulator:
         self.add_artifact(contract_name, "abi", find_file_in_folder(output_subdirectory, "*.abi.json").name)
         self.add_artifact(contract_name, "imports", find_file_in_folder(output_subdirectory, "*.imports.json").name)
         self.add_artifact(contract_name, "codehash", code_hash)
-        self.add_artifact(contract_name, "src", find_file_in_folder(output_subdirectory, "*-src-*.zip").name)
+        self.add_artifact(contract_name, "srcPackage", find_file_in_folder(output_subdirectory, "*.source.json").name)
+        self.add_artifact(contract_name, "srcArchive", find_file_in_folder(output_subdirectory, "*-src-*.zip").name)
         self.add_artifact(contract_name, "output", find_file_in_folder(output_subdirectory, "*-output-*.zip").name)
 
     def add_artifact(self, contract_name: str, kind: str, value: str):
@@ -77,7 +78,7 @@ class PackagedProject:
         self.entries = entries
 
     @classmethod
-    def load_from_package(cls, path: Path) -> 'PackagedProject':
+    def from_file(cls, path: Path) -> 'PackagedProject':
         with open(path, "r") as f:
             data: Dict[str, Any] = json.load(f)
 
@@ -92,13 +93,13 @@ class PackagedProject:
         return PackagedProject(name, version, entries)
 
     @classmethod
-    def create_from_folder(cls, folder: Path) -> 'PackagedProject':
-        entries = cls.create_entries_from_folder(folder)
+    def from_folder(cls, folder: Path) -> 'PackagedProject':
+        entries = cls._create_entries_from_folder(folder)
         name, version = get_contract_name_and_version(folder)
         return PackagedProject(name, version, entries)
 
     @classmethod
-    def create_entries_from_folder(cls, folder: Path) -> List[PackagedProjectEntry]:
+    def _create_entries_from_folder(cls, folder: Path) -> List[PackagedProjectEntry]:
         files = get_files_recursively(folder, is_source_code_file)
         entries: List[PackagedProjectEntry] = []
 
@@ -118,7 +119,7 @@ class PackagedProject:
             with open(full_path, "wb") as f:
                 f.write(entry.content)
 
-    def save_to_package(self, path: Path):
+    def save_to_file(self, path: Path):
         data = self.to_dict()
 
         with open(path, "w") as f:
@@ -156,14 +157,13 @@ def main(cli_args: List[str]):
     cargo_target_dir = parsed_args.cargo_target_dir
     no_wasm_opt = parsed_args.no_wasm_opt
 
-    if not project_path and not packaged_project_path:
-        raise Exception("One of the following must be provided: --project, --packaged-project")
-
     if not project_path:
-        project_path = HARDCODED_UNWRAP_DIRECTORY
+        if not packaged_project_path:
+            raise ErrKnown("One of the following must be provided: --project, --packaged-project")
 
-    if packaged_project_path:
-        packaged = PackagedProject.load_from_package(packaged_project_path)
+        # We have to unwrap a packaged project (JSON)
+        project_path = HARDCODED_UNWRAP_DIRECTORY
+        packaged = PackagedProject.from_file(packaged_project_path)
         packaged.unwrap_to_folder(HARDCODED_UNWRAP_DIRECTORY)
 
     contracts_directories = get_contracts_directories(project_path)
@@ -384,9 +384,9 @@ def is_source_code_file(path: Path):
 
 
 def create_packaged_project(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
-    package = PackagedProject.create_from_folder(input_directory)
+    package = PackagedProject.from_folder(input_directory)
     package_path = output_directory / f"{contract_name}-{contract_version}.source.json"
-    package.save_to_package(package_path)
+    package.save_to_file(package_path)
 
 
 class ErrKnown(Exception):
