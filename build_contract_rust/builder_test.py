@@ -12,5 +12,5 @@ def test_build_project():
         no_wasm_opt=False
     )
 
-    assert outcome.get_version("adder") == "1.2.3"
-    assert outcome.get_codehash("adder") == "58c6e78f40bd6ccc30d8a01f952b34a13ebfdad796a2526678be17c5d7820174"
+    assert outcome.get_entry("adder").version == "1.2.3"
+    assert outcome.get_entry("adder").codehash == "58c6e78f40bd6ccc30d8a01f952b34a13ebfdad796a2526678be17c5d7820174"

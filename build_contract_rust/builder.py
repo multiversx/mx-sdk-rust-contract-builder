@@ -63,7 +63,7 @@ def build_project(
         create_archives(contract_name, contract_version, build_directory, output_subdirectory)
         create_packaged_project(contract_name, contract_version, build_directory, output_subdirectory)
 
-        outcome.gather_artifacts(contract_name, contract_version, output_subdirectory)
+        outcome.gather_artifacts(contract_name, build_directory, output_subdirectory)
 
     return outcome
 
