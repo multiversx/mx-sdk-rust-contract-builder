@@ -1,10 +1,10 @@
 [package]
-name = "adder-meta"
-version = "1.2.3"
+name = "empty-meta"
+version = "0.0.0"
 edition = "2018"
 publish = false
 
-[dependencies.adder]
+[dependencies.empty]
 path = ".."
 
 [dependencies.elrond-wasm-debug]
