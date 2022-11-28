@@ -25,11 +25,12 @@ COPY "build_contract_rust" "/build_contract_rust"
 ENV PATH="/rust/bin:${PATH}"
 ENV CARGO_HOME="/rust"
 ENV RUSTUP_HOME="/rust"
+ENV PYTHONPATH=/
 
 # Additional arguments (must be provided at "docker run"):
+# --project or --packaged-src
 # --no-wasm-opt (optional)
 ENTRYPOINT ["python", "/build_contract_rust/main.py", \
-    "--project", "/project", \
     "--output", "/output", \
     "--cargo-target-dir", "/rust/cargo-target-dir"]
 

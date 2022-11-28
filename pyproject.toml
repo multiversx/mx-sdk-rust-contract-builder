@@ -7,7 +7,7 @@ allow-direct-references = true
 
 [project]
 name = "build_contract_rust"
-version = "0.1.0"
+version = "4.0.0"
 authors = [
   { name="MultiversX" },
 ]

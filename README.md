@@ -2,7 +2,6 @@
 
 Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.elrond.com](https://docs.elrond.com/developers/reproducible-contract-builds/).
 
-
 ## Build the Docker image
 
 ```
@@ -26,6 +25,14 @@ python3 ./build_with_docker.py --image=build-contract-rust:experimental \
     --project=~/contracts/reproducible-contract-build-example \
     --output=~/contracts/output-from-docker \
     --cargo-target-dir=~/cargo-target-dir-docker
+```
+
+Building from a packaged source code:
+
+```
+python3 ./build_with_docker.py --image=build-contract-rust:experimental \
+    --packaged-src=~/contracts/example-0.0.0.source.json \
+    --output=~/contracts/output-from-docker
 ```
 
 ## Build contract using the Docker inner script

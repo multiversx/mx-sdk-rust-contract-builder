@@ -25,9 +25,9 @@ def build_project(
         specific_contract: Union[Path, None],
         cargo_target_dir: Path,
         no_wasm_opt: bool) -> BuildOutcome:
-    project_path = project_path.resolve()
-    parent_output_directory = parent_output_directory.resolve()
-    cargo_target_dir = cargo_target_dir.resolve()
+    project_path = project_path.expanduser().resolve()
+    parent_output_directory = parent_output_directory.expanduser().resolve()
+    cargo_target_dir = cargo_target_dir.expanduser().resolve()
 
     outcome = BuildOutcome()
     contracts_directories = get_contracts_directories(project_path)

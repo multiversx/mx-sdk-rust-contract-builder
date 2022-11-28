@@ -26,11 +26,11 @@ def main(cli_args: List[str]):
     parser.add_argument("--cargo-target-dir", type=str, required=True, help="Cargo's target-dir")
 
     parsed_args = parser.parse_args(cli_args)
-    project_path = Path(parsed_args.project).expanduser() if parsed_args.project else None
-    packaged_src_path = Path(parsed_args.packaged_src).expanduser() if parsed_args.packaged_src else None
+    project_path = Path(parsed_args.project).expanduser().resolve() if parsed_args.project else None
+    packaged_src_path = Path(parsed_args.packaged_src).expanduser().resolve() if parsed_args.packaged_src else None
     parent_output_directory = Path(parsed_args.output)
     specific_contract = parsed_args.contract
-    cargo_target_dir = parsed_args.cargo_target_dir
+    cargo_target_dir = Path(parsed_args.cargo_target_dir)
     no_wasm_opt = parsed_args.no_wasm_opt
 
     if not project_path:

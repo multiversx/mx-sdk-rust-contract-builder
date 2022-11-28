@@ -18,8 +18,18 @@ class BuildOutcome:
         return self.contracts[contract_name]
 
     def save_to_file(self, file: Path):
+        data = self.to_dict()
+
         with open(file, "w") as f:
-            json.dump(self.contracts, f, indent=4)
+            json.dump(data, f, indent=4)
+
+    def to_dict(self) -> Dict[str, Any]:
+        data: Dict[str, Any] = dict()
+
+        for key, value in self.contracts.items():
+            data[key] = value.to_dict()
+
+        return data
 
 
 class BuildOutcomeEntry:
