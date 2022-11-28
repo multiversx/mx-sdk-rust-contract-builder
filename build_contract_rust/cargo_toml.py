@@ -1,4 +1,5 @@
 
+import shutil
 from pathlib import Path
 from typing import Tuple
 
@@ -15,3 +16,9 @@ def get_contract_name_and_version(contract_directory: Path) -> Tuple[str, str]:
     name = line_with_name.split("=")[1].strip().strip('"')
     version = line_with_version.split("=")[1].strip().strip('"')
     return name, version
+
+
+def promote_cargo_lock_to_contract_directory(build_directory: Path, contract_directory: Path):
+    from_path = build_directory / "wasm" / "Cargo.lock"
+    to_path = contract_directory / "wasm" / "Cargo.lock"
+    shutil.copy(from_path, to_path)

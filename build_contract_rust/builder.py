@@ -6,9 +6,8 @@ from pathlib import Path
 from typing import List, Union
 
 from build_contract_rust.build_outcome import BuildOutcome
-from build_contract_rust.cargo_lock import \
-    promote_cargo_lock_to_contract_directory
-from build_contract_rust.cargo_toml import get_contract_name_and_version
+from build_contract_rust.cargo_toml import (
+    get_contract_name_and_version, promote_cargo_lock_to_contract_directory)
 from build_contract_rust.codehash import generate_code_hash_artifact
 from build_contract_rust.constants import (HARDCODED_BUILD_DIRECTORY,
                                            MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE,
@@ -61,7 +60,7 @@ def build_project(
 
         # The archives are created after build, so that Cargo.lock files are included (if previously missing).
         create_archives(contract_name, contract_version, build_directory, output_subdirectory)
-        create_packaged_project(contract_name, contract_version, build_directory, output_subdirectory)
+        create_packaged_source_code(contract_name, contract_version, build_directory, output_subdirectory)
 
         outcome.gather_artifacts(contract_name, build_directory, output_subdirectory)
 
@@ -140,7 +139,7 @@ def warn_file_too_large(path: Path, size: int, max_size: int):
 file = {path}, size = {size}, maximum size = {max_size}""")
 
 
-def create_packaged_project(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
+def create_packaged_source_code(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
     package = PackagedSourceCode.from_folder(input_directory)
     package_path = output_directory / f"{contract_name}-{contract_version}.source.json"
     package.save_to_file(package_path)
