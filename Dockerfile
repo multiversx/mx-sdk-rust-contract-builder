@@ -20,16 +20,17 @@ RUN wget -O rustup.sh https://sh.rustup.rs && \
     rm rustup.sh && \
     chmod -R 777 /rust
 
-COPY "./build_within_docker.py" "/build.py"
+COPY "build_contract_rust" "/build_contract_rust"
 
 ENV PATH="/rust/bin:${PATH}"
 ENV CARGO_HOME="/rust"
 ENV RUSTUP_HOME="/rust"
+ENV PYTHONPATH=/
 
 # Additional arguments (must be provided at "docker run"):
+# --project or --packaged-src
 # --no-wasm-opt (optional)
-ENTRYPOINT ["python", "./build.py", \
-    "--project", "/project", \
+ENTRYPOINT ["python", "/build_contract_rust/main.py", \
     "--output", "/output", \
     "--cargo-target-dir", "/rust/cargo-target-dir"]
 
