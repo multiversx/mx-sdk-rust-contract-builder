@@ -27,6 +27,14 @@ python3 ./build_with_docker.py --image=build-contract-rust:experimental \
     --cargo-target-dir=~/cargo-target-dir-docker
 ```
 
+Building from a packaged source code:
+
+```
+python3 ./build_with_docker.py --image=build-contract-rust:experimental \
+    --packaged-src=~/contracts/example-0.0.0.source.json \
+    --output=~/contracts/output-from-docker
+```
+
 ## Build contract using the Docker inner script
 
 This is useful for useful for testing, debugging and reviewing the script.
