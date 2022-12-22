@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 allow-direct-references = true
 
 [project]
-name = "mx-sdk-images-build-contract-rs"
+name = "mx-sdk-build-contract-rs"
 version = "4.0.0"
 authors = [
   { name="MultiversX" },
