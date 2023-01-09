@@ -1,6 +1,6 @@
-# elrond-sdk-images-build-contract-rust
+# mx-sdk-build-contract
 
-Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.elrond.com](https://docs.elrond.com/developers/reproducible-contract-builds/).
+Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.multiversx.com](https://docs.multiversx.com/developers/reproducible-contract-builds/).
 
 ## Build the Docker image
 

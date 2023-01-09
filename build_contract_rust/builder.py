@@ -68,7 +68,7 @@ def build_project(
 
 
 def get_contracts_directories(project_path: Path) -> List[Path]:
-    directories = [elrond_json.parent for elrond_json in project_path.glob("**/elrond.json")]
+    directories = [project_config_json.parent for project_config_json in project_path.glob("**/elrond.json")]
     return sorted(directories)
 
 
