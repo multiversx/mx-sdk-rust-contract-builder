@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from build_contract_rust import builder
+from multiversx_sdk_rust_contract_builder import builder
 
 
 def test_build_project():

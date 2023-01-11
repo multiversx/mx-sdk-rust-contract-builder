@@ -4,9 +4,12 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
-from build_contract_rust.cargo_toml import get_contract_name_and_version
-from build_contract_rust.filesystem import get_files_recursively
-from build_contract_rust.source_code import is_source_code_file
+from multiversx_sdk_rust_contract_builder.cargo_toml import \
+    get_contract_name_and_version
+from multiversx_sdk_rust_contract_builder.filesystem import \
+    get_files_recursively
+from multiversx_sdk_rust_contract_builder.source_code import \
+    is_source_code_file
 
 
 class PackagedSourceCodeEntry:

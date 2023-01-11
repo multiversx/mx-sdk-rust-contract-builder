@@ -5,7 +5,7 @@ Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.m
 ## Build the Docker image
 
 ```
-docker buildx build --no-cache . -t build-contract-rust:experimental -f ./Dockerfile
+docker buildx build --no-cache . -t sdk-rust-contract-builder:experimental -f ./Dockerfile
 ```
 
 ## Build contract using the wrapper
@@ -13,7 +13,7 @@ docker buildx build --no-cache . -t build-contract-rust:experimental -f ./Docker
 Without providing `cargo-target-dir`:
 
 ```
-python3 ./build_with_docker.py --image=build-contract-rust:experimental \
+python3 ./build_with_docker.py --image=sdk-rust-contract-builder:experimental \
     --project=~/contracts/reproducible-contract-build-example \
     --output=~/contracts/output-from-docker
 ```
@@ -21,7 +21,7 @@ python3 ./build_with_docker.py --image=build-contract-rust:experimental \
 With providing `cargo-target-dir`:
 
 ```
-python3 ./build_with_docker.py --image=build-contract-rust:experimental \
+python3 ./build_with_docker.py --image=sdk-rust-contract-builder:experimental \
     --project=~/contracts/reproducible-contract-build-example \
     --output=~/contracts/output-from-docker \
     --cargo-target-dir=~/cargo-target-dir-docker
@@ -30,7 +30,7 @@ python3 ./build_with_docker.py --image=build-contract-rust:experimental \
 Building from a packaged source code:
 
 ```
-python3 ./build_with_docker.py --image=build-contract-rust:experimental \
+python3 ./build_with_docker.py --image=sdk-rust-contract-builder:experimental \
     --packaged-src=~/contracts/example-0.0.0.source.json \
     --output=~/contracts/output-from-docker
 ```
@@ -43,9 +43,9 @@ This is useful for useful for testing, debugging and reviewing the script.
 export PROJECT=${HOME}/contracts/reproducible-contract-build-example
 export OUTPUT=${HOME}/contracts/output
 export CARGO_TARGET_DIR=${HOME}/cargo-target-dir
-export PATH=${HOME}/elrondsdk/vendor-rust/bin:${HOME}/elrondsdk/wabt/latest/bin:${PATH}
-export RUSTUP_HOME=${HOME}/elrondsdk/vendor-rust
-export CARGO_HOME=${HOME}/elrondsdk/vendor-rust
+export PATH=${HOME}/multiversx-sdk/vendor-rust/bin:${HOME}/multiversx-sdk/wabt/latest/bin:${PATH}
+export RUSTUP_HOME=${HOME}/multiversx-sdk/vendor-rust
+export CARGO_HOME=${HOME}/multiversx-sdk/vendor-rust
 ```
 
 Build a project:

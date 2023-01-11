@@ -3,8 +3,9 @@ import json
 from pathlib import Path
 from typing import Any, Dict
 
-from build_contract_rust.cargo_toml import get_contract_name_and_version
-from build_contract_rust.filesystem import find_file_in_folder
+from multiversx_sdk_rust_contract_builder.cargo_toml import \
+    get_contract_name_and_version
+from multiversx_sdk_rust_contract_builder.filesystem import find_file_in_folder
 
 
 class BuildOutcome:
