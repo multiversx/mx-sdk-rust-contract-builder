@@ -5,18 +5,21 @@ import subprocess
 from pathlib import Path
 from typing import List, Union
 
-from build_contract_rust.build_outcome import BuildOutcome
-from build_contract_rust.cargo_toml import (
+from multiversx_sdk_rust_contract_builder.build_outcome import BuildOutcome
+from multiversx_sdk_rust_contract_builder.cargo_toml import (
     get_contract_name_and_version, promote_cargo_lock_to_contract_directory)
-from build_contract_rust.codehash import generate_code_hash_artifact
-from build_contract_rust.constants import (HARDCODED_BUILD_DIRECTORY,
-                                           MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE,
-                                           MAX_SOURCE_CODE_ARCHIVE_SIZE)
-from build_contract_rust.filesystem import (archive_directory,
-                                            find_file_in_folder)
-from build_contract_rust.packaged_source_code import PackagedSourceCode
-from build_contract_rust.source_code import is_source_code_file
-from build_contract_rust.wabt import generate_wabt_artifacts
+from multiversx_sdk_rust_contract_builder.codehash import \
+    generate_code_hash_artifact
+from multiversx_sdk_rust_contract_builder.constants import (
+    HARDCODED_BUILD_DIRECTORY, MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE,
+    MAX_SOURCE_CODE_ARCHIVE_SIZE)
+from multiversx_sdk_rust_contract_builder.filesystem import (
+    archive_directory, find_file_in_folder)
+from multiversx_sdk_rust_contract_builder.packaged_source_code import \
+    PackagedSourceCode
+from multiversx_sdk_rust_contract_builder.source_code import \
+    is_source_code_file
+from multiversx_sdk_rust_contract_builder.wabt import generate_wabt_artifacts
 
 
 def build_project(

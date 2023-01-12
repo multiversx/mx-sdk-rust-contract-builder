@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Callable, List, Union
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from build_contract_rust.errors import ErrKnown
+from multiversx_sdk_rust_contract_builder.errors import ErrKnown
 
 
 def archive_directory(archive_file: Path, directory: Path, should_include_file: Union[Callable[[Path], bool], None] = None):

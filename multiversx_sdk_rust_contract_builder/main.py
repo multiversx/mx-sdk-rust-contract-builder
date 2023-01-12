@@ -6,10 +6,12 @@ from argparse import ArgumentParser
 from pathlib import Path
 from typing import List
 
-from build_contract_rust import builder
-from build_contract_rust.constants import HARDCODED_UNWRAP_DIRECTORY
-from build_contract_rust.errors import ErrKnown
-from build_contract_rust.packaged_source_code import PackagedSourceCode
+from multiversx_sdk_rust_contract_builder import builder
+from multiversx_sdk_rust_contract_builder.constants import \
+    HARDCODED_UNWRAP_DIRECTORY
+from multiversx_sdk_rust_contract_builder.errors import ErrKnown
+from multiversx_sdk_rust_contract_builder.packaged_source_code import \
+    PackagedSourceCode
 
 
 def main(cli_args: List[str]):

@@ -20,7 +20,7 @@ RUN wget -O rustup.sh https://sh.rustup.rs && \
     rm rustup.sh && \
     chmod -R 777 /rust
 
-COPY "build_contract_rust" "/build_contract_rust"
+COPY "multiversx_sdk_rust_contract_builder" "/multiversx_sdk_rust_contract_builder"
 
 ENV PATH="/rust/bin:${PATH}"
 ENV CARGO_HOME="/rust"
@@ -30,7 +30,7 @@ ENV PYTHONPATH=/
 # Additional arguments (must be provided at "docker run"):
 # --project or --packaged-src
 # --no-wasm-opt (optional)
-ENTRYPOINT ["python", "/build_contract_rust/main.py", \
+ENTRYPOINT ["python", "/multiversx_sdk_rust_contract_builder/main.py", \
     "--output", "/output", \
     "--cargo-target-dir", "/rust/cargo-target-dir"]
 
