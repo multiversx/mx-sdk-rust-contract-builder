@@ -1,4 +1,4 @@
-# mx-sdk-build-contract
+# mx-sdk-rust-contract-builder
 
 Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.multiversx.com](https://docs.multiversx.com/developers/reproducible-contract-builds/).
 
