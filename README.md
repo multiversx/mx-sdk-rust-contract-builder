@@ -1,4 +1,4 @@
-# mx-sdk-build-contract
+# mx-sdk-rust-contract-builder
 
 Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.multiversx.com](https://docs.multiversx.com/developers/reproducible-contract-builds/).
 
@@ -53,4 +53,15 @@ Build a project:
 ```
 python3 ./build_within_docker.py --project=${PROJECT} --output=${OUTPUT} \
     --cargo-target-dir=${CARGO_TARGET_DIR}
+```
+
+## Run tests
+
+```
+export CARGO_TARGET_DIR=${HOME}/cargo-target-dir
+export PATH=${HOME}/multiversx-sdk/vendor-rust/bin:${HOME}/multiversx-sdk/wabt/latest/bin:${PATH}
+export RUSTUP_HOME=${HOME}/multiversx-sdk/vendor-rust
+export CARGO_HOME=${HOME}/multiversx-sdk/vendor-rust
+
+pytest .
 ```
