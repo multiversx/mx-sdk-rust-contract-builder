@@ -4,8 +4,6 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
-from multiversx_sdk_rust_contract_builder.cargo_toml import \
-    get_contract_name_and_version
 from multiversx_sdk_rust_contract_builder.filesystem import \
     get_files_recursively
 from multiversx_sdk_rust_contract_builder.source_code import \
@@ -56,10 +54,9 @@ class PackagedSourceCode:
         return PackagedSourceCode(name, version, entries)
 
     @classmethod
-    def from_folder(cls, folder: Path) -> 'PackagedSourceCode':
+    def from_folder(cls, folder: Path, contract_name: str = "", contract_version: str = "") -> 'PackagedSourceCode':
         entries = cls._create_entries_from_folder(folder)
-        name, version = get_contract_name_and_version(folder)
-        return PackagedSourceCode(name, version, entries)
+        return PackagedSourceCode(contract_name, contract_version, entries)
 
     @classmethod
     def _create_entries_from_folder(cls, folder: Path) -> List[PackagedSourceCodeEntry]:

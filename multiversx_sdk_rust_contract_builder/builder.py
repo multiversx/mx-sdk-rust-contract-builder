@@ -63,7 +63,7 @@ def build_project(
 
         # The archives are created after build, so that Cargo.lock files are included (if previously missing).
         create_archives(contract_name, contract_version, build_directory, output_subdirectory)
-        create_packaged_source_code(contract_name, contract_version, build_directory, output_subdirectory)
+        create_packaged_source_code(contract_name, contract_version, project_path, output_subdirectory)
 
         outcome.gather_artifacts(contract_name, build_directory, output_subdirectory)
 
@@ -143,6 +143,6 @@ file = {path}, size = {size}, maximum size = {max_size}""")
 
 
 def create_packaged_source_code(contract_name: str, contract_version: str, input_directory: Path, output_directory: Path):
-    package = PackagedSourceCode.from_folder(input_directory)
+    package = PackagedSourceCode.from_folder(input_directory, contract_name, contract_version)
     package_path = output_directory / f"{contract_name}-{contract_version}.source.json"
     package.save_to_file(package_path)
