@@ -3,7 +3,7 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
-from typing import List, Union
+from typing import List, Optional
 
 from multiversx_sdk_rust_contract_builder.build_outcome import BuildOutcome
 from multiversx_sdk_rust_contract_builder.cargo_toml import (
@@ -25,7 +25,7 @@ from multiversx_sdk_rust_contract_builder.wabt import generate_wabt_artifacts
 def build_project(
         project_path: Path,
         parent_output_directory: Path,
-        specific_contract: Union[Path, None],
+        specific_contract: Optional[str],
         cargo_target_dir: Path,
         no_wasm_opt: bool) -> BuildOutcome:
     project_path = project_path.expanduser().resolve()
@@ -42,15 +42,15 @@ def build_project(
         contract_name, contract_version = get_contract_name_and_version(contract_directory)
         logging.info(f"Contract = {contract_name}, version = {contract_version}")
 
+        if specific_contract and contract_name != specific_contract:
+            logging.info(f"Skipping {contract_name}.")
+            continue
+
         output_subdirectory = parent_output_directory / f"{contract_name}"
         output_subdirectory.mkdir(parents=True, exist_ok=True)
 
         relative_contract_directory = contract_directory.relative_to(project_path)
         build_directory = project_within_build_directory / relative_contract_directory
-
-        if specific_contract and contract_name != specific_contract:
-            logging.info(f"Skipping {contract_name}.")
-            continue
 
         # Clean directory - useful if it contains externally-generated build artifacts
         clean_contract(build_directory)
