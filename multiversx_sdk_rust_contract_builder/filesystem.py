@@ -29,7 +29,7 @@ def get_files_recursively(directory: Path, should_include_file: Union[Callable[[
 
             if file_path.is_dir():
                 continue
-            if not should_include_file(file_path):
+            if not should_include_file(full_path):
                 continue
 
             paths.append(full_path)
