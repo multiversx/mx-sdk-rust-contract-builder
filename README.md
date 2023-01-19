@@ -58,7 +58,6 @@ python3 ./build_within_docker.py --project=${PROJECT} --output=${OUTPUT} \
 ## Run tests
 
 ```
-export CARGO_TARGET_DIR=${HOME}/cargo-target-dir
 export PATH=${HOME}/multiversx-sdk/vendor-rust/bin:${HOME}/multiversx-sdk/wabt/latest/bin:${PATH}
 export RUSTUP_HOME=${HOME}/multiversx-sdk/vendor-rust
 export CARGO_HOME=${HOME}/multiversx-sdk/vendor-rust
