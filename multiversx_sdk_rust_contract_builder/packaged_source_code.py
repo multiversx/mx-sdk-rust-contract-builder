@@ -51,6 +51,8 @@ class PackagedSourceCode:
         version = data.get("version", "0.0.0")
         entries_raw: List[Dict[str, Any]] = data.get("entries", [])
         entries = [PackagedSourceCodeEntry.from_dict(entry) for entry in entries_raw]
+        _sort_entries(entries)
+
         return PackagedSourceCode(name, version, entries)
 
     @classmethod
@@ -71,6 +73,7 @@ class PackagedSourceCode:
             relative_path = full_path.relative_to(folder)
             entries.append(PackagedSourceCodeEntry(relative_path, content))
 
+        _sort_entries(entries)
         return entries
 
     def unwrap_to_folder(self, folder: Path):
@@ -94,3 +97,8 @@ class PackagedSourceCode:
             "version": self.version,
             "entries": entries
         }
+
+
+def _sort_entries(entries: List[PackagedSourceCodeEntry]) -> List[PackagedSourceCodeEntry]:
+    entries.sort(key=lambda entry: entry.path)
+    return entries
