@@ -21,7 +21,7 @@ def test_build_project_adder():
     assert outcome.get_entry("adder").version == "1.2.3"
     assert outcome.get_entry("adder").codehash == "58c6e78f40bd6ccc30d8a01f952b34a13ebfdad796a2526678be17c5d7820174"
     assert_equal_src_package(actual_src_package, expected_src_package)
-    assert actual_wat == read_text_file(Path("./testdata/expected/adder.wat"))
+    assert actual_wat == Path("./testdata/expected/adder.wat").read_text()
 
 
 def test_build_project_empty():
@@ -40,7 +40,7 @@ def test_build_project_empty():
     assert outcome.get_entry("empty").version == "4.5.6"
     assert outcome.get_entry("empty").codehash == "20df405fa1733a22748c888f6c1571f2c12cc40a8b1de800e0fd105674b426a5"
     assert_equal_src_package(actual_src_package, expected_src_package)
-    assert actual_wat == read_text_file(Path("./testdata/expected/empty.wat"))
+    assert actual_wat == Path("./testdata/expected/empty.wat").read_text()
 
 
 def assert_equal_src_package(actual: PackagedSourceCode, expected: PackagedSourceCode):
@@ -50,8 +50,3 @@ def assert_equal_src_package(actual: PackagedSourceCode, expected: PackagedSourc
     for actual_entry, expected_entry in zip(actual.entries, expected.entries):
         assert actual_entry.path == expected_entry.path, f"actual={actual_entry.path}, expected={expected_entry.path}"
         assert actual_entry.content == expected_entry.content, f"content differs for {actual_entry.path}"
-
-
-def read_text_file(path: Path) -> str:
-    with open(path, "r") as f:
-        return f.read()

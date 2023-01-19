@@ -132,4 +132,5 @@ dmypy.json
 typings/**
 
 # Test data
+testdata/input/extracted
 testdata/**/output
