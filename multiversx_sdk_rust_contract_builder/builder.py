@@ -12,7 +12,8 @@ from multiversx_sdk_rust_contract_builder.codehash import \
     generate_code_hash_artifact
 from multiversx_sdk_rust_contract_builder.constants import (
     HARDCODED_BUILD_DIRECTORY, MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE,
-    MAX_SOURCE_CODE_ARCHIVE_SIZE)
+    MAX_SOURCE_CODE_ARCHIVE_SIZE, OLD_PROJECT_CONFIG_FILENAME,
+    PROJECT_CONFIG_FILENAME)
 from multiversx_sdk_rust_contract_builder.filesystem import (
     archive_directory, find_file_in_folder)
 from multiversx_sdk_rust_contract_builder.packaged_source_code import \
@@ -71,7 +72,10 @@ def build_project(
 
 
 def get_contracts_directories(project_path: Path) -> List[Path]:
-    directories = [project_config_json.parent for project_config_json in project_path.glob("**/elrond.json")]
+    old_markers = list(project_path.glob(f"**/{OLD_PROJECT_CONFIG_FILENAME}"))
+    new_markers = list(project_path.glob(f"**/{PROJECT_CONFIG_FILENAME}"))
+    marker_files = old_markers + new_markers
+    directories = [marker_file.parent for marker_file in marker_files]
     return sorted(directories)
 
 
