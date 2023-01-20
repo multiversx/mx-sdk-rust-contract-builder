@@ -11,8 +11,9 @@ from multiversx_sdk_rust_contract_builder.cargo_toml import (
 from multiversx_sdk_rust_contract_builder.codehash import \
     generate_code_hash_artifact
 from multiversx_sdk_rust_contract_builder.constants import (
-    HARDCODED_BUILD_FOLDER, MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE,
-    OLD_PROJECT_CONFIG_FILENAME, PROJECT_CONFIG_FILENAME)
+    CONTRACT_CONFIG_FILENAME, HARDCODED_BUILD_FOLDER,
+    MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE, MAX_PACKAGED_SOURCE_CODE_SIZE,
+    OLD_CONTRACT_CONFIG_FILENAME)
 from multiversx_sdk_rust_contract_builder.filesystem import (
     archive_folder, find_file_in_folder)
 from multiversx_sdk_rust_contract_builder.packaged_source_code import \
@@ -62,7 +63,7 @@ def build_project(
 
         # The archives are created after build, so that Cargo.lock files are included (if previously missing).
         create_archives(contract_name, contract_version, build_folder, output_subfolder)
-        create_packaged_source_code(project_folder, contract_name, contract_version, build_folder, output_subfolder)
+        create_packaged_source_code(project_within_build_folder, contract_name, contract_version, build_folder, output_subfolder)
 
         outcome.gather_artifacts(contract_name, build_folder, output_subfolder)
 
@@ -70,8 +71,8 @@ def build_project(
 
 
 def get_contracts_folders(project_path: Path) -> List[Path]:
-    old_markers = list(project_path.glob(f"**/{OLD_PROJECT_CONFIG_FILENAME}"))
-    new_markers = list(project_path.glob(f"**/{PROJECT_CONFIG_FILENAME}"))
+    old_markers = list(project_path.glob(f"**/{OLD_CONTRACT_CONFIG_FILENAME}"))
+    new_markers = list(project_path.glob(f"**/{CONTRACT_CONFIG_FILENAME}"))
     marker_files = old_markers + new_markers
     folders = [marker_file.parent for marker_file in marker_files]
     return sorted(folders)
@@ -133,12 +134,16 @@ def create_archives(contract_name: str, contract_version: str, input_folder: Pat
         warn_file_too_large(output_artifacts_archive_file, size_of_output_artifacts_archive, MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE)
 
 
-def warn_file_too_large(path: Path, size: int, max_size: int):
-    logging.warning(f"""File is too large (this might cause issues with using downstream applications, such as the contract build verification services): 
-file = {path}, size = {size}, maximum size = {max_size}""")
-
-
 def create_packaged_source_code(parent_project_folder: Path, contract_name: str, contract_version: str, contract_folder: Path, output_folder: Path):
     package = PackagedSourceCode.from_filesystem(parent_project_folder, contract_folder)
     package_path = output_folder / f"{contract_name}-{contract_version}.source.json"
     package.save_to_file(package_path)
+
+    size_of_file = package_path.stat().st_size
+    if size_of_file > MAX_PACKAGED_SOURCE_CODE_SIZE:
+        warn_file_too_large(package_path, size_of_file, MAX_PACKAGED_SOURCE_CODE_SIZE)
+
+
+def warn_file_too_large(path: Path, size: int, max_size: int):
+    logging.warning(f"""File is too large (this might cause issues with using downstream applications, such as the contract build verification services): 
+file = {path}, size = {size}, maximum size = {max_size}""")

@@ -19,21 +19,8 @@ def archive_folder(archive_file: Path, folder: Path, should_include_file: Union[
 
 def get_files_recursively(folder: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
     should_include_file = should_include_file or (lambda _: True)
-    paths: List[Path] = []
-
-    for root, _, files in os.walk(folder):
-        root_path = Path(root)
-        for file in files:
-            file_path = Path(file)
-            full_path = root_path / file_path
-
-            if file_path.is_dir():
-                continue
-            if not should_include_file(full_path):
-                continue
-
-            paths.append(full_path)
-
+    paths = list(folder.rglob("*"))
+    paths = [path for path in paths if path.is_file() and should_include_file(path)]
     return paths
 
 
