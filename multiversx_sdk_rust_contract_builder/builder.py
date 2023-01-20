@@ -28,12 +28,13 @@ def build_project(
         parent_output_directory: Path,
         specific_contract: Optional[str],
         cargo_target_dir: Path,
-        no_wasm_opt: bool) -> BuildOutcome:
+        no_wasm_opt: bool,
+        context: str) -> BuildOutcome:
     project_path = project_path.expanduser().resolve()
     parent_output_directory = parent_output_directory.expanduser().resolve()
     cargo_target_dir = cargo_target_dir.expanduser().resolve()
 
-    outcome = BuildOutcome()
+    outcome = BuildOutcome(context)
     contracts_directories = get_contracts_directories(project_path)
 
     # We copy the whole project folder to the build path, to ensure that all local dependencies are available.

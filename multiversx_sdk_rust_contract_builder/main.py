@@ -26,6 +26,7 @@ def main(cli_args: List[str]):
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
     parser.add_argument("--cargo-target-dir", type=str, required=True, help="Cargo's target-dir")
+    parser.add_argument("--context", type=str, required=False, default="unknown", help="the context of the build (e.g. a Docker image identifier))")
 
     parsed_args = parser.parse_args(cli_args)
     project_path = Path(parsed_args.project).expanduser().resolve() if parsed_args.project else None
@@ -34,6 +35,7 @@ def main(cli_args: List[str]):
     specific_contract = parsed_args.contract
     cargo_target_dir = Path(parsed_args.cargo_target_dir)
     no_wasm_opt = parsed_args.no_wasm_opt
+    context = parsed_args.context
 
     if not project_path:
         if not packaged_src_path:
@@ -44,7 +46,15 @@ def main(cli_args: List[str]):
         packaged = PackagedSourceCode.from_file(packaged_src_path)
         packaged.unwrap_to_folder(HARDCODED_UNWRAP_DIRECTORY)
 
-    outcome = builder.build_project(project_path, parent_output_directory, specific_contract, cargo_target_dir, no_wasm_opt)
+    outcome = builder.build_project(
+        project_path,
+        parent_output_directory,
+        specific_contract,
+        cargo_target_dir,
+        no_wasm_opt,
+        context
+    )
+
     outcome.save_to_file(parent_output_directory / "artifacts.json")
 
     end_time = time.time()

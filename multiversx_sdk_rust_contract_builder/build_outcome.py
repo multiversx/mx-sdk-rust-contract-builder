@@ -9,7 +9,8 @@ from multiversx_sdk_rust_contract_builder.filesystem import find_file_in_folder
 
 
 class BuildOutcome:
-    def __init__(self):
+    def __init__(self, context: str):
+        self.context = context
         self.contracts: Dict[str, BuildOutcomeEntry] = dict()
 
     def gather_artifacts(self, contract_name: str, build_directory: Path, output_subdirectory: Path):
@@ -25,7 +26,7 @@ class BuildOutcome:
             json.dump(data, f, indent=4)
 
     def to_dict(self) -> Dict[str, Any]:
-        data: Dict[str, Any] = dict()
+        data: Dict[str, Any] = {"context": self.context}
 
         for key, value in self.contracts.items():
             data[key] = value.to_dict()
