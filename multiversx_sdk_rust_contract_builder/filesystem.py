@@ -7,21 +7,21 @@ from zipfile import ZIP_DEFLATED, ZipFile
 from multiversx_sdk_rust_contract_builder.errors import ErrKnown
 
 
-def archive_directory(archive_file: Path, directory: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
-    files = get_files_recursively(directory, should_include_file)
+def archive_folder(archive_file: Path, folder: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
+    files = get_files_recursively(folder, should_include_file)
 
     with ZipFile(archive_file, "w", ZIP_DEFLATED) as archive:
         for full_path in files:
-            archive.write(full_path, full_path.relative_to(directory))
+            archive.write(full_path, full_path.relative_to(folder))
 
     logging.info(f"Created archive: file = {archive_file}, with size = {archive_file.stat().st_size} bytes")
 
 
-def get_files_recursively(directory: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
+def get_files_recursively(folder: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
     should_include_file = should_include_file or (lambda _: True)
     paths: List[Path] = []
 
-    for root, _, files in os.walk(directory):
+    for root, _, files in os.walk(folder):
         root_path = Path(root)
         for file in files:
             file_path = Path(file)

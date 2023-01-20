@@ -13,8 +13,8 @@ class BuildOutcome:
         self.context = context
         self.contracts: Dict[str, BuildOutcomeEntry] = dict()
 
-    def gather_artifacts(self, contract_name: str, build_directory: Path, output_subdirectory: Path):
-        self.contracts[contract_name] = BuildOutcomeEntry.from_directories(build_directory, output_subdirectory)
+    def gather_artifacts(self, contract_name: str, build_folder: Path, output_subfolder: Path):
+        self.contracts[contract_name] = BuildOutcomeEntry.from_folders(build_folder, output_subfolder)
 
     def get_entry(self, contract_name: str) -> 'BuildOutcomeEntry':
         return self.contracts[contract_name]
@@ -42,14 +42,14 @@ class BuildOutcomeEntry:
         self.artifacts = BunchOfBuildArtifacts()
 
     @classmethod
-    def from_directories(cls, build_directory: Path, output_directory: Path) -> 'BuildOutcomeEntry':
+    def from_folders(cls, build_folder: Path, output_folder: Path) -> 'BuildOutcomeEntry':
         entry = BuildOutcomeEntry()
-        _, entry.version = get_contract_name_and_version(build_directory)
+        _, entry.version = get_contract_name_and_version(build_folder)
 
-        with open(find_file_in_folder(output_directory, "*.codehash.txt")) as file:
+        with open(find_file_in_folder(output_folder, "*.codehash.txt")) as file:
             entry.codehash = file.read()
 
-        entry.artifacts = BunchOfBuildArtifacts.from_output_directory(output_directory)
+        entry.artifacts = BunchOfBuildArtifacts.from_output_folder(output_folder)
         return entry
 
     def to_dict(self) -> Dict[str, Any]:
@@ -72,15 +72,15 @@ class BunchOfBuildArtifacts:
         self.output_archive = BuildArtifact(Path(""))
 
     @classmethod
-    def from_output_directory(cls, output_directory: Path) -> 'BunchOfBuildArtifacts':
+    def from_output_folder(cls, output_folder: Path) -> 'BunchOfBuildArtifacts':
         artifacts = BunchOfBuildArtifacts()
-        artifacts.bytecode = BuildArtifact.find_in_output("*.wasm", output_directory)
-        artifacts.text = BuildArtifact.find_in_output("*.wat", output_directory)
-        artifacts.abi = BuildArtifact.find_in_output("*.abi.json", output_directory)
-        artifacts.imports = BuildArtifact.find_in_output("*.imports.json", output_directory)
-        artifacts.src_package = BuildArtifact.find_in_output("*.source.json", output_directory)
-        artifacts.src_archive = BuildArtifact.find_in_output("*-src-*.zip", output_directory)
-        artifacts.src_archive = BuildArtifact.find_in_output("*-output-*.zip", output_directory)
+        artifacts.bytecode = BuildArtifact.find_in_output("*.wasm", output_folder)
+        artifacts.text = BuildArtifact.find_in_output("*.wat", output_folder)
+        artifacts.abi = BuildArtifact.find_in_output("*.abi.json", output_folder)
+        artifacts.imports = BuildArtifact.find_in_output("*.imports.json", output_folder)
+        artifacts.src_package = BuildArtifact.find_in_output("*.source.json", output_folder)
+        artifacts.src_archive = BuildArtifact.find_in_output("*-src-*.zip", output_folder)
+        artifacts.src_archive = BuildArtifact.find_in_output("*-output-*.zip", output_folder)
 
         return artifacts
 
@@ -101,8 +101,8 @@ class BuildArtifact:
         self.path = path
 
     @classmethod
-    def find_in_output(cls, name_pattern: str, output_directory: Path) -> 'BuildArtifact':
-        path = find_file_in_folder(output_directory, name_pattern)
+    def find_in_output(cls, name_pattern: str, output_folder: Path) -> 'BuildArtifact':
+        path = find_file_in_folder(output_folder, name_pattern)
         return BuildArtifact(path)
 
     def read(self) -> bytes:
