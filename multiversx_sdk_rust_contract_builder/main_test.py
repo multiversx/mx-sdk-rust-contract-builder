@@ -4,16 +4,19 @@ from pathlib import Path
 
 from multiversx_sdk_rust_contract_builder.main import main
 
+archives_folder = Path("./testdata/input/archives")
+extracted_folder = Path("./testdata/input/extracted")
+
 
 def test_build_using_project_and_packaged_src():
-    project_path = Path("./testdata/input/extracted/mx-exchange-sc")
-    archive_path = Path("./testdata/input/archives/mx-exchange-sc-2.1.4-locked-token-wrapper.zip")
+    project_path = extracted_folder / "mx-exchange-sc-2.1.4-locked-token-wrapper"
+    archive_path = archives_folder / "mx-exchange-sc-2.1.4-locked-token-wrapper.zip"
     cargo_target_dir = Path("/tmp/cargo-target-dir")
     output_using_project = Path("./testdata/output/using-project")
     output_using_packaged_src = Path("./testdata/output/using-packaged-src")
 
     shutil.rmtree(project_path, ignore_errors=True)
-    shutil.unpack_archive(archive_path, project_path)
+    shutil.unpack_archive(archive_path, extracted_folder)
 
     contracts = ["pair", "farm", "router"]
 
