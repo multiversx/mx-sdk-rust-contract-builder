@@ -1,5 +1,7 @@
 
 import json
+import logging
+import subprocess
 from pathlib import Path
 from typing import List
 
@@ -18,18 +20,19 @@ def is_source_code_file(path: Path) -> bool:
     return False
 
 
-def get_local_dependencies_wildcards(contract_folder: Path) -> List[str]:
-    new_config_file = contract_folder / CONTRACT_CONFIG_FILENAME
-    old_config_file = contract_folder / OLD_CONTRACT_CONFIG_FILENAME
+def get_local_dependencies(contract_folder: Path, contract_name: str) -> List[Path]:
+    logging.info(f"get_local_dependencies({contract_folder})")
 
-    if new_config_file.exists():
-        config_file = new_config_file
-    elif old_config_file.exists():
-        config_file = old_config_file
-    else:
-        raise ErrKnown(f"Could not find contract config file in {contract_folder}")
+    args = ["cargo", "metadata", "--format-version=1"]
+    metadata_json = subprocess.check_output(args, cwd=contract_folder, shell=False, universal_newlines=True)
+    metadata = json.loads(metadata_json)
+    packages = metadata.get("packages", [])
 
-    config_content = config_file.read_text()
-    config = json.loads(config_content)
-    wildcards = config.get("localDependencies", [])
-    return wildcards
+    contract_package = next((package for package in packages if package["name"] == contract_name), None)
+    if not contract_package:
+        raise ErrKnown(f"Could not find contract {contract_name} in project metadata.")
+
+    project_dependencies = contract_package.get("dependencies", [])
+    local_dependencies = [depedency for depedency in project_dependencies if "path" in depedency]
+    paths = [Path(dependency["path"]) for dependency in local_dependencies]
+    return paths

@@ -1,6 +1,0 @@
-{
-    "localDependencies": [
-        "shared/**/*",
-        "bar/**/*"
-    ]
-}

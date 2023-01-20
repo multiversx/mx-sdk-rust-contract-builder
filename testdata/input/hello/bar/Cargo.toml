@@ -1,9 +1,0 @@
-[package]
-name = "bar"
-version = "1.2.3"
-authors = ["you"]
-edition = "2018"
-publish = false
-
-[lib]
-path = "main.rs"

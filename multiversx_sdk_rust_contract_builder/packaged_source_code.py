@@ -9,7 +9,7 @@ from multiversx_sdk_rust_contract_builder.cargo_toml import \
 from multiversx_sdk_rust_contract_builder.filesystem import \
     get_files_recursively
 from multiversx_sdk_rust_contract_builder.source_code import (
-    get_local_dependencies_wildcards, is_source_code_file)
+    get_local_dependencies, is_source_code_file)
 
 
 class PackagedSourceCodeEntry:
@@ -58,18 +58,18 @@ class PackagedSourceCode:
     @classmethod
     def from_filesystem(cls, project_folder: Path, contract_folder: Path) -> 'PackagedSourceCode':
         name, version = get_contract_name_and_version(contract_folder)
-        entries = cls._create_entries_from_filesystem(project_folder, contract_folder)
+        entries = cls._create_entries_from_filesystem(project_folder, contract_folder, name)
         return PackagedSourceCode(name, version, entries)
 
     @classmethod
-    def _create_entries_from_filesystem(cls, project_folder: Path, contract_folder: Path) -> List[PackagedSourceCodeEntry]:
+    def _create_entries_from_filesystem(cls, project_folder: Path, contract_folder: Path, contract_name: str) -> List[PackagedSourceCodeEntry]:
         source_files: List[Path] = []
 
         source_files.extend(get_files_recursively(contract_folder, "*", is_source_code_file))
-        local_dependencies_wildcards = get_local_dependencies_wildcards(contract_folder)
+        local_dependencies = get_local_dependencies(contract_folder, contract_name)
 
-        for wildcard in local_dependencies_wildcards:
-            source_files.extend(get_files_recursively(project_folder, wildcard, is_source_code_file))
+        for dependency in local_dependencies:
+            source_files.extend(get_files_recursively(dependency, "*", is_source_code_file))
 
         entries: List[PackagedSourceCodeEntry] = []
 
