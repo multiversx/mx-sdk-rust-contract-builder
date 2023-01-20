@@ -1,7 +1,9 @@
-name: Build & publish
+name: Build & publish image
 
 on:
   workflow_dispatch:
+  release:
+    types: [published]
 
 jobs:
   push_to_registry:
