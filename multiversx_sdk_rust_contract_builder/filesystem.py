@@ -8,7 +8,7 @@ from multiversx_sdk_rust_contract_builder.errors import ErrKnown
 
 
 def archive_folder(archive_file: Path, folder: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
-    files = get_files_recursively(folder, should_include_file)
+    files = get_files_recursively(folder, "*", should_include_file)
 
     with ZipFile(archive_file, "w", ZIP_DEFLATED) as archive:
         for full_path in files:
@@ -17,9 +17,9 @@ def archive_folder(archive_file: Path, folder: Path, should_include_file: Union[
     logging.info(f"Created archive: file = {archive_file}, with size = {archive_file.stat().st_size} bytes")
 
 
-def get_files_recursively(folder: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
+def get_files_recursively(folder: Path, wildcard: str = "*", should_include_file: Union[Callable[[Path], bool], None] = None):
     should_include_file = should_include_file or (lambda _: True)
-    paths = list(folder.rglob("*"))
+    paths = list(folder.rglob(wildcard))
     paths = [path for path in paths if path.is_file() and should_include_file(path)]
     return paths
 

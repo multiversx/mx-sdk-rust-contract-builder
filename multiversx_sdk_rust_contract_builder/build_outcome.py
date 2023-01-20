@@ -68,7 +68,6 @@ class BunchOfBuildArtifacts:
         self.abi = BuildArtifact(Path(""))
         self.imports = BuildArtifact(Path(""))
         self.src_package = BuildArtifact(Path(""))
-        self.src_archive = BuildArtifact(Path(""))
         self.output_archive = BuildArtifact(Path(""))
 
     @classmethod
@@ -79,8 +78,6 @@ class BunchOfBuildArtifacts:
         artifacts.abi = BuildArtifact.find_in_output("*.abi.json", output_folder)
         artifacts.imports = BuildArtifact.find_in_output("*.imports.json", output_folder)
         artifacts.src_package = BuildArtifact.find_in_output("*.source.json", output_folder)
-        artifacts.src_archive = BuildArtifact.find_in_output("*-src-*.zip", output_folder)
-        artifacts.src_archive = BuildArtifact.find_in_output("*-output-*.zip", output_folder)
 
         return artifacts
 
@@ -91,7 +88,6 @@ class BunchOfBuildArtifacts:
             "abi": self.abi.path.name,
             "imports": self.imports.path.name,
             "srcPackage": self.src_package.path.name,
-            "srcArchive": self.src_archive.path.name,
             "outputArchive": self.output_archive.path.name
         }
 

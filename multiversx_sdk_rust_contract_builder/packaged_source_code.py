@@ -8,8 +8,8 @@ from multiversx_sdk_rust_contract_builder.cargo_toml import \
     get_contract_name_and_version
 from multiversx_sdk_rust_contract_builder.filesystem import \
     get_files_recursively
-from multiversx_sdk_rust_contract_builder.source_code import \
-    is_source_code_file
+from multiversx_sdk_rust_contract_builder.source_code import (
+    get_local_dependencies_wildcards, is_source_code_file)
 
 
 class PackagedSourceCodeEntry:
@@ -63,13 +63,18 @@ class PackagedSourceCode:
 
     @classmethod
     def _create_entries_from_filesystem(cls, project_folder: Path, contract_folder: Path) -> List[PackagedSourceCodeEntry]:
-        files = get_files_recursively(contract_folder, is_source_code_file)
+        source_files: List[Path] = []
+
+        source_files.extend(get_files_recursively(contract_folder, "*", is_source_code_file))
+        local_dependencies_wildcards = get_local_dependencies_wildcards(contract_folder)
+
+        for wildcard in local_dependencies_wildcards:
+            source_files.extend(get_files_recursively(project_folder, wildcard, is_source_code_file))
+
         entries: List[PackagedSourceCodeEntry] = []
 
-        for full_path in files:
-            with open(full_path, "rb") as f:
-                content = f.read()
-
+        for full_path in source_files:
+            content = full_path.read_bytes()
             relative_path = full_path.relative_to(project_folder)
             entries.append(PackagedSourceCodeEntry(relative_path, content))
 
