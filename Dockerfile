@@ -5,7 +5,7 @@ ARG VERSION_RUST="nightly-2022-12-08"
 ARG VERSION_BINARYEN="105-1"
 ARG VERSION_WABT="1.0.27-1"
 # Normally, this should be "multiversx/sdk-rust-contract-builder:{{pyproject.toml:project:version}}"
-ARG CONTEXT="multiversx/sdk-rust-contract-builder:v5.0.0"
+ARG CONTEXT="multiversx/sdk-rust-contract-builder:v5.0.0b0"
 
 # Install dependencies (including binaryen and wabt)
 RUN apt-get update && apt-get install -y \
@@ -27,6 +27,7 @@ COPY "multiversx_sdk_rust_contract_builder" "/multiversx_sdk_rust_contract_build
 ENV PATH="/rust/bin:${PATH}"
 ENV CARGO_HOME="/rust"
 ENV RUSTUP_HOME="/rust"
+ENV CONTEXT=${CONTEXT}
 ENV PYTHONPATH=/
 
 # Additional arguments (must be provided at "docker run"):
@@ -34,7 +35,7 @@ ENV PYTHONPATH=/
 # --no-wasm-opt (optional)
 ENTRYPOINT ["python", "/multiversx_sdk_rust_contract_builder/main.py", \
     "--output", "/output", \
-    "--cargo-target-dir", "/rust/cargo-target-dir", "--context", ${CONTEXT}]
+    "--cargo-target-dir", "/rust/cargo-target-dir"]
 
 LABEL frozen="yes"
 LABEL rust=${VERSION_RUST}

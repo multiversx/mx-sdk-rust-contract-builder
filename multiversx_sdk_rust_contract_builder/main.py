@@ -27,7 +27,7 @@ def main(cli_args: List[str]):
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
     parser.add_argument("--cargo-target-dir", type=str, required=True, help="Cargo's target-dir")
-    parser.add_argument("--context", type=str, required=False, default="unknown", help="the context of the build (e.g. a Docker image identifier))")
+    parser.add_argument("--context", type=str, required=False, default=os.environ.get("CONTEXT", "unknown"), help="the context of the build (e.g. a Docker image identifier))")
 
     parsed_args = parser.parse_args(cli_args)
     project_path = Path(parsed_args.project).expanduser().resolve() if parsed_args.project else None

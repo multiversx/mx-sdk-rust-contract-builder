@@ -7,7 +7,7 @@ allow-direct-references = true
 
 [project]
 name = "multiversx-sdk-rust-contract-builder"
-version = "5.0.0"
+version = "5.0.0b0"
 authors = [
   { name="MultiversX" },
 ]
