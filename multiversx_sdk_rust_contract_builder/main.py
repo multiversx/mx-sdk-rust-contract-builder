@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 import sys
 import time
 from argparse import ArgumentParser
@@ -43,6 +44,7 @@ def main(cli_args: List[str]):
 
         # We have to unwrap the packaged source code (JSON)
         project_path = HARDCODED_UNWRAP_FOLDER
+        shutil.rmtree(HARDCODED_UNWRAP_FOLDER, ignore_errors=True)
         packaged = PackagedSourceCode.from_file(packaged_src_path)
         packaged.unwrap_to_filesystem(HARDCODED_UNWRAP_FOLDER)
 
