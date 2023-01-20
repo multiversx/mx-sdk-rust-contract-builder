@@ -1,6 +1,6 @@
 {
     "localDependencies": [
-        "shared/**",
-        "bar/**"
+        "shared/**/*",
+        "bar/**/*"
     ]
 }
