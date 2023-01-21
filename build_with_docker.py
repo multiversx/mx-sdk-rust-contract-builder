@@ -75,7 +75,7 @@ def run_docker(
         docker_mount_args.extend(["--volume", f"{packaged_src_path}:/packaged-src.json"])
 
     if cargo_target_dir:
-        docker_mount_args += ["--volume", f"{cargo_target_dir}:/cargo-target-dir"]
+        docker_mount_args += ["--volume", f"{cargo_target_dir}:/rust/cargo-target-dir"]
 
     docker_args = ["docker", "run"]
 

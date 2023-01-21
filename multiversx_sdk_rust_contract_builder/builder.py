@@ -1,5 +1,4 @@
 import logging
-import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -14,6 +13,7 @@ from multiversx_sdk_rust_contract_builder.constants import (
     CONTRACT_CONFIG_FILENAME, HARDCODED_BUILD_FOLDER,
     MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE, MAX_PACKAGED_SOURCE_CODE_SIZE,
     OLD_CONTRACT_CONFIG_FILENAME)
+from multiversx_sdk_rust_contract_builder.errors import ErrKnown
 from multiversx_sdk_rust_contract_builder.filesystem import (
     archive_folder, find_file_in_folder)
 from multiversx_sdk_rust_contract_builder.packaged_source_code import \
@@ -101,10 +101,6 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
     meta_folder = build_folder / "meta"
     cargo_lock = build_folder / "wasm" / "Cargo.lock"
 
-    # Best-effort on passing CARGO_TARGET_DIR: both as environment variable and as meta-crate parameter.
-    env = os.environ.copy()
-    env["CARGO_TARGET_DIR"] = str(cargo_target_dir)
-
     args = ["cargo", "run", "build"]
     args.extend(["--target-dir", str(cargo_target_dir)])
     args.extend(["--no-wasm-opt"] if no_wasm_opt else [])
@@ -113,9 +109,9 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
     args.extend(["--locked"] if cargo_lock.exists() else [])
 
     logging.info(f"Building: {args}")
-    return_code = subprocess.run(args, cwd=meta_folder, env=env).returncode
+    return_code = subprocess.run(args, cwd=meta_folder).returncode
     if return_code != 0:
-        exit(return_code)
+        raise ErrKnown(f"Failed to build contract {build_folder}. Return code: {return_code}.")
 
     wasm_file = find_file_in_folder(cargo_output_folder, "*.wasm")
     generate_wabt_artifacts(wasm_file)

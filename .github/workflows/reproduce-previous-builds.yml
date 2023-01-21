@@ -1,4 +1,4 @@
-name: Build & test
+name: Reproduce previous builds
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build and test
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -18,4 +18,8 @@ jobs:
 
       - name: Build image
         run: |
-          docker buildx build --no-cache . -t builder:experimental -f ./Dockerfile
+          docker buildx build --no-cache . -t sdk-rust-contract-builder:next -f ./Dockerfile
+
+      - name: Build
+        run: |
+          python ./tests/reproduce_previous_builds.py

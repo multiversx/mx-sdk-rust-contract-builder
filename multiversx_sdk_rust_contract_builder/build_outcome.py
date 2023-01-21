@@ -45,10 +45,7 @@ class BuildOutcomeEntry:
     def from_folders(cls, build_folder: Path, output_folder: Path) -> 'BuildOutcomeEntry':
         entry = BuildOutcomeEntry()
         _, entry.version = get_contract_name_and_version(build_folder)
-
-        with open(find_file_in_folder(output_folder, "*.codehash.txt")) as file:
-            entry.codehash = file.read()
-
+        entry.codehash = find_file_in_folder(output_folder, "*.codehash.txt").read_text()
         entry.artifacts = BunchOfBuildArtifacts.from_output_folder(output_folder)
         return entry
 

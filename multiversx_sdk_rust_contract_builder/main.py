@@ -70,3 +70,4 @@ if __name__ == "__main__":
     except ErrKnown as err:
         print("An error occurred.")
         print(err)
+        exit(1)

@@ -5,7 +5,7 @@ Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.m
 ## Build the Docker image
 
 ```
-docker buildx build --no-cache . -t sdk-rust-contract-builder:experimental -f ./Dockerfile
+docker buildx build --no-cache . -t sdk-rust-contract-builder:next -f ./Dockerfile
 ```
 
 ## Build contract using the wrapper
@@ -13,7 +13,7 @@ docker buildx build --no-cache . -t sdk-rust-contract-builder:experimental -f ./
 Without providing `cargo-target-dir`:
 
 ```
-python3 ./build_with_docker.py --image=sdk-rust-contract-builder:experimental \
+python3 ./build_with_docker.py --image=sdk-rust-contract-builder:next \
     --project=~/contracts/reproducible-contract-build-example \
     --output=~/contracts/output-from-docker
 ```
@@ -21,7 +21,7 @@ python3 ./build_with_docker.py --image=sdk-rust-contract-builder:experimental \
 With providing `cargo-target-dir`:
 
 ```
-python3 ./build_with_docker.py --image=sdk-rust-contract-builder:experimental \
+python3 ./build_with_docker.py --image=sdk-rust-contract-builder:next \
     --project=~/contracts/reproducible-contract-build-example \
     --output=~/contracts/output-from-docker \
     --cargo-target-dir=~/cargo-target-dir-docker
@@ -30,7 +30,7 @@ python3 ./build_with_docker.py --image=sdk-rust-contract-builder:experimental \
 Building from a packaged source code:
 
 ```
-python3 ./build_with_docker.py --image=sdk-rust-contract-builder:experimental \
+python3 ./build_with_docker.py --image=sdk-rust-contract-builder:next \
     --packaged-src=~/contracts/example-0.0.0.source.json \
     --output=~/contracts/output-from-docker
 ```
