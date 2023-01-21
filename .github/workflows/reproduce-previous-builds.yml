@@ -16,8 +16,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Build image
+        run: |
+          docker buildx build --output type=docker --no-cache . -t sdk-rust-contract-builder:next -f ./Dockerfile
+
       - name: Build
         run: |
-          docker buildx build --no-cache . -t sdk-rust-contract-builder:next -f ./Dockerfile
           python ./tests/reproduce_previous_builds.py
-          
