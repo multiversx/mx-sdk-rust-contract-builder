@@ -15,15 +15,15 @@ cargo_target_dir = Path("./testdata/output/cargo_target_dir").resolve()
 
 class PreviousBuild:
     def __init__(self, name: str,
-                 project_zip_url: Optional[str],
-                 project_path_adjustment: Optional[str],
+                 project_archive_url: Optional[str],
+                 project_relative_path_in_archive: Optional[str],
                  packaged_src_url: Optional[str],
                  contract_name: Optional[str],
                  expected_code_hashes: Dict[str, str],
                  docker_image: str) -> None:
         self.name = name
-        self.project_zip_url = project_zip_url
-        self.project_path_adjustment = project_path_adjustment
+        self.project_zip_url = project_archive_url
+        self.project_path_adjustment = project_relative_path_in_archive
         self.packaged_src_url = packaged_src_url
         self.contract_name = contract_name
         self.expected_code_hashs = expected_code_hashes
@@ -33,8 +33,8 @@ class PreviousBuild:
 builds: List[PreviousBuild] = [
     PreviousBuild(
         name="a.1",
-        project_zip_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.1.5.zip",
-        project_path_adjustment=None,
+        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.1.5.zip",
+        project_relative_path_in_archive=None,
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
@@ -44,8 +44,8 @@ builds: List[PreviousBuild] = [
     ),
     PreviousBuild(
         name="a.2",
-        project_zip_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.1.5.zip",
-        project_path_adjustment=None,
+        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.1.5.zip",
+        project_relative_path_in_archive=None,
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
@@ -55,8 +55,8 @@ builds: List[PreviousBuild] = [
     ),
     PreviousBuild(
         name="a.3",
-        project_zip_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.1.5.zip",
-        project_path_adjustment=None,
+        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.1.5.zip",
+        project_relative_path_in_archive=None,
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
@@ -66,8 +66,8 @@ builds: List[PreviousBuild] = [
     ),
     PreviousBuild(
         name="b.1",
-        project_zip_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/tags/v1.5.4-metabonding-unbond.zip",
-        project_path_adjustment="mx-exchange-sc-1.5.4-metabonding-unbond",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/tags/v1.5.4-metabonding-unbond.zip",
+        project_relative_path_in_archive="mx-exchange-sc-1.5.4-metabonding-unbond",
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
@@ -77,8 +77,8 @@ builds: List[PreviousBuild] = [
     ),
     PreviousBuild(
         name="b.2",
-        project_zip_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/tags/v1.5.4-metabonding-unbond.zip",
-        project_path_adjustment="mx-exchange-sc-1.5.4-metabonding-unbond",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/tags/v1.5.4-metabonding-unbond.zip",
+        project_relative_path_in_archive="mx-exchange-sc-1.5.4-metabonding-unbond",
         packaged_src_url=None,
         contract_name="metabonding-staking",
         expected_code_hashes={
@@ -88,8 +88,8 @@ builds: List[PreviousBuild] = [
     ),
     PreviousBuild(
         name="b.3",
-        project_zip_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/tags/v1.5.4-metabonding-unbond.zip",
-        project_path_adjustment="mx-exchange-sc-1.5.4-metabonding-unbond",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/tags/v1.5.4-metabonding-unbond.zip",
+        project_relative_path_in_archive="mx-exchange-sc-1.5.4-metabonding-unbond",
         packaged_src_url=None,
         contract_name="metabonding-staking",
         expected_code_hashes={
@@ -98,9 +98,9 @@ builds: List[PreviousBuild] = [
         docker_image="multiversx/sdk-rust-contract-builder:v3.2.3"
     ),
     PreviousBuild(
-        name="e.1",
-        project_zip_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.1.1-staking-upgrade.zip",
-        project_path_adjustment="mx-exchange-sc-reproducible-v2.1.1-staking-upgrade",
+        name="c.1",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.1.1-staking-upgrade.zip",
+        project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.1.1-staking-upgrade",
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
@@ -133,9 +133,9 @@ builds: List[PreviousBuild] = [
         docker_image="multiversx/sdk-rust-contract-builder:v3.1.0"
     ),
     PreviousBuild(
-        name="e.2",
-        project_zip_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.0-rc6.zip",
-        project_path_adjustment="mx-exchange-sc-reproducible-v2.0-rc6",
+        name="c.2",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.0-rc6.zip",
+        project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.0-rc6",
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
@@ -168,9 +168,44 @@ builds: List[PreviousBuild] = [
         docker_image="multiversx/sdk-rust-contract-builder:v3.1.0"
     ),
     PreviousBuild(
-        name="f.1",
-        project_zip_url="https://github.com/multiversx/mx-nft-marketplace-sc/archive/refs/heads/reproducible-v2.0.1.zip",
-        project_path_adjustment="mx-nft-marketplace-sc-reproducible-v2.0.1",
+        name="c.3",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.1.3-price-discovery-comp-upgrade.zip",
+        project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.1.3-price-discovery-comp-upgrade",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "distribution": "c8f6a78ca4007608905484952c88b680afe450203ca89a9e176ff36472eb4e3c",
+            "energy-factory": "1d444aaae54ab41c04ecf6147cfba16b03e5841382d69c65decb5fbd3bef6b25",
+            "energy-factory-mock": "a55835cd6992f0c02331ee1b8a21b3163c0efc1a8c1c3fdb1b5e34944a358d66",
+            "energy-update": "5ecde1bde66e1ccc10ac4bf8dcabfabf0d314ecaac51c72c3a19037256557885",
+            "factory": "3bcee411030c9426500178f1e92b3a1d7c31a7ed2bbb29ab05d15a4eaac3a955",
+            "farm": "4029cd4df87f2be4b7d1ed96161c9c3ab6fa44c090a574de4e6f1926ff302ea0",
+            "farm-staking": "89833609549b085f258b8fac6272014d874918883cf5643b071fb097993cdf03",
+            "farm-staking-proxy": "afe66cd648e293a98939af01a6b75180f0545ac3049ef26dfd6cfcdc7fcea51c",
+            "farm-with-locked-rewards": "c1dcd37f29dbc5a810ef1893c07cd3d7af765cb5d7b0c7ac92f5a601df73e033",
+            "fees-collector": "44a90c28bf35386cd533d22046243e02dc38cec00db948ef0c85392779c20593",
+            "governance": "956d520e05e97327ce2b8d05872a758c0e88ddce15a298b3fb8b7e0cf4a5ef1c",
+            "governance-v2": "995add2c509c29f4a8f875019f46831a0f5702fa21ea7a69e6fdad19bb6fda04",
+            "lkmex-transfer": "1c776af3ec771aba18c1cb2bb567a583ed179d91c8765bfbdc2dd4ddcca65790",
+            "locked-token-wrapper": "086a9baf3d89a54c2fccd066e36872d75406ac30ff1ed7c5ac9aae3a98b83284",
+            "metabonding-staking": "c2c5bbed7f35767315c574dedbabdfbd5f18bf6cd2a561e3df08fc46637ef1a8",
+            "pair": "c5c373155de76e6dfa040386947459d8cbdb4e7cc28d3dfe907922032a05e626",
+            "pair-mock": "7a631dbc9e2ba07932c21d923292234110859d2ce5335851f0265aeaa37b7687",
+            "pause-all": "2ad8aa911555b41e397541eb46cd1a7fa87186146f8c2b295e3916303833f3cd",
+            "price-discovery": "96b51ec9df3eb7a8e72f297aac2c8e4e609e39ac5a5f6d861c0819d010b87fde",
+            "proxy-deployer": "17e225e07b2ec759c86d70f6b61342f603135ac399b36bc48acab89f0bcfa483",
+            "proxy_dex": "3cac5e915b9c8f8dfa711b1f4b1cf213380660cbd0afe3695cc73d4989abe301",
+            "router": "5383bf12ad1ff9134782bd9aa9638bd16260ae7800434d01f853117e3db15c42",
+            "simple-lock": "4f2747e6952b0e0aaa275e57dbd87afe63b1caf353ba25ff002b1a85185f3927",
+            "simple-lock-whitelist": "3bc3cecbee78958e65efdaa077974d95d743d962254788d9280839362dc4da8b",
+            "token-unstake": "2b0f59073bd697d75ec2009a3bf3c350b74ff9b10d6a7bfe1e13f653732ddb1a",
+        },
+        docker_image="multiversx/sdk-rust-contract-builder:v3.1.0"
+    ),
+    PreviousBuild(
+        name="d.1",
+        project_archive_url="https://github.com/multiversx/mx-nft-marketplace-sc/archive/refs/heads/reproducible-v2.0.1.zip",
+        project_relative_path_in_archive="mx-nft-marketplace-sc-reproducible-v2.0.1",
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
@@ -191,7 +226,12 @@ def main(cli_args: List[str]):
     extracted_folder.mkdir(parents=True, exist_ok=True)
     cargo_target_dir.mkdir(parents=True, exist_ok=True)
 
+    selected_builds = ["a.1", "a.2", "a.3", "b.1", "b.2", "b.3", "c.1", "c.2", "c.3", "d.1"]
+
     for build in builds:
+        if not build.name in selected_builds:
+            continue
+
         print("Reproducing build", build.name, "...")
 
         project_path, packaged_src_path = fetch_source_code(build)
