@@ -2,8 +2,6 @@ name: Reproduce previous builds
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
@@ -22,4 +20,4 @@ jobs:
 
       - name: Build
         run: |
-          python ./tests/reproduce_previous_builds.py
+          python ./integration_tests/reproduce_previous_builds.py
