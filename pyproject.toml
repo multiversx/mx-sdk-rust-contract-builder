@@ -23,7 +23,9 @@ classifiers = [
 
 [tool.hatch.build]
 exclude = [
-  "testdata/**"
+  "tests/**",
+  "testdata/**",
+  "support/**"
 ]
 
 [project.urls]
