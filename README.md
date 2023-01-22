@@ -4,27 +4,40 @@ Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.m
 
 ## Build the Docker image
 
+We use `docker buildx` to build the image:
+
 ```
 docker buildx build --no-cache . -t sdk-rust-contract-builder:next -f ./Dockerfile
 ```
 
+Maintainers can publish the image as follows:
+
+```
+docker buildx create --name multiarch --use
+
+docker buildx build --no-cache --push --platform=linux/amd64,linux/arm64 . -t multiversx/sdk-rust-contract-builder:next -f ./Dockerfile
+
+docker buildx rm multiarch
+```
+
+For the above to work properly, make sure to install `tonistiigi/binfmt` beforehand. Please follow the official Docker documentation [here](https://docs.docker.com/build/building/multi-platform/).
+
+Though, note that currently (January 2023) we recommend against using the `linux/arm64` image for performing reproducible contract builds. This is because, in some (possibly rare) circumstances, a WASM binary generated on the `linux/amd64` image _might_ differ (at the bytecode level) from one generated on the `linux/arm64` image - probably due to distinct (unfortunate) bytecode-emitting logic in the Rust compiler.
+
 ## Build contract using the wrapper
 
-Without providing `cargo-target-dir`:
+If you are using a Mac with ARM64, we _recommend_ setting this variable beforehand (contract builds will be slower, but this eliminates the risk of not being able to reproduce the build on Linux):
+
+```
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
+```
+
+Building from a project folder:
 
 ```
 python3 ./build_with_docker.py --image=sdk-rust-contract-builder:next \
-    --project=~/contracts/reproducible-contract-build-example \
+    --project=~/contracts/example \
     --output=~/contracts/output-from-docker
-```
-
-With providing `cargo-target-dir`:
-
-```
-python3 ./build_with_docker.py --image=sdk-rust-contract-builder:next \
-    --project=~/contracts/reproducible-contract-build-example \
-    --output=~/contracts/output-from-docker \
-    --cargo-target-dir=~/cargo-target-dir-docker
 ```
 
 Building from a packaged source code:
@@ -35,27 +48,7 @@ python3 ./build_with_docker.py --image=sdk-rust-contract-builder:next \
     --output=~/contracts/output-from-docker
 ```
 
-## Build contract using the Docker inner script
-
-This is useful for useful for testing, debugging and reviewing the script.
-
-```
-export PROJECT=${HOME}/contracts/reproducible-contract-build-example
-export OUTPUT=${HOME}/contracts/output
-export CARGO_TARGET_DIR=${HOME}/cargo-target-dir
-export PATH=${HOME}/multiversx-sdk/vendor-rust/bin:${HOME}/multiversx-sdk/wabt/latest/bin:${PATH}
-export RUSTUP_HOME=${HOME}/multiversx-sdk/vendor-rust
-export CARGO_HOME=${HOME}/multiversx-sdk/vendor-rust
-```
-
-Build a project:
-
-```
-python3 ./build_within_docker.py --project=${PROJECT} --output=${OUTPUT} \
-    --cargo-target-dir=${CARGO_TARGET_DIR}
-```
-
-## Run tests
+## Run unit tests (without Docker)
 
 ```
 export PATH=${HOME}/multiversx-sdk/vendor-rust/bin:${HOME}/multiversx-sdk/wabt/latest/bin:${PATH}
@@ -63,4 +56,10 @@ export RUSTUP_HOME=${HOME}/multiversx-sdk/vendor-rust
 export CARGO_HOME=${HOME}/multiversx-sdk/vendor-rust
 
 pytest .
+```
+
+## Run integration tests (with Docker)
+
+```
+python3 ./tests/reproduce_previous_builds.py
 ```
