@@ -1,7 +1,9 @@
-name: Reproduce previous builds
+name: Regular integration tests
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
@@ -20,4 +22,4 @@ jobs:
 
       - name: Build
         run: |
-          python ./integration_tests/test_previous_builds_are_reproducible.py --selected-builds "a.1" "a.2" "a.3" "b.1" "b.2" "b.3" "c.1" "c.2" "c.3" "c.4" "c.5" "d.1" "e.1"
+          python ./integration_tests/test_project_folder_and_packaged_src_are_equivalent.py
