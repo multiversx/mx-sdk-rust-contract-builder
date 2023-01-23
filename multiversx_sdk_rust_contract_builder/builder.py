@@ -17,8 +17,10 @@ from multiversx_sdk_rust_contract_builder.errors import ErrKnown
 from multiversx_sdk_rust_contract_builder.filesystem import (
     archive_folder, find_file_in_folder)
 from multiversx_sdk_rust_contract_builder.packaged_source_code import \
-    PackagedSourceCode,
-from multiversx_sdk_rust_contract_builder.source_code import remove_dev_dependencies_sections_from_cargo_toml, replace_all_test_content_with_noop
+    PackagedSourceCode
+from multiversx_sdk_rust_contract_builder.source_code import (
+    remove_dev_dependencies_sections_from_cargo_toml,
+    replace_all_test_content_with_noop)
 from multiversx_sdk_rust_contract_builder.wabt import generate_wabt_artifacts
 
 
