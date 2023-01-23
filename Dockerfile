@@ -1,12 +1,11 @@
 FROM ubuntu:22.04
 
 # Constants
-# TODO: change this back after tests
 ARG VERSION_RUST="nightly-2022-10-16"
 ARG VERSION_BINARYEN="105-1"
 ARG VERSION_WABT="1.0.27-1"
 # Normally, this should be "multiversx/sdk-rust-contract-builder:{{pyproject.toml:project:version}}"
-ARG CONTEXT="multiversx/sdk-rust-contract-builder:v4.5.0"
+ARG CONTEXT="multiversx/sdk-rust-contract-builder:v4.1.0"
 
 # Install dependencies (including binaryen and wabt)
 RUN apt-get update && apt-get install -y \
