@@ -21,27 +21,30 @@ def is_source_code_file(path: Path) -> bool:
 
 
 def get_local_dependencies(contract_folder: Path, contract_name: str) -> List[Path]:
-    logging.info(f"get_local_dependencies({contract_folder})")
-
     args = ["cargo", "metadata", "--format-version=1"]
+    logging.info(f"get_local_dependencies(), running: {args} in folder {contract_folder}")
     metadata_json = subprocess.check_output(args, cwd=contract_folder, shell=False, universal_newlines=True)
     metadata = json.loads(metadata_json)
-    paths = _get_local_dependencies_recursively(metadata, contract_name, [])
+
+    paths = _get_local_dependencies_recursively(metadata, contract_name, [], 0)
 
     # Remove duplicates
     paths = list(set(paths))
     return paths
 
 
-def _get_local_dependencies_recursively(cargo_metadata: Dict[str, Any], package_name: str, visited: List[str]) -> List[Path]:
+def _get_local_dependencies_recursively(cargo_metadata: Dict[str, Any], package_name: str, visited: List[str], indentation: int) -> List[Path]:
     if package_name in visited or _is_mock_package(package_name):
         return []
+
+    logging.debug(f"{indentation * 4 * ' '} _get_local_dependencies_recursively({package_name})")
 
     visited.append(package_name)
 
     packages = cargo_metadata.get("packages", [])
     package = next((package for package in packages if package["name"] == package_name), None)
     if not package:
+        print(json.dumps(cargo_metadata))
         raise ErrKnown(f"Could not find package {package_name} in project metadata.")
 
     dependencies = package.get("dependencies", [])
@@ -49,7 +52,7 @@ def _get_local_dependencies_recursively(cargo_metadata: Dict[str, Any], package_
     paths = [Path(dependency["path"]) for dependency in local_dependencies]
 
     for dependency in local_dependencies:
-        paths += _get_local_dependencies_recursively(cargo_metadata, dependency["name"], visited)
+        paths += _get_local_dependencies_recursively(cargo_metadata, dependency["name"], visited, indentation + 1)
 
     return paths
 

@@ -63,6 +63,8 @@ def build_project(
 
         # The archives are created after build, so that Cargo.lock files are included (if previously missing).
         create_archives(contract_name, contract_version, build_folder, output_subfolder)
+
+        # TODO: actually, create this before, then remove all files that are not needed.
         create_packaged_source_code(project_within_build_folder, contract_name, contract_version, build_folder, output_subfolder)
 
         outcome.gather_artifacts(contract_name, build_folder, output_subfolder)

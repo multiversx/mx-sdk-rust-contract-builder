@@ -1,6 +1,7 @@
 
 import base64
 import json
+import logging
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -67,6 +68,11 @@ class PackagedSourceCode:
 
         source_files.extend(get_all_files(contract_folder, is_source_code_file))
         local_dependencies = get_local_dependencies(contract_folder, contract_name)
+
+        logging.info(f"Found {len(local_dependencies)} local dependencies.")
+
+        for dependency in local_dependencies:
+            logging.debug(f"Local dependency: {dependency}")
 
         for dependency in local_dependencies:
             source_files.extend(get_all_files(dependency, is_source_code_file))

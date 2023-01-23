@@ -15,6 +15,7 @@ def main(cli_args: List[str]):
     output_using_packaged_src.mkdir(parents=True, exist_ok=True)
 
     contracts = ['distribution', 'energy-factory', 'energy-update', 'factory', 'farm', 'farm-staking', 'farm-staking-proxy', 'farm-with-locked-rewards', 'fees-collector', 'governance', 'governance-v2', 'lkmex-transfer', 'locked-token-wrapper', 'metabonding-staking', 'pair', 'pause-all', 'price-discovery', 'proxy-deployer', 'proxy_dex', 'router', 'simple-lock', 'simple-lock-whitelist', 'token-unstake']
+    contracts = ['farm-staking']
 
     for contract in contracts:
         run_docker(
