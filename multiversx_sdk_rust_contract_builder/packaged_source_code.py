@@ -7,7 +7,7 @@ from typing import Any, Dict, List
 from multiversx_sdk_rust_contract_builder.cargo_toml import \
     get_contract_name_and_version
 from multiversx_sdk_rust_contract_builder.filesystem import \
-    get_files_recursively
+    get_all_files
 from multiversx_sdk_rust_contract_builder.source_code import (
     get_local_dependencies, is_source_code_file)
 
@@ -65,11 +65,11 @@ class PackagedSourceCode:
     def _create_entries_from_filesystem(cls, project_folder: Path, contract_folder: Path, contract_name: str) -> List[PackagedSourceCodeEntry]:
         source_files: List[Path] = []
 
-        source_files.extend(get_files_recursively(contract_folder, "*", is_source_code_file))
+        source_files.extend(get_all_files(contract_folder, is_source_code_file))
         local_dependencies = get_local_dependencies(contract_folder, contract_name)
 
         for dependency in local_dependencies:
-            source_files.extend(get_files_recursively(dependency, "*", is_source_code_file))
+            source_files.extend(get_all_files(dependency, is_source_code_file))
 
         entries: List[PackagedSourceCodeEntry] = []
 

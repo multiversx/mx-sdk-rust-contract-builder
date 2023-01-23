@@ -52,7 +52,7 @@ def build_project(
         relative_contract_folder = contract_folder.relative_to(project_folder)
         build_folder = project_within_build_folder / relative_contract_folder
 
-        # Clean folder - useful if it contains externally-generated build artifacts
+        # Clean folder - it may contain externally-generated build artifacts
         clean_contract(build_folder)
         build_contract(build_folder, output_subfolder, cargo_target_dir, no_wasm_opt)
 

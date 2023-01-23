@@ -22,4 +22,5 @@ jobs:
 
       - name: Build
         run: |
+          export PYTHONPATH=.
           python ./integration_tests/test_project_folder_and_packaged_src_are_equivalent.py

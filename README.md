@@ -26,7 +26,7 @@ Though, note that currently (January 2023) we recommend against using the `linux
 
 ## Build contract using the wrapper
 
-If you are using a Mac with ARM64, we _recommend_ setting this variable beforehand (contract builds will be slower, but this eliminates the risk of not being able to reproduce the build on Linux):
+If you are using a Mac with ARM64, we _recommend_ setting the following variable beforehand (contract builds will be slower, but this eliminates the risk of not being able to reproduce the build on Linux):
 
 ```
 export DOCKER_DEFAULT_PLATFORM=linux/amd64

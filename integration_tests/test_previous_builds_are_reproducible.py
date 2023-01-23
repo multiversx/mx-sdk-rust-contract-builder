@@ -62,7 +62,7 @@ def check_code_hashes(build: PreviousBuild, output_folder: Path):
         codehash = artifacts[contract_name]["codehash"]
         if codehash != expected_code_hash:
             raise Exception(f"{build.name}: codehash mismatch for contract {contract_name}! Expected {expected_code_hash}, got {codehash}")
-        print("OK, codehash matches!", codehash)
+        print("OK, codehashes match:", codehash)
 
 
 if __name__ == "__main__":

@@ -27,6 +27,9 @@ def get_local_dependencies(contract_folder: Path, contract_name: str) -> List[Pa
     metadata_json = subprocess.check_output(args, cwd=contract_folder, shell=False, universal_newlines=True)
     metadata = json.loads(metadata_json)
     paths = _get_local_dependencies_recursively(metadata, contract_name, [])
+
+    # Remove duplicates
+    paths = list(set(paths))
     return paths
 
 
@@ -42,7 +45,7 @@ def _get_local_dependencies_recursively(cargo_metadata: Dict[str, Any], package_
         raise ErrKnown(f"Could not find package {package_name} in project metadata.")
 
     project_dependencies = package.get("dependencies", [])
-    local_dependencies = [depedency for depedency in project_dependencies if "path" in depedency]
+    local_dependencies = [dependency for dependency in project_dependencies if "path" in dependency]
     paths = [Path(dependency["path"]) for dependency in local_dependencies]
 
     for dependency in local_dependencies:
