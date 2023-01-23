@@ -11,11 +11,13 @@ from integration_tests.config import DOWNLOADS_FOLDER, EXTRACTED_FOLDER, PARENT_
 
 
 def download_repository(zip_archive_url: str, name: str) -> Path:
-    downloaded_archive = DOWNLOADS_FOLDER / f"{name}.zip"
-    extracted_project = EXTRACTED_FOLDER / name
-    urllib.request.urlretrieve(zip_archive_url, downloaded_archive)
-    shutil.unpack_archive(downloaded_archive, extracted_project)
-    return extracted_project
+    download_to_path = DOWNLOADS_FOLDER / f"{name}.zip"
+    extract_to_path = EXTRACTED_FOLDER / name
+
+    urllib.request.urlretrieve(zip_archive_url, download_to_path)
+    shutil.rmtree(extract_to_path, ignore_errors=True)
+    shutil.unpack_archive(download_to_path, extract_to_path)
+    return extract_to_path
 
 
 def run_docker(
@@ -53,4 +55,6 @@ def run_docker(
 
     args = docker_args + entrypoint_args
     result = subprocess.run(args)
-    return result.returncode
+    returncode = result.returncode
+    if returncode != 0:
+        raise Exception(f"Docker exited with return code {returncode}.")

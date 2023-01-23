@@ -62,4 +62,5 @@ pytest .
 
 ```
 python3 ./integration_tests/test_previous_builds_are_reproducible.py --selected-builds "a.1" [...]
+python3 ./integration_tests/test_project_folder_and_packaged_src_are_equivalent.py
 ```
