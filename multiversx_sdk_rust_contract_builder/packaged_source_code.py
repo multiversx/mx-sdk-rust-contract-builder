@@ -1,16 +1,13 @@
 
 import base64
 import json
-import logging
 from pathlib import Path
 from typing import Any, Dict, List
 
 from multiversx_sdk_rust_contract_builder.cargo_toml import \
     get_contract_name_and_version
-from multiversx_sdk_rust_contract_builder.filesystem import \
-    get_all_files
-from multiversx_sdk_rust_contract_builder.source_code import (
-    get_local_dependencies, is_source_code_file)
+from multiversx_sdk_rust_contract_builder.source_code import \
+    get_all_source_code_files
 
 
 class PackagedSourceCodeEntry:
@@ -64,19 +61,7 @@ class PackagedSourceCode:
 
     @classmethod
     def _create_entries_from_filesystem(cls, project_folder: Path, contract_folder: Path, contract_name: str) -> List[PackagedSourceCodeEntry]:
-        source_files: List[Path] = []
-
-        source_files.extend(get_all_files(contract_folder, is_source_code_file))
-        local_dependencies = get_local_dependencies(contract_folder, contract_name)
-
-        logging.info(f"Found {len(local_dependencies)} local dependencies.")
-
-        for dependency in local_dependencies:
-            logging.debug(f"Local dependency: {dependency}")
-
-        for dependency in local_dependencies:
-            source_files.extend(get_all_files(dependency, is_source_code_file))
-
+        source_files = get_all_source_code_files(project_folder)
         entries: List[PackagedSourceCodeEntry] = []
 
         for full_path in source_files:

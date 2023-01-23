@@ -224,7 +224,7 @@ previous_builds: List[PreviousBuild] = [
             "simple-lock-whitelist": "b8f14e78635ad3894cb78f7d24302d17ee2059b353d1017e4b84f3beef2abc1a",
             "token-unstake": "3059ffec6f44259b8f2be56b9e1c67c72342f93c0c6f4b5cadc24364f2ee95e7",
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v3.2.3"
+        docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
         name="c.5",

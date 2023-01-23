@@ -1,13 +1,12 @@
-import json
-import shutil
-import sys
-import urllib.request
 import os
+import shutil
 import subprocess
+import urllib.request
 from pathlib import Path
 from typing import List, Optional
 
-from integration_tests.config import DOWNLOADS_FOLDER, EXTRACTED_FOLDER, CARGO_TARGET_DIR
+from integration_tests.config import (CARGO_TARGET_DIR, DOWNLOADS_FOLDER,
+                                      EXTRACTED_FOLDER)
 
 
 def download_project_repository(zip_archive_url: str, name: str) -> Path:

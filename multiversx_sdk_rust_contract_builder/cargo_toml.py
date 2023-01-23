@@ -1,7 +1,10 @@
 
+import logging
 import shutil
 from pathlib import Path
 from typing import Tuple
+
+import tomlkit
 
 
 def get_contract_name_and_version(contract_folder: Path) -> Tuple[str, str]:
@@ -22,3 +25,17 @@ def promote_cargo_lock_to_contract_folder(build_folder: Path, contract_folder: P
     from_path = build_folder / "wasm" / "Cargo.lock"
     to_path = contract_folder / "wasm" / "Cargo.lock"
     shutil.copy(from_path, to_path)
+
+
+def remove_dev_dependencies_sections(file: Path):
+    toml = tomlkit.parse(file.read_text())
+    if "dev-dependencies" in toml:
+        logging.info(f"Removing dev-dependencies from {file} ...")
+        del toml["dev-dependencies"]
+        file.write_text(tomlkit.dumps(toml))
+
+        # ...
+        toml = tomlkit.parse(file.read_text())
+        if "dev-dependencies" in toml:
+            del toml["dev-dependencies"]
+            file.write_text(tomlkit.dumps(toml))
