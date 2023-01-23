@@ -61,5 +61,5 @@ pytest .
 ## Run integration tests (with Docker)
 
 ```
-python3 ./integration_tests/reproduce_previous_builds.py
+python3 ./integration_tests/test_previous_builds_are_reproducible.py --selected-builds "a.1" [...]
 ```

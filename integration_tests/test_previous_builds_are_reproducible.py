@@ -1,29 +1,28 @@
+from argparse import ArgumentParser
 import json
 import shutil
 import sys
 import urllib.request
 from pathlib import Path
 from typing import List, Optional, Tuple
-
-from integration_tests.docker import run_docker
+from integration_tests.config import DOWNLOADS_FOLDER, EXTRACTED_FOLDER, PARENT_OUTPUT_FOLDER, CARGO_TARGET_DIR
+from integration_tests.shared import download_repository, run_docker
 from integration_tests.previous_builds import PreviousBuild, previous_builds
-
-downloads_folder = Path("./testdata/downloads").resolve()
-extracted_folder = Path("./testdata/input/extracted").resolve()
-parent_output_folder = Path("./testdata/output").resolve()
-cargo_target_dir = Path("./testdata/output/cargo_target_dir").resolve()
 
 
 def main(cli_args: List[str]):
-    shutil.rmtree(downloads_folder, ignore_errors=True)
-    shutil.rmtree(extracted_folder, ignore_errors=True)
-    shutil.rmtree(parent_output_folder, ignore_errors=True)
+    parser = ArgumentParser()
+    parser.add_argument("--selected-builds", nargs='+')
+    parsed_args = parser.parse_args(cli_args)
+    selected_builds = parsed_args.selected_builds
 
-    downloads_folder.mkdir(parents=True, exist_ok=True)
-    extracted_folder.mkdir(parents=True, exist_ok=True)
-    cargo_target_dir.mkdir(parents=True, exist_ok=True)
+    shutil.rmtree(DOWNLOADS_FOLDER, ignore_errors=True)
+    shutil.rmtree(EXTRACTED_FOLDER, ignore_errors=True)
+    shutil.rmtree(PARENT_OUTPUT_FOLDER, ignore_errors=True)
 
-    selected_builds = ["a.1", "a.2", "a.3", "b.1", "b.2", "b.3", "c.1", "c.2", "c.3", "c.4", "c.5", "d.1", "e.1"]
+    DOWNLOADS_FOLDER.mkdir(parents=True, exist_ok=True)
+    EXTRACTED_FOLDER.mkdir(parents=True, exist_ok=True)
+    CARGO_TARGET_DIR.mkdir(parents=True, exist_ok=True)
 
     for build in previous_builds:
         if not build.name in selected_builds:
@@ -32,13 +31,13 @@ def main(cli_args: List[str]):
         print("Reproducing build", build.name, "...")
 
         project_path, packaged_src_path = fetch_source_code(build)
-        output_folder = parent_output_folder / build.name
+        output_folder = PARENT_OUTPUT_FOLDER / build.name
         output_folder.mkdir(parents=True, exist_ok=True)
 
         if project_path and build.project_path_adjustment:
             project_path = project_path / build.project_path_adjustment
 
-        run_docker(cargo_target_dir, project_path, packaged_src_path, build.contract_name, build.docker_image, output_folder)
+        run_docker(project_path, packaged_src_path, build.contract_name, build.docker_image, output_folder)
 
         artifacts_path = output_folder / "artifacts.json"
         artifacts_json = artifacts_path.read_text()
@@ -60,14 +59,9 @@ def fetch_source_code(build: PreviousBuild) -> Tuple[Optional[Path], Optional[Pa
     print("Fetching source code for", build.name, "...")
 
     if build.project_zip_url:
-        downloaded_archive = downloads_folder / f"{build.name}.zip"
-        extracted_project = extracted_folder / build.name
-        urllib.request.urlretrieve(build.project_zip_url, downloaded_archive)
-        shutil.unpack_archive(downloaded_archive, extracted_project)
-        return extracted_project, None
-
+        return download_repository(build.project_zip_url, build.name), None
     if build.packaged_src_url:
-        downloaded_packaged_src = downloads_folder / f"{build.name}.json"
+        downloaded_packaged_src = DOWNLOADS_FOLDER / f"{build.name}.json"
         urllib.request.urlretrieve(build.packaged_src_url, downloaded_packaged_src)
         return None, downloaded_packaged_src
 
