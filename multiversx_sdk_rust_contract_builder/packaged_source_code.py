@@ -7,7 +7,7 @@ from typing import Any, Dict, List
 from multiversx_sdk_rust_contract_builder.cargo_toml import \
     get_contract_name_and_version
 from multiversx_sdk_rust_contract_builder.source_code import \
-    get_all_source_code_files
+    get_source_code_files_necessary_for_contract
 
 
 class PackagedSourceCodeEntry:
@@ -61,7 +61,7 @@ class PackagedSourceCode:
 
     @classmethod
     def _create_entries_from_filesystem(cls, project_folder: Path, contract_folder: Path, contract_name: str) -> List[PackagedSourceCodeEntry]:
-        source_files = get_all_source_code_files(project_folder)
+        source_files = get_source_code_files_necessary_for_contract(contract_folder, contract_name)
         entries: List[PackagedSourceCodeEntry] = []
 
         for full_path in source_files:

@@ -24,8 +24,7 @@ def get_source_code_files_necessary_for_contract(contract_folder: Path, contract
         logging.debug(f"Local dependency: {dependency}")
         source_files.extend(get_all_files(dependency, is_source_code_file))
 
-    source_files.sort()
-    return source_files
+    return sorted(set(source_files))
 
 
 def get_all_source_code_files(folder: Path) -> List[Path]:

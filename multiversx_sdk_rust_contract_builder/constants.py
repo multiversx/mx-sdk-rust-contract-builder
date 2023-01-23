@@ -1,6 +1,6 @@
 from pathlib import Path
 
-HARDCODED_BUILD_FOLDER = Path("/tmp/contract")
+HARDCODED_BUILD_FOLDER = Path("/tmp/elrond-contract-rust")
 HARDCODED_UNWRAP_FOLDER = Path("/tmp/unwrapped")
 ONE_KB_IN_BYTES: int = 1024
 MAX_PACKAGED_SOURCE_CODE_SIZE: int = 2 * ONE_KB_IN_BYTES * 1024

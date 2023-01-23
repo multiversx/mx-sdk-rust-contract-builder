@@ -133,4 +133,5 @@ typings/**
 
 # Test data
 testdata/input/extracted
-testdata/**/output
+testdata/output
+testdata/rust

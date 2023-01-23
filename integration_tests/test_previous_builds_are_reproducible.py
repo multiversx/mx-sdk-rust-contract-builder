@@ -1,12 +1,15 @@
-from argparse import ArgumentParser
 import json
 import shutil
 import sys
+from argparse import ArgumentParser
 from pathlib import Path
 from typing import List, Optional, Tuple
-from integration_tests.config import DOWNLOADS_FOLDER, EXTRACTED_FOLDER, PARENT_OUTPUT_FOLDER, CARGO_TARGET_DIR
-from integration_tests.shared import download_packaged_src, download_project_repository, run_docker
+
+from integration_tests.config import (CARGO_TARGET_DIR, DOWNLOADS_FOLDER,
+                                      EXTRACTED_FOLDER, PARENT_OUTPUT_FOLDER)
 from integration_tests.previous_builds import PreviousBuild, previous_builds
+from integration_tests.shared import (download_packaged_src,
+                                      download_project_repository, run_docker)
 
 
 def main(cli_args: List[str]):
