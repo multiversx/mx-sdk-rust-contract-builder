@@ -5,7 +5,6 @@ import subprocess
 from pathlib import Path
 from typing import Any, Dict, List, Set
 
-import multiversx_sdk_rust_contract_builder.cargo_toml
 from multiversx_sdk_rust_contract_builder.constants import (
     CONTRACT_CONFIG_FILENAME, OLD_CONTRACT_CONFIG_FILENAME)
 from multiversx_sdk_rust_contract_builder.errors import ErrKnown
@@ -39,13 +38,6 @@ def is_source_code_file(path: Path) -> bool:
     if path.name in ["Cargo.toml", "Cargo.lock", CONTRACT_CONFIG_FILENAME, OLD_CONTRACT_CONFIG_FILENAME]:
         return True
     return False
-
-
-def remove_dev_dependencies_sections_from_cargo_toml(folder: Path):
-    logging.info("Patching Cargo.toml files to remove all dev-dependencies ...")
-    cargo_toml_files = get_all_files(folder, lambda file: file.name == "Cargo.toml")
-    for file in cargo_toml_files:
-        multiversx_sdk_rust_contract_builder.cargo_toml.remove_dev_dependencies_sections(file)
 
 
 def replace_all_test_content_with_noop(folder: Path):

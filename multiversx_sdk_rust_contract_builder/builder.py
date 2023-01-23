@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 from typing import List, Optional
 
+from multiversx_sdk_rust_contract_builder import cargo_toml, source_code
 from multiversx_sdk_rust_contract_builder.build_outcome import BuildOutcome
 from multiversx_sdk_rust_contract_builder.cargo_toml import (
     get_contract_name_and_version, promote_cargo_lock_to_contract_folder)
@@ -18,9 +19,6 @@ from multiversx_sdk_rust_contract_builder.filesystem import (
     archive_folder, find_file_in_folder)
 from multiversx_sdk_rust_contract_builder.packaged_source_code import \
     PackagedSourceCode
-from multiversx_sdk_rust_contract_builder.source_code import (
-    remove_dev_dependencies_sections_from_cargo_toml,
-    replace_all_test_content_with_noop)
 from multiversx_sdk_rust_contract_builder.wabt import generate_wabt_artifacts
 
 
@@ -41,8 +39,8 @@ def build_project(
     # We copy the whole project folder to the build path, to ensure that all local dependencies are available.
     project_within_build_folder = copy_project_folder_to_build_folder(project_folder)
 
-    remove_dev_dependencies_sections_from_cargo_toml(project_within_build_folder)
-    replace_all_test_content_with_noop(project_within_build_folder)
+    cargo_toml.remove_dev_dependencies_sections_from_all(project_within_build_folder)
+    source_code.replace_all_test_content_with_noop(project_within_build_folder)
 
     for contract_folder in sorted(contracts_folders):
         contract_name, contract_version = get_contract_name_and_version(contract_folder)

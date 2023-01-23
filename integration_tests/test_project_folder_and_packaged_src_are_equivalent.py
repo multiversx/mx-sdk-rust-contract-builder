@@ -4,7 +4,6 @@ from typing import List
 
 from integration_tests.config import PARENT_OUTPUT_FOLDER
 from integration_tests.shared import download_project_repository, run_docker
-from multiversx_sdk_rust_contract_builder.main import main
 
 
 def main(cli_args: List[str]):
