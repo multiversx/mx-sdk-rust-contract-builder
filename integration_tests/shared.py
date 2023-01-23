@@ -7,10 +7,13 @@ import subprocess
 from pathlib import Path
 from typing import List, Optional
 
-from integration_tests.config import DOWNLOADS_FOLDER, EXTRACTED_FOLDER, PARENT_OUTPUT_FOLDER, CARGO_TARGET_DIR
+from integration_tests.config import DOWNLOADS_FOLDER, EXTRACTED_FOLDER, CARGO_TARGET_DIR
 
 
 def download_project_repository(zip_archive_url: str, name: str) -> Path:
+    DOWNLOADS_FOLDER.mkdir(parents=True, exist_ok=True)
+    EXTRACTED_FOLDER.mkdir(parents=True, exist_ok=True)
+
     download_to_path = DOWNLOADS_FOLDER / f"{name}.zip"
     extract_to_path = EXTRACTED_FOLDER / name
 

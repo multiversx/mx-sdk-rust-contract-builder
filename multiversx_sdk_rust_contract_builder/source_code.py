@@ -44,11 +44,20 @@ def _get_local_dependencies_recursively(cargo_metadata: Dict[str, Any], package_
     if not package:
         raise ErrKnown(f"Could not find package {package_name} in project metadata.")
 
-    project_dependencies = package.get("dependencies", [])
-    local_dependencies = [dependency for dependency in project_dependencies if "path" in dependency]
+    dependencies = package.get("dependencies", [])
+    local_dependencies = [dependency for dependency in dependencies if _is_local_dependency(dependency)]
+    local_dependencies = [dependency for dependency in local_dependencies if not _is_mock_dependency(dependency)]
     paths = [Path(dependency["path"]) for dependency in local_dependencies]
 
     for dependency in local_dependencies:
         paths += _get_local_dependencies_recursively(cargo_metadata, dependency["name"], visited)
 
     return paths
+
+
+def _is_local_dependency(dependency: Dict[str, Any]) -> bool:
+    return "path" in dependency
+
+
+def _is_mock_dependency(dependency: Dict[str, Any]) -> bool:
+    return dependency["name"].endswith("-mock")
