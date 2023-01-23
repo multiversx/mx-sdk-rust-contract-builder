@@ -1,13 +1,13 @@
 import sys
 from typing import List
-from integration_tests.config import CARGO_TARGET_DIR, PARENT_OUTPUT_FOLDER
-from integration_tests.shared import download_repository, run_docker
+from integration_tests.config import PARENT_OUTPUT_FOLDER
+from integration_tests.shared import download_project_repository, run_docker
 
 from multiversx_sdk_rust_contract_builder.main import main
 
 
 def main(cli_args: List[str]):
-    project_path = download_repository("https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/main.zip", "mx-exchange-sc-main")
+    project_path = download_project_repository("https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/main.zip", "mx-exchange-sc-main")
     output_using_project = PARENT_OUTPUT_FOLDER / "using-project"
     output_using_packaged_src = PARENT_OUTPUT_FOLDER / "using-packaged-src"
 

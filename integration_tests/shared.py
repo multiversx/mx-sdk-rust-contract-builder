@@ -10,7 +10,7 @@ from typing import List, Optional
 from integration_tests.config import DOWNLOADS_FOLDER, EXTRACTED_FOLDER, PARENT_OUTPUT_FOLDER, CARGO_TARGET_DIR
 
 
-def download_repository(zip_archive_url: str, name: str) -> Path:
+def download_project_repository(zip_archive_url: str, name: str) -> Path:
     download_to_path = DOWNLOADS_FOLDER / f"{name}.zip"
     extract_to_path = EXTRACTED_FOLDER / name
 
@@ -20,6 +20,11 @@ def download_repository(zip_archive_url: str, name: str) -> Path:
     return extract_to_path
 
 
+def download_packaged_src(json_url: str, name: str) -> Path:
+    downloaded_packaged_src = DOWNLOADS_FOLDER / f"{name}.source.json"
+    urllib.request.urlretrieve(json_url, downloaded_packaged_src)
+
+
 def run_docker(
     project_path: Optional[Path],
     packaged_src_path: Optional[Path],
@@ -27,6 +32,8 @@ def run_docker(
     image: str,
     output_folder: Path,
 ):
+    CARGO_TARGET_DIR.mkdir(parents=True, exist_ok=True)
+
     docker_mount_args: List[str] = ["--volume", f"{output_folder}:/output"]
 
     if project_path:
