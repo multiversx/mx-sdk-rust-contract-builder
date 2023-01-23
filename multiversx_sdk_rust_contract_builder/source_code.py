@@ -34,7 +34,7 @@ def get_local_dependencies(contract_folder: Path, contract_name: str) -> List[Pa
 
 
 def _get_local_dependencies_recursively(cargo_metadata: Dict[str, Any], package_name: str, visited: List[str]) -> List[Path]:
-    if package_name in visited:
+    if package_name in visited or _is_mock_package(package_name):
         return []
 
     visited.append(package_name)
@@ -46,7 +46,6 @@ def _get_local_dependencies_recursively(cargo_metadata: Dict[str, Any], package_
 
     dependencies = package.get("dependencies", [])
     local_dependencies = [dependency for dependency in dependencies if _is_local_dependency(dependency)]
-    local_dependencies = [dependency for dependency in local_dependencies if not _is_mock_dependency(dependency)]
     paths = [Path(dependency["path"]) for dependency in local_dependencies]
 
     for dependency in local_dependencies:
@@ -55,9 +54,9 @@ def _get_local_dependencies_recursively(cargo_metadata: Dict[str, Any], package_
     return paths
 
 
+def _is_mock_package(package_name: str) -> bool:
+    return "mock" in package_name
+
+
 def _is_local_dependency(dependency: Dict[str, Any]) -> bool:
     return "path" in dependency
-
-
-def _is_mock_dependency(dependency: Dict[str, Any]) -> bool:
-    return dependency["name"].endswith("-mock")
