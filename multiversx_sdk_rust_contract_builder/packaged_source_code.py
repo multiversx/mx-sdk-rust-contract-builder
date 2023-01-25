@@ -6,10 +6,8 @@ from typing import Any, Dict, List
 
 from multiversx_sdk_rust_contract_builder.cargo_toml import \
     get_contract_name_and_version
-from multiversx_sdk_rust_contract_builder.filesystem import \
-    get_files_recursively
 from multiversx_sdk_rust_contract_builder.source_code import \
-    is_source_code_file
+    get_source_code_files_necessary_for_contract
 
 
 class PackagedSourceCodeEntry:
@@ -51,31 +49,32 @@ class PackagedSourceCode:
         version = data.get("version", "0.0.0")
         entries_raw: List[Dict[str, Any]] = data.get("entries", [])
         entries = [PackagedSourceCodeEntry.from_dict(entry) for entry in entries_raw]
+        _sort_entries(entries)
+
         return PackagedSourceCode(name, version, entries)
 
     @classmethod
-    def from_folder(cls, folder: Path) -> 'PackagedSourceCode':
-        entries = cls._create_entries_from_folder(folder)
-        name, version = get_contract_name_and_version(folder)
+    def from_filesystem(cls, project_folder: Path, contract_folder: Path) -> 'PackagedSourceCode':
+        name, version = get_contract_name_and_version(contract_folder)
+        entries = cls._create_entries_from_filesystem(project_folder, contract_folder, name)
         return PackagedSourceCode(name, version, entries)
 
     @classmethod
-    def _create_entries_from_folder(cls, folder: Path) -> List[PackagedSourceCodeEntry]:
-        files = get_files_recursively(folder, is_source_code_file)
+    def _create_entries_from_filesystem(cls, project_folder: Path, contract_folder: Path, contract_name: str) -> List[PackagedSourceCodeEntry]:
+        source_files = get_source_code_files_necessary_for_contract(contract_folder, contract_name)
         entries: List[PackagedSourceCodeEntry] = []
 
-        for full_path in files:
-            with open(full_path, "rb") as f:
-                content = f.read()
-
-            relative_path = full_path.relative_to(folder)
+        for full_path in source_files:
+            content = full_path.read_bytes()
+            relative_path = full_path.relative_to(project_folder)
             entries.append(PackagedSourceCodeEntry(relative_path, content))
 
+        _sort_entries(entries)
         return entries
 
-    def unwrap_to_folder(self, folder: Path):
+    def unwrap_to_filesystem(self, project_folder: Path):
         for entry in self.entries:
-            full_path = folder / entry.path
+            full_path = project_folder / entry.path
             full_path.parent.mkdir(parents=True, exist_ok=True)
             with open(full_path, "wb") as f:
                 f.write(entry.content)
@@ -94,3 +93,8 @@ class PackagedSourceCode:
             "version": self.version,
             "entries": entries
         }
+
+
+def _sort_entries(entries: List[PackagedSourceCodeEntry]) -> List[PackagedSourceCodeEntry]:
+    entries.sort(key=lambda entry: entry.path)
+    return entries

@@ -1,24 +1,47 @@
-
+import logging
 import shutil
 from pathlib import Path
 from typing import Tuple
 
+import tomlkit
 
-def get_contract_name_and_version(contract_directory: Path) -> Tuple[str, str]:
-    # For simplicity and less dependencies installed in the Docker image, we do not rely on an external library
-    # to parse the metadata from Cargo.toml.
-    with open(contract_directory / "Cargo.toml") as file:
-        lines = file.readlines()
+from multiversx_sdk_rust_contract_builder.filesystem import get_all_files
 
-    line_with_name = next((line for line in lines if line.startswith("name = ")), 'name = "untitled"')
-    line_with_version = next((line for line in lines if line.startswith("version = ")), 'version = "0.0.0"')
 
-    name = line_with_name.split("=")[1].strip().strip('"')
-    version = line_with_version.split("=")[1].strip().strip('"')
+def get_contract_name_and_version(contract_folder: Path) -> Tuple[str, str]:
+    file = contract_folder / "Cargo.toml"
+    toml = tomlkit.parse(file.read_text())
+
+    name = toml["package"]["name"]
+    version = toml["package"]["version"]
     return name, version
 
 
-def promote_cargo_lock_to_contract_directory(build_directory: Path, contract_directory: Path):
-    from_path = build_directory / "wasm" / "Cargo.lock"
-    to_path = contract_directory / "wasm" / "Cargo.lock"
+def promote_cargo_lock_to_contract_folder(build_folder: Path, contract_folder: Path):
+    from_path = build_folder / "wasm" / "Cargo.lock"
+    to_path = contract_folder / "wasm" / "Cargo.lock"
     shutil.copy(from_path, to_path)
+
+
+def remove_dev_dependencies_sections_from_all(folder: Path):
+    logging.info(f"remove_dev_dependencies_sections_from_all({folder})")
+
+    all_files = get_all_files(folder, lambda file: file.name == "Cargo.toml")
+    for file in all_files:
+        remove_dev_dependencies_sections(file)
+
+
+def remove_dev_dependencies_sections(file: Path):
+    # Workaround: if Cargo.toml contains [dev-dependencies] sections,
+    # then we'll attempt several times to remove them,
+    # because tomlkit does not properly handle a few special cases, such as:
+    # - https://github.com/multiversx/mx-exchange-sc/blob/v2.1-staking/dex/farm/Cargo.toml#L71
+    # - https://github.com/multiversx/mx-exchange-sc/blob/v2.1-staking/dex/farm/Cargo.toml#L84
+    while True:
+        toml = tomlkit.parse(file.read_text())
+
+        if "dev-dependencies" not in toml:
+            break
+
+        del toml["dev-dependencies"]
+        file.write_text(tomlkit.dumps(toml))

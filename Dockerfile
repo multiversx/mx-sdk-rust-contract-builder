@@ -1,17 +1,21 @@
 FROM ubuntu:22.04
 
 # Constants
-ARG VERSION_RUST="nightly-2022-12-08"
+ARG VERSION_RUST="nightly-2022-10-16"
 ARG VERSION_BINARYEN="105-1"
 ARG VERSION_WABT="1.0.27-1"
+# Normally, this should be "multiversx/sdk-rust-contract-builder:{{pyproject.toml:project:version}}"
+ARG CONTEXT="multiversx/sdk-rust-contract-builder:v4.1.0"
 
 # Install dependencies (including binaryen and wabt)
 RUN apt-get update && apt-get install -y \
     wget \ 
     build-essential \
-    python3.10 python-is-python3 \
+    python3.11 python-is-python3 python3-pip \
     binaryen=${VERSION_BINARYEN} \
     wabt=${VERSION_WABT}
+
+RUN pip3 install tomlkit==0.11.6
 
 # Install rust
 RUN wget -O rustup.sh https://sh.rustup.rs && \
@@ -25,6 +29,7 @@ COPY "multiversx_sdk_rust_contract_builder" "/multiversx_sdk_rust_contract_build
 ENV PATH="/rust/bin:${PATH}"
 ENV CARGO_HOME="/rust"
 ENV RUSTUP_HOME="/rust"
+ENV CONTEXT=${CONTEXT}
 ENV PYTHONPATH=/
 
 # Additional arguments (must be provided at "docker run"):
