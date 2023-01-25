@@ -3,6 +3,7 @@ import shutil
 from pathlib import Path
 from typing import Tuple
 
+import semver
 import tomlkit
 
 from multiversx_sdk_rust_contract_builder.filesystem import get_all_files
@@ -45,3 +46,17 @@ def remove_dev_dependencies_sections(file: Path):
 
         del toml["dev-dependencies"]
         file.write_text(tomlkit.dumps(toml))
+
+
+def does_cargo_build_accept_locked(contract_folder: Path) -> bool:
+    file = contract_folder / "Cargo.toml"
+    toml = tomlkit.parse(file.read_text())
+
+    framework_version_old: str = str(toml.get("dependencies", {}).get("elrond-wasm", {}).get("version", ""))
+    framework_version_new: str = str(toml.get("dependencies", {}).get("multiversx-sc", {}).get("version", ""))
+    framework_version: str = framework_version_old or framework_version_new
+
+    supports_locked: bool = semver.compare(framework_version, "0.38.0") <= 0
+
+    logging.info(f"does_cargo_build_accept_locked({contract_folder}), framework version = {framework_version}? {supports_locked}")
+    return supports_locked

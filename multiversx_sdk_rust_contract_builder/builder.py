@@ -110,7 +110,8 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
     args.extend(["--no-wasm-opt"] if no_wasm_opt else [])
     # If the lock file is missing, or it needs to be updated, Cargo will exit with an error.
     # See: https://doc.rust-lang.org/cargo/commands/cargo-build.html
-    args.extend(["--locked"] if cargo_lock.exists() else [])
+    if cargo_toml.does_cargo_build_accept_locked(build_folder):
+        args.extend(["--locked"] if cargo_lock.exists() else [])
 
     logging.info(f"Building: {args}")
     return_code = subprocess.run(args, cwd=meta_folder).returncode
