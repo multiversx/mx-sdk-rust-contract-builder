@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 from typing import List, Optional
 
+from multiversx_sdk_rust_contract_builder import cargo_toml, source_code
 from multiversx_sdk_rust_contract_builder.build_outcome import BuildOutcome
 from multiversx_sdk_rust_contract_builder.cargo_toml import (
     get_contract_name_and_version, promote_cargo_lock_to_contract_folder)
@@ -38,6 +39,9 @@ def build_project(
     # We copy the whole project folder to the build path, to ensure that all local dependencies are available.
     project_within_build_folder = copy_project_folder_to_build_folder(project_folder)
 
+    cargo_toml.remove_dev_dependencies_sections_from_all(project_within_build_folder)
+    source_code.replace_all_test_content_with_noop(project_within_build_folder)
+
     for contract_folder in sorted(contracts_folders):
         contract_name, contract_version = get_contract_name_and_version(contract_folder)
         logging.info(f"Contract = {contract_name}, version = {contract_version}")
@@ -50,22 +54,22 @@ def build_project(
         output_subfolder.mkdir(parents=True, exist_ok=True)
 
         relative_contract_folder = contract_folder.relative_to(project_folder)
-        build_folder = project_within_build_folder / relative_contract_folder
+        contract_build_subfolder = project_within_build_folder / relative_contract_folder
 
         # Clean folder - it may contain externally-generated build artifacts
-        clean_contract(build_folder)
-        build_contract(build_folder, output_subfolder, cargo_target_dir, no_wasm_opt)
+        clean_contract(contract_build_subfolder)
+        build_contract(contract_build_subfolder, output_subfolder, cargo_target_dir, no_wasm_opt)
 
         # We do not clean the "output" folder, since it will be included in one of the generated archives.
-        clean_contract(build_folder, clean_output=False)
+        clean_contract(contract_build_subfolder, clean_output=False)
 
-        promote_cargo_lock_to_contract_folder(build_folder, contract_folder)
+        promote_cargo_lock_to_contract_folder(contract_build_subfolder, contract_folder)
 
         # The archives are created after build, so that Cargo.lock files are included (if previously missing).
-        create_archives(contract_name, contract_version, build_folder, output_subfolder)
-        create_packaged_source_code(project_within_build_folder, contract_name, contract_version, build_folder, output_subfolder)
+        create_archives(contract_name, contract_version, contract_build_subfolder, output_subfolder)
+        create_packaged_source_code(project_within_build_folder, contract_name, contract_version, contract_build_subfolder, output_subfolder)
 
-        outcome.gather_artifacts(contract_name, build_folder, output_subfolder)
+        outcome.gather_artifacts(contract_name, contract_build_subfolder, output_subfolder)
 
     return outcome
 
@@ -141,5 +145,5 @@ def create_packaged_source_code(parent_project_folder: Path, contract_name: str,
 
 
 def warn_file_too_large(path: Path, size: int, max_size: int):
-    logging.warning(f"""File is too large (this might cause issues with using downstream applications, such as the contract build verification services): 
+    logging.warning(f"""File is too large (this might cause issues with using downstream applications, such as the contract build verification services):
 file = {path}, size = {size}, maximum size = {max_size}""")

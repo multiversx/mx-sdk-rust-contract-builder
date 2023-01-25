@@ -29,7 +29,7 @@ previous_builds: List[PreviousBuild] = [
         expected_code_hashes={
             "adder": "58c6e78f40bd6ccc30d8a01f952b34a13ebfdad796a2526678be17c5d7820174"
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.0.3"
+        docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
         name="a.2",
@@ -40,7 +40,7 @@ previous_builds: List[PreviousBuild] = [
         expected_code_hashes={
             "adder": "58c6e78f40bd6ccc30d8a01f952b34a13ebfdad796a2526678be17c5d7820174"
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.0.3"
+        docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
         name="a.3",
@@ -62,7 +62,7 @@ previous_builds: List[PreviousBuild] = [
         expected_code_hashes={
             "metabonding-staking": "4a9b2afa13eca738b1804c48b82a961afd67adcbbf2aa518052fa124ac060bea"
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.0.2"
+        docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
         name="b.2",
@@ -73,7 +73,7 @@ previous_builds: List[PreviousBuild] = [
         expected_code_hashes={
             "metabonding-staking": "4a9b2afa13eca738b1804c48b82a961afd67adcbbf2aa518052fa124ac060bea"
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.0.2"
+        docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
         name="b.3",
@@ -84,7 +84,7 @@ previous_builds: List[PreviousBuild] = [
         expected_code_hashes={
             "metabonding-staking": "4a9b2afa13eca738b1804c48b82a961afd67adcbbf2aa518052fa124ac060bea"
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.0.2"
+        docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
         name="c.1",
@@ -119,7 +119,7 @@ previous_builds: List[PreviousBuild] = [
             "simple-lock-whitelist": "c576c6106234e5f7978efb1885afe36c5d6da6a13c12b459fd7fe95967646d13",
             "token-unstake": "463e49892f64726450d0df5ab4ba26559ad882525ce5e93173a26fde8437266e",
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.0.2"
+        docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
         name="c.2",
@@ -154,7 +154,7 @@ previous_builds: List[PreviousBuild] = [
             "simple-lock-whitelist": "c576c6106234e5f7978efb1885afe36c5d6da6a13c12b459fd7fe95967646d13",
             "token-unstake": "463e49892f64726450d0df5ab4ba26559ad882525ce5e93173a26fde8437266e",
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.0.2"
+        docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
         name="c.3",
@@ -189,7 +189,7 @@ previous_builds: List[PreviousBuild] = [
             "simple-lock-whitelist": "3bc3cecbee78958e65efdaa077974d95d743d962254788d9280839362dc4da8b",
             "token-unstake": "2b0f59073bd697d75ec2009a3bf3c350b74ff9b10d6a7bfe1e13f653732ddb1a",
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.0.2"
+        docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
         name="c.4",
@@ -224,7 +224,7 @@ previous_builds: List[PreviousBuild] = [
             "simple-lock-whitelist": "b8f14e78635ad3894cb78f7d24302d17ee2059b353d1017e4b84f3beef2abc1a",
             "token-unstake": "3059ffec6f44259b8f2be56b9e1c67c72342f93c0c6f4b5cadc24364f2ee95e7",
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.0.2"
+        docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
         name="c.5",
@@ -235,7 +235,7 @@ previous_builds: List[PreviousBuild] = [
         expected_code_hashes={
             "energy-factory": "529fd987e7702b90044757073f36024d24cbe5cc8810d5abe93c6c5176a0ec53",
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.0.2"
+        docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
         name="d.1",
@@ -258,6 +258,6 @@ previous_builds: List[PreviousBuild] = [
         expected_code_hashes={
             "metabonding": "897b19e1990f7c487c99c12f50722febe1ee4468bcd3a7405641966dfff2791d"
         },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.0.2"
+        docker_image="sdk-rust-contract-builder:next"
     )
 ]

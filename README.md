@@ -7,7 +7,7 @@ Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.m
 We use `docker buildx` to build the image:
 
 ```
-docker buildx build --no-cache . -t sdk-rust-contract-builder:next -f ./Dockerfile
+docker buildx build --output type=docker --no-cache . -t sdk-rust-contract-builder:next -f ./Dockerfile
 ```
 
 Maintainers can publish the image as follows:

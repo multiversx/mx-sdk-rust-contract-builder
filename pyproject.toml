@@ -28,5 +28,9 @@ exclude = [
   "support/**"
 ]
 
+dependencies = [
+  "tomlkit==0.11.6"
+]
+
 [project.urls]
 "Homepage" = "https://github.com/multiversx/mx-sdk-build-contract"

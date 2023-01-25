@@ -1,13 +1,13 @@
-import json
-import shutil
-import sys
-import urllib.request
 import os
+import shutil
 import subprocess
+import urllib.request
 from pathlib import Path
 from typing import List, Optional
 
-from integration_tests.config import DOWNLOADS_FOLDER, EXTRACTED_FOLDER, CARGO_TARGET_DIR
+from integration_tests.config import (CARGO_TARGET_DIR, DOWNLOADS_FOLDER,
+                                      EXTRACTED_FOLDER, RUST_GIT,
+                                      RUST_REGISTRY, RUST_TMP)
 
 
 def download_project_repository(zip_archive_url: str, name: str) -> Path:
@@ -26,6 +26,7 @@ def download_project_repository(zip_archive_url: str, name: str) -> Path:
 def download_packaged_src(json_url: str, name: str) -> Path:
     downloaded_packaged_src = DOWNLOADS_FOLDER / f"{name}.source.json"
     urllib.request.urlretrieve(json_url, downloaded_packaged_src)
+    return downloaded_packaged_src
 
 
 def run_docker(
@@ -36,6 +37,9 @@ def run_docker(
     output_folder: Path,
 ):
     CARGO_TARGET_DIR.mkdir(parents=True, exist_ok=True)
+    RUST_REGISTRY.mkdir(parents=True, exist_ok=True)
+    RUST_GIT.mkdir(parents=True, exist_ok=True)
+    RUST_TMP.mkdir(parents=True, exist_ok=True)
 
     docker_mount_args: List[str] = ["--volume", f"{output_folder}:/output"]
 
@@ -46,6 +50,9 @@ def run_docker(
         docker_mount_args.extend(["--volume", f"{packaged_src_path}:/packaged-src.json"])
 
     docker_mount_args += ["--volume", f"{CARGO_TARGET_DIR}:/rust/cargo-target-dir"]
+    docker_mount_args += ["--volume", f"{RUST_REGISTRY}:/rust/registry"]
+    docker_mount_args += ["--volume", f"{RUST_GIT}:/rust/git"]
+    docker_mount_args += ["--volume", f"{RUST_TMP}:/rust/tmp"]
 
     docker_args = ["docker", "run"]
     docker_args += docker_mount_args
