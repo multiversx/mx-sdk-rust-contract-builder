@@ -48,15 +48,26 @@ def remove_dev_dependencies_sections(file: Path):
         file.write_text(tomlkit.dumps(toml))
 
 
-def does_cargo_build_accept_locked(contract_folder: Path) -> bool:
+def does_cargo_build_support_locked(contract_folder: Path) -> bool:
     file = contract_folder / "Cargo.toml"
     toml = tomlkit.parse(file.read_text())
 
     framework_version_old: str = str(toml.get("dependencies", {}).get("elrond-wasm", {}).get("version", ""))
     framework_version_new: str = str(toml.get("dependencies", {}).get("multiversx-sc", {}).get("version", ""))
     framework_version: str = framework_version_old or framework_version_new
+    framework_version = _normalize_rust_framework_version(framework_version)
 
-    supports_locked: bool = semver.compare(framework_version, "0.38.0") <= 0
+    # Before this version, --locked was ignored.
+    # On this version, using --locked resulted in an error.
+    # After this version, --locked is supported.
+    supports_locked: bool = semver.compare(framework_version, "0.39.2") > 0
 
-    logging.info(f"does_cargo_build_accept_locked({contract_folder}), framework version = {framework_version}? {supports_locked}")
+    logging.info(f"does_cargo_build_support_locked({contract_folder}), framework version = {framework_version}? {supports_locked}")
     return supports_locked
+
+
+def _normalize_rust_framework_version(version: str) -> str:
+    version_parts = version.split(".")
+    if len(version_parts) == 2:
+        version += ".0"
+    return version
