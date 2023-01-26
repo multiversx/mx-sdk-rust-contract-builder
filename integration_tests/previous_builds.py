@@ -259,5 +259,16 @@ previous_builds: List[PreviousBuild] = [
             "metabonding": "897b19e1990f7c487c99c12f50722febe1ee4468bcd3a7405641966dfff2791d"
         },
         docker_image="sdk-rust-contract-builder:next"
+    ),
+    PreviousBuild(
+        name="f.1",
+        project_archive_url="https://github.com/multiversx/mx-energy-competition-winners-extraction-sc/archive/refs/tags/0.1.0.zip",
+        project_relative_path_in_archive="mx-energy-competition-winners-extraction-sc-0.1.0",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "winners-extractor": "14afb225664cc7c25e94410bf113875bd784991509fe3589eae1c078bc4fe69a"
+        },
+        docker_image="sdk-rust-contract-builder:next"
     )
 ]
