@@ -67,7 +67,8 @@ def does_cargo_build_support_locked(contract_folder: Path) -> bool:
 
 
 def _normalize_rust_framework_version(version: str) -> str:
-    version_parts = version.strip('^').strip('=').split(".")
+    version = version.strip('^').strip('=')
+    version_parts = version.split(".")
     if len(version_parts) == 2:
         version += ".0"
     return version
