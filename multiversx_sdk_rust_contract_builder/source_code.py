@@ -49,7 +49,7 @@ def replace_all_test_content_with_noop(folder: Path):
     logging.info(f"replace_all_test_content_with_noop({folder})")
     test_files = get_all_files(folder, is_test_file)
     for file in test_files:
-        file.write_text("fn nothing() {}")
+        file.write_text("fn _() {}")
 
 
 def is_test_file(path: Path) -> bool:
