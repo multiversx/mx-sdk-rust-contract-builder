@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     binaryen=${VERSION_BINARYEN} \
     wabt=${VERSION_WABT}
 
-RUN pip3 install tomlkit==0.11.6 semver==2.13.0
+RUN pip3 install toml==0.10.2 semver==2.13.0
 
 # Install rust
 RUN wget -O rustup.sh https://sh.rustup.rs && \
