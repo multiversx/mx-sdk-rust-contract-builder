@@ -40,7 +40,7 @@ def is_source_code_file(path: Path) -> bool:
     return False
 
 
-def replace_all_test_content_with_noop(folder: Path):
+def replace_all_test_content_with_noop(folder: Path, content: str):
     # At this moment (January 2023) we cannot completely exclude test files from the compilation
     # (if we do so, the build throws some errors, in some cases).
     # So we replace all test content with a noop function.
@@ -49,7 +49,7 @@ def replace_all_test_content_with_noop(folder: Path):
     logging.info(f"replace_all_test_content_with_noop({folder})")
     test_files = get_all_files(folder, is_test_file)
     for file in test_files:
-        file.write_text("fn _() {}")
+        file.write_text(content)
 
 
 def is_test_file(path: Path) -> bool:

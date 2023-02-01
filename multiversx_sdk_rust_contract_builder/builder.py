@@ -13,7 +13,7 @@ from multiversx_sdk_rust_contract_builder.codehash import \
 from multiversx_sdk_rust_contract_builder.constants import (
     CONTRACT_CONFIG_FILENAME, HARDCODED_BUILD_FOLDER,
     MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE, MAX_PACKAGED_SOURCE_CODE_SIZE,
-    OLD_CONTRACT_CONFIG_FILENAME)
+    OLD_CONTRACT_CONFIG_FILENAME, TEST_FILES_PLACEHOLDER)
 from multiversx_sdk_rust_contract_builder.errors import ErrKnown
 from multiversx_sdk_rust_contract_builder.filesystem import (
     archive_folder, find_file_in_folder)
@@ -40,7 +40,7 @@ def build_project(
     project_within_build_folder = copy_project_folder_to_build_folder(project_folder)
 
     cargo_toml.remove_dev_dependencies_sections_from_all(project_within_build_folder)
-    source_code.replace_all_test_content_with_noop(project_within_build_folder)
+    source_code.replace_all_test_content_with_noop(project_within_build_folder, TEST_FILES_PLACEHOLDER)
 
     for contract_folder in sorted(contracts_folders):
         contract_name, contract_version = get_contract_name_and_version(contract_folder)

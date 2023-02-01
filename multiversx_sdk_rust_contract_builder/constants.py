@@ -9,3 +9,5 @@ MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE: int = 2 * ONE_KB_IN_BYTES * 1024
 
 CONTRACT_CONFIG_FILENAME = "multiversx.json"
 OLD_CONTRACT_CONFIG_FILENAME = "elrond.json"
+
+TEST_FILES_PLACEHOLDER = "// Test files are not included in the packaged source code."
