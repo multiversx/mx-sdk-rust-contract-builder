@@ -12,6 +12,7 @@ output_folder = Path("./testdata/output")
 def test_build_project_adder():
     outcome = builder.build_project(
         project_folder=input_folder / "adder",
+        package_whole_project_src=True,
         parent_output_folder=output_folder,
         specific_contract=None,
         cargo_target_dir=Path("/tmp/cargo-target-dir"),
@@ -33,6 +34,7 @@ def test_build_project_adder():
 def test_build_project_empty():
     outcome = builder.build_project(
         project_folder=input_folder / "empty",
+        package_whole_project_src=True,
         parent_output_folder=output_folder,
         specific_contract=None,
         cargo_target_dir=Path("/tmp/cargo-target-dir"),

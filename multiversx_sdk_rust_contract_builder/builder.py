@@ -24,6 +24,7 @@ from multiversx_sdk_rust_contract_builder.wabt import generate_wabt_artifacts
 
 def build_project(
         project_folder: Path,
+        package_whole_project_src: bool,
         parent_output_folder: Path,
         specific_contract: Optional[str],
         cargo_target_dir: Path,
@@ -39,8 +40,9 @@ def build_project(
     # We copy the whole project folder to the build path, to ensure that all local dependencies are available.
     project_within_build_folder = copy_project_folder_to_build_folder(project_folder)
 
-    cargo_toml.remove_dev_dependencies_sections_from_all(project_within_build_folder)
-    source_code.replace_all_test_content_with_noop(project_within_build_folder, TEST_FILES_PLACEHOLDER)
+    if not package_whole_project_src:
+        cargo_toml.remove_dev_dependencies_sections_from_all(project_within_build_folder)
+        source_code.replace_all_test_content_with_noop(project_within_build_folder, TEST_FILES_PLACEHOLDER)
 
     for contract_folder in sorted(contracts_folders):
         contract_name, contract_version = get_contract_name_and_version(contract_folder)
@@ -67,7 +69,7 @@ def build_project(
 
         # The archives are created after build, so that Cargo.lock files are included (if previously missing).
         create_archives(contract_name, contract_version, contract_build_subfolder, output_subfolder)
-        create_packaged_source_code(project_within_build_folder, contract_name, contract_version, contract_build_subfolder, output_subfolder)
+        create_packaged_source_code(project_within_build_folder, package_whole_project_src, contract_name, contract_version, contract_build_subfolder, output_subfolder)
 
         outcome.gather_artifacts(contract_name, contract_build_subfolder, output_subfolder)
 
@@ -136,8 +138,21 @@ def create_archives(contract_name: str, contract_version: str, input_folder: Pat
         warn_file_too_large(output_artifacts_archive_file, size_of_output_artifacts_archive, MAX_OUTPUT_ARTIFACTS_ARCHIVE_SIZE)
 
 
-def create_packaged_source_code(parent_project_folder: Path, contract_name: str, contract_version: str, contract_folder: Path, output_folder: Path):
-    package = PackagedSourceCode.from_filesystem(parent_project_folder, contract_folder)
+def create_packaged_source_code(
+        parent_project_folder: Path,
+        package_whole_project_src: bool,
+        contract_name: str,
+        contract_version: str,
+        contract_folder: Path,
+        output_folder: Path
+):
+    if package_whole_project_src:
+        files = source_code.get_all_source_code_files(parent_project_folder)
+    else:
+        files = source_code.get_source_code_files_necessary_for_contract(contract_folder, contract_name)
+
+    contract_name, contract_version = get_contract_name_and_version(contract_folder)
+    package = PackagedSourceCode.from_filesystem(parent_project_folder, contract_name, contract_version, files)
     package_path = output_folder / f"{contract_name}-{contract_version}.source.json"
     package.save_to_file(package_path)
 

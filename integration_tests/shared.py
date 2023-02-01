@@ -31,6 +31,7 @@ def download_packaged_src(json_url: str, name: str) -> Path:
 
 def run_docker(
     project_path: Optional[Path],
+    package_whole_project_src: bool,
     packaged_src_path: Optional[Path],
     contract_name: Optional[str],
     image: str,
@@ -63,6 +64,9 @@ def run_docker(
 
     if project_path:
         entrypoint_args.extend(["--project", "project"])
+
+    if package_whole_project_src:
+        entrypoint_args.append("--package-whole-project-src")
 
     if packaged_src_path:
         entrypoint_args.extend(["--packaged-src", "packaged-src.json"])
