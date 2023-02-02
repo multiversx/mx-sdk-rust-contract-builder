@@ -39,7 +39,13 @@ def main(cli_args: List[str]):
         if project_path and build.project_relative_path_in_archive:
             project_path = project_path / build.project_relative_path_in_archive
 
-        run_docker(project_path, packaged_src_path, build.contract_name, build.docker_image, output_folder)
+        run_docker(
+            project_path=project_path,
+            package_whole_project_src=False,
+            packaged_src_path=packaged_src_path,
+            contract_name=build.contract_name,
+            image=build.docker_image,
+            output_folder=output_folder)
         check_code_hashes(build, output_folder)
 
 

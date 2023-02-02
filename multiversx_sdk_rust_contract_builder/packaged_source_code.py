@@ -4,11 +4,6 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
-from multiversx_sdk_rust_contract_builder.cargo_toml import \
-    get_contract_name_and_version
-from multiversx_sdk_rust_contract_builder.source_code import \
-    get_source_code_files_necessary_for_contract
-
 
 class PackagedSourceCodeEntry:
     def __init__(self, path: Path, content: bytes) -> None:
@@ -54,17 +49,15 @@ class PackagedSourceCode:
         return PackagedSourceCode(name, version, entries)
 
     @classmethod
-    def from_filesystem(cls, project_folder: Path, contract_folder: Path) -> 'PackagedSourceCode':
-        name, version = get_contract_name_and_version(contract_folder)
-        entries = cls._create_entries_from_filesystem(project_folder, contract_folder, name)
-        return PackagedSourceCode(name, version, entries)
+    def from_filesystem(cls, project_folder: Path, contract_name: str, contract_version: str, files: List[Path]) -> 'PackagedSourceCode':
+        entries = cls._create_entries_from_filesystem(project_folder, files)
+        return PackagedSourceCode(contract_name, contract_version, entries)
 
     @classmethod
-    def _create_entries_from_filesystem(cls, project_folder: Path, contract_folder: Path, contract_name: str) -> List[PackagedSourceCodeEntry]:
-        source_files = get_source_code_files_necessary_for_contract(contract_folder, contract_name)
+    def _create_entries_from_filesystem(cls, project_folder: Path, files: List[Path]) -> List[PackagedSourceCodeEntry]:
         entries: List[PackagedSourceCodeEntry] = []
 
-        for full_path in source_files:
+        for full_path in files:
             content = full_path.read_bytes()
             relative_path = full_path.relative_to(project_folder)
             entries.append(PackagedSourceCodeEntry(relative_path, content))

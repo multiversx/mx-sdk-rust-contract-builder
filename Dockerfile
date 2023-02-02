@@ -4,8 +4,7 @@ FROM ubuntu:22.04
 ARG VERSION_RUST="nightly-2022-10-16"
 ARG VERSION_BINARYEN="105-1"
 ARG VERSION_WABT="1.0.27-1"
-# Normally, this should be "multiversx/sdk-rust-contract-builder:{{pyproject.toml:project:version}}"
-ARG CONTEXT="multiversx/sdk-rust-contract-builder:v4.1.1"
+ARG CONTEXT="multiversx/sdk-rust-contract-builder:v4.1.2"
 
 # Install dependencies (including binaryen and wabt)
 RUN apt-get update && apt-get install -y \
@@ -15,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     binaryen=${VERSION_BINARYEN} \
     wabt=${VERSION_WABT}
 
-RUN pip3 install tomlkit==0.11.6 semver==2.13.0
+RUN pip3 install toml==0.10.2 semver==2.13.0
 
 # Install rust
 RUN wget -O rustup.sh https://sh.rustup.rs && \
