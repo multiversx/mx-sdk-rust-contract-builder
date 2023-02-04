@@ -3,7 +3,7 @@ import json
 import logging
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import List
 
 from multiversx_sdk_rust_contract_builder.constants import (
     CONTRACT_CONFIG_FILENAME, OLD_CONTRACT_CONFIG_FILENAME)
@@ -11,19 +11,12 @@ from multiversx_sdk_rust_contract_builder.errors import ErrKnown
 from multiversx_sdk_rust_contract_builder.filesystem import get_all_files
 
 
-def get_source_code_files_necessary_for_contract(contract_folder: Path, contract_name: str) -> List[Path]:
-    source_files: List[Path] = []
-
-    source_files.extend(get_all_source_code_files(contract_folder))
-    local_dependencies = get_local_dependencies(contract_folder, contract_name)
-
-    logging.info(f"Found {len(local_dependencies)} local dependencies.")
-
-    for dependency in local_dependencies:
-        logging.debug(f"Local dependency: {dependency}")
-        source_files.extend(get_all_files(dependency, is_source_code_file))
-
-    return sorted(set(source_files))
+class SourceCodeFile:
+    def __init__(self, path: Path, module: Path, dependency_depth: int):
+        self.path = path
+        self.module = module
+        self.dependency_depth = dependency_depth
+        self.is_test_file = is_test_file(path)
 
 
 def get_all_source_code_files(folder: Path) -> List[Path]:
@@ -57,39 +50,35 @@ def is_test_file(path: Path) -> bool:
     return path.suffix == ".rs" and is_in_tests_folder
 
 
-def get_local_dependencies(contract_folder: Path, contract_name: str) -> List[Path]:
-    args = ["cargo", "metadata", "--format-version=1"]
-    logging.info(f"get_local_dependencies(), running: {args}, with cwd = {contract_folder}")
-    metadata_json = subprocess.check_output(args, cwd=contract_folder, shell=False, universal_newlines=True)
-    metadata = json.loads(metadata_json)
+def get_source_code_files_necessary_for_contract_v2(project_folder: Path, contract_folder: Path) -> List[SourceCodeFile]:
+    args = ["sc-meta", "local-deps", "--path", str(contract_folder)]
+    logging.info(f"get_source_code_files_necessary_for_contract_v2(), running: {args}")
+    subprocess.check_output(args, shell=False, universal_newlines=True, cwd=project_folder)
 
-    logging.info(f"get_local_dependencies(), explore metadata recursively for contract {contract_name}")
-    paths = _get_local_dependencies_recursively(metadata, contract_name, set(), 0)
-    return list(paths)
+    output_file = contract_folder / "output" / "local_deps.txt"
+    output_content = output_file.read_text()
 
+    data = json.loads(output_content)
+    dependencies = data.get("dependencies", [])
 
-def _get_local_dependencies_recursively(cargo_metadata: Dict[str, Any], package_name: str, visited: Set[str], indentation: int) -> Set[Path]:
-    if package_name in visited:
-        return set()
+    source_code_files: List[SourceCodeFile] = []
 
-    visited.add(package_name)
+    for dependency in dependencies:
+        dependency_path = (contract_folder / dependency.get("path", "")).resolve()
+        dependency_depth = dependency.get("depth", 0)
 
-    packages = cargo_metadata.get("packages", [])
-    package = next((package for package in packages if package["name"] == package_name), None)
-    if not package:
-        raise ErrKnown(f"Could not find package {package_name} in project metadata.")
+        if not dependency_path.exists():
+            raise ErrKnown(f"Dependency does not exist: {dependency_path}")
 
-    dependencies = package.get("dependencies", [])
-    local_dependencies = [dependency for dependency in dependencies if _is_local_dependency(dependency)]
-    paths = set([Path(dependency["path"]) for dependency in local_dependencies])
+        files_of_dependency = get_all_files(dependency_path, is_source_code_file)
 
-    logging.debug(f"{indentation * 4 * ' '} ({package_name}): {[dependency['name'] for dependency in local_dependencies]}")
+        for file in files_of_dependency:
+            source_code_file = SourceCodeFile(file, dependency_path, dependency_depth)
+            source_code_files.append(source_code_file)
 
-    for dependency in local_dependencies:
-        paths |= _get_local_dependencies_recursively(cargo_metadata, dependency["name"], visited, indentation + 1)
+    files_of_contract = get_all_files(contract_folder, is_source_code_file)
+    for file in files_of_contract:
+        source_code_file = SourceCodeFile(file, contract_folder, 0)
+        source_code_files.append(source_code_file)
 
-    return paths
-
-
-def _is_local_dependency(dependency: Dict[str, Any]) -> bool:
-    return "path" in dependency
+    return source_code_files

@@ -146,13 +146,17 @@ def create_packaged_source_code(
         contract_folder: Path,
         output_folder: Path
 ):
-    if package_whole_project_src:
-        files = source_code.get_all_source_code_files(parent_project_folder)
-    else:
-        files = source_code.get_source_code_files_necessary_for_contract(contract_folder, contract_name)
+    source_code_files: List[source_code.SourceCodeFile] = []
+
+    # if package_whole_project_src:
+    #    files = source_code.get_all_source_code_files(parent_project_folder)
+    # else:
+    #    files = source_code.get_source_code_files_necessary_for_contract(contract_folder, contract_name)
+
+    source_code_files = source_code.get_source_code_files_necessary_for_contract_v2(parent_project_folder, contract_folder)
 
     contract_name, contract_version = get_contract_name_and_version(contract_folder)
-    package = PackagedSourceCode.from_filesystem(parent_project_folder, contract_name, contract_version, files)
+    package = PackagedSourceCode.from_filesystem(parent_project_folder, contract_name, contract_version, source_code_files)
     package_path = output_folder / f"{contract_name}-{contract_version}.source.json"
     package.save_to_file(package_path)
 

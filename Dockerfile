@@ -4,7 +4,7 @@ FROM ubuntu:22.04
 ARG VERSION_RUST="nightly-2022-10-16"
 ARG VERSION_BINARYEN="105-1"
 ARG VERSION_WABT="1.0.27-1"
-ARG CONTEXT="multiversx/sdk-rust-contract-builder:v4.1.2"
+ARG CONTEXT="multiversx/sdk-rust-contract-builder:v4.1.3"
 
 # Install dependencies (including binaryen and wabt)
 RUN apt-get update && apt-get install -y \
@@ -21,7 +21,18 @@ RUN wget -O rustup.sh https://sh.rustup.rs && \
     chmod +x rustup.sh && \
     CARGO_HOME=/rust RUSTUP_HOME=/rust ./rustup.sh --verbose --default-toolchain ${VERSION_RUST} --profile minimal --target wasm32-unknown-unknown -y && \
     rm rustup.sh && \
-    chmod -R 777 /rust
+    chmod -R 777 /rust && \
+    rm -rf /rust/registry
+
+# TODO: remove upon sc-tool release
+RUN apt-get install -y git
+
+# Install sc-tool
+RUN git clone https://github.com/multiversx/mx-sdk-rs.git --branch=meta-local-deps --single-branch --depth=1 && \
+    chmod -R 777 /mx-sdk-rs && \
+    cd /mx-sdk-rs/framework/meta && \
+    PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install --path . && \
+    rm -rf /rust/registry
 
 COPY "multiversx_sdk_rust_contract_builder" "/multiversx_sdk_rust_contract_builder"
 

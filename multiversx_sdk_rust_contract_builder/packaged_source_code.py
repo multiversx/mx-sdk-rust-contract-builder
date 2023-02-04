@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
+from multiversx_sdk_rust_contract_builder.source_code import SourceCodeFile
+
 
 class PackagedSourceCodeEntry:
     def __init__(self, path: Path, content: bytes) -> None:
@@ -49,21 +51,17 @@ class PackagedSourceCode:
         return PackagedSourceCode(name, version, entries)
 
     @classmethod
-    def from_filesystem(cls, project_folder: Path, contract_name: str, contract_version: str, files: List[Path]) -> 'PackagedSourceCode':
-        entries = cls._create_entries_from_filesystem(project_folder, files)
-        return PackagedSourceCode(contract_name, contract_version, entries)
-
-    @classmethod
-    def _create_entries_from_filesystem(cls, project_folder: Path, files: List[Path]) -> List[PackagedSourceCodeEntry]:
+    def from_filesystem(cls, project_folder: Path, contract_name: str, contract_version: str, source_code_files: List[SourceCodeFile]) -> 'PackagedSourceCode':
         entries: List[PackagedSourceCodeEntry] = []
 
-        for full_path in files:
+        for file in source_code_files:
+            full_path = file.path
             content = full_path.read_bytes()
             relative_path = full_path.relative_to(project_folder)
             entries.append(PackagedSourceCodeEntry(relative_path, content))
 
         _sort_entries(entries)
-        return entries
+        return PackagedSourceCode(contract_name, contract_version, entries)
 
     def unwrap_to_filesystem(self, project_folder: Path):
         for entry in self.entries:
