@@ -17,7 +17,7 @@ def main(cli_args: List[str]):
     contracts = ['distribution', 'energy-factory', 'energy-update', 'factory', 'farm', 'farm-staking', 'farm-staking-proxy', 'farm-with-locked-rewards', 'fees-collector', 'governance', 'governance-v2', 'lkmex-transfer', 'locked-token-wrapper', 'metabonding-staking', 'pair', 'pause-all', 'price-discovery', 'proxy-deployer', 'proxy_dex', 'router', 'simple-lock', 'simple-lock-whitelist', 'token-unstake']
 
     for contract in contracts:
-        for package_whole_project_src in [False]:
+        for package_whole_project_src in [True, False]:
             output_using_project = parent_output_using_project / ("whole" if package_whole_project_src else "truncated")
             output_using_packaged_src = parent_output_using_packaged_src / ("whole" if package_whole_project_src else "truncated")
 

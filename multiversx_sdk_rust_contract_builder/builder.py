@@ -3,9 +3,10 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
-from typing import List
+from typing import Any, Dict, List
 
 from multiversx_sdk_rust_contract_builder import cargo_toml, source_code
+from multiversx_sdk_rust_contract_builder.build_metadata import BuildMetadata
 from multiversx_sdk_rust_contract_builder.build_options import BuildOptions
 from multiversx_sdk_rust_contract_builder.build_outcome import BuildOutcome
 from multiversx_sdk_rust_contract_builder.cargo_toml import (
@@ -19,22 +20,25 @@ from multiversx_sdk_rust_contract_builder.errors import ErrKnown
 from multiversx_sdk_rust_contract_builder.filesystem import find_file_in_folder
 from multiversx_sdk_rust_contract_builder.packaged_source_code import \
     PackagedSourceCode
-from multiversx_sdk_rust_contract_builder.wabt import generate_wabt_artifacts
 
 
-def build_project(options: BuildOptions) -> BuildOutcome:
-    project_folder = options.project_folder.expanduser().resolve()
-    parent_output_folder = options.parent_output_folder.expanduser().resolve()
+def build_project(
+    project_folder: Path,
+    parent_output_folder: Path,
+    metadata: BuildMetadata,
+    options: BuildOptions
+) -> BuildOutcome:
+    project_folder = project_folder.expanduser().resolve()
+    parent_output_folder = parent_output_folder.expanduser().resolve()
     cargo_target_dir = options.cargo_target_dir.expanduser().resolve()
     package_whole_project_src = options.package_whole_project_src
     no_wasm_opt = options.no_wasm_opt
     specific_contract = options.specific_contract
-    context = options.context
     build_root_folder = options.build_root_folder
 
     ensure_output_folder_is_empty(parent_output_folder)
 
-    outcome = BuildOutcome(context)
+    outcome = BuildOutcome(metadata, options)
     contracts_folders = get_contracts_folders(project_folder)
 
     # We copy the whole project folder to the build path, to ensure that all local dependencies are available.
@@ -68,7 +72,14 @@ def build_project(options: BuildOptions) -> BuildOutcome:
         promote_cargo_lock_to_contract_folder(contract_build_subfolder, contract_folder)
 
         # The bundle (packaged source code) is created after build, so that Cargo.lock files are included (if previously missing).
-        create_packaged_source_code(project_within_build_folder, package_whole_project_src, contract_name, contract_version, contract_build_subfolder, output_subfolder)
+        create_packaged_source_code(
+            parent_project_folder=project_within_build_folder,
+            package_whole_project_src=package_whole_project_src,
+            contract_folder=contract_build_subfolder,
+            output_folder=output_subfolder,
+            build_metadata=metadata.to_dict(),
+            build_options=options.to_dict(),
+        )
 
         outcome.gather_artifacts(contract_name, contract_build_subfolder, output_subfolder)
 
@@ -127,7 +138,6 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
         raise ErrKnown(f"Failed to build contract {build_folder}. Return code: {return_code}.")
 
     wasm_file = find_file_in_folder(cargo_output_folder, "*.wasm")
-    generate_wabt_artifacts(wasm_file)
     generate_code_hash_artifact(wasm_file)
 
     shutil.copytree(cargo_output_folder, output_folder, dirs_exist_ok=True)
@@ -136,10 +146,10 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
 def create_packaged_source_code(
         parent_project_folder: Path,
         package_whole_project_src: bool,
-        contract_name: str,
-        contract_version: str,
         contract_folder: Path,
-        output_folder: Path
+        output_folder: Path,
+        build_metadata: Dict[str, Any],
+        build_options: Dict[str, Any]
 ):
     source_code_files = source_code.get_source_code_files(
         project_folder=parent_project_folder,
@@ -148,7 +158,14 @@ def create_packaged_source_code(
     )
 
     contract_name, contract_version = get_contract_name_and_version(contract_folder)
-    package = PackagedSourceCode.from_filesystem(parent_project_folder, contract_name, contract_version, source_code_files)
+    metadata = {
+        "contractName": contract_name,
+        "contractVersion": contract_version,
+        "buildMetadata": build_metadata,
+        "buildOptions": build_options
+    }
+
+    package = PackagedSourceCode.from_filesystem(metadata, parent_project_folder, source_code_files)
     package_path = output_folder / f"{contract_name}-{contract_version}.source.json"
     package.save_to_file(package_path)
 

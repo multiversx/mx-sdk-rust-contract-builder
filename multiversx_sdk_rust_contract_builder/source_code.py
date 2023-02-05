@@ -2,6 +2,7 @@
 import json
 import logging
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -50,10 +51,10 @@ def get_source_code_files(
     files_related_to_contract = set(file.path for file in source_code_files)
 
     if include_unrelated_to_contract:
-        all_files = get_all_files(contract_folder)
+        all_files = get_all_files(contract_folder, _is_source_code_file)
         for file in all_files:
             if file not in files_related_to_contract:
-                source_code_files.append(SourceCodeFile(file, contract_folder, None))
+                source_code_files.append(SourceCodeFile(file, contract_folder, sys.maxsize))
 
     return source_code_files
 

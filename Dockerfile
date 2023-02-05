@@ -1,20 +1,18 @@
 FROM ubuntu:22.04
 
 # Constants
+ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v4.1.3"
 ARG VERSION_RUST="nightly-2022-10-16"
 ARG VERSION_BINARYEN="105-1"
-ARG VERSION_WABT="1.0.27-1"
-ARG CONTEXT="multiversx/sdk-rust-contract-builder:v4.1.3"
 
-# Install dependencies (including binaryen and wabt)
+# Install dependencies (including binaryen)
 RUN apt-get update && apt-get install -y \
     wget \ 
     build-essential \
     python3.11 python-is-python3 python3-pip \
-    binaryen=${VERSION_BINARYEN} \
-    wabt=${VERSION_WABT}
+    binaryen=${VERSION_BINARYEN}
 
-RUN pip3 install toml==0.10.2 semver==2.13.0
+RUN pip3 install toml==0.10.2 semver==3.0.0-dev.4
 
 # Install rust
 RUN wget -O rustup.sh https://sh.rustup.rs && \
@@ -39,12 +37,15 @@ COPY "multiversx_sdk_rust_contract_builder" "/multiversx_sdk_rust_contract_build
 ENV PATH="/rust/bin:${PATH}"
 ENV CARGO_HOME="/rust"
 ENV RUSTUP_HOME="/rust"
-ENV CONTEXT=${CONTEXT}
 ENV PYTHONPATH=/
+ENV BUILD_METADATA_BUILDER_NAME=${BUILDER_NAME}
+ENV BUILD_METADATA_VERSION_RUST=${VERSION_RUST}
+ENV BUILD_METADATA_VERSION_BINARYEN=${VERSION_BINARYEN}
 
 # Additional arguments (must be provided at "docker run"):
 # --project or --packaged-src
 # --no-wasm-opt (optional)
+# --build-root (optional)
 ENTRYPOINT ["python", "/multiversx_sdk_rust_contract_builder/main.py", \
     "--output", "/output", \
     "--cargo-target-dir", "/rust/cargo-target-dir"]
