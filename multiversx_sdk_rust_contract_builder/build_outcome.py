@@ -65,7 +65,6 @@ class BunchOfBuildArtifacts:
         self.abi = BuildArtifact(Path(""))
         self.imports = BuildArtifact(Path(""))
         self.src_package = BuildArtifact(Path(""))
-        self.output_archive = BuildArtifact(Path(""))
 
     @classmethod
     def from_output_folder(cls, output_folder: Path) -> 'BunchOfBuildArtifacts':
@@ -85,7 +84,6 @@ class BunchOfBuildArtifacts:
             "abi": self.abi.path.name,
             "imports": self.imports.path.name,
             "srcPackage": self.src_package.path.name,
-            "outputArchive": self.output_archive.path.name
         }
 
 
