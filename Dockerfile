@@ -22,15 +22,15 @@ RUN wget -O rustup.sh https://sh.rustup.rs && \
     chmod -R 777 /rust && \
     rm -rf /rust/registry
 
-# TODO: remove upon sc-tool release
-RUN apt-get install -y git
 
 # Install sc-tool
-RUN git clone https://github.com/multiversx/mx-sdk-rs.git --branch=meta-local-deps --single-branch --depth=1 && \
+RUN apt-get update && apt-get install -y git && \
+    git clone https://github.com/multiversx/mx-sdk-rs.git --branch=meta-local-deps --single-branch --depth=1 && \
     chmod -R 777 /mx-sdk-rs && \
     cd /mx-sdk-rs/framework/meta && \
     PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install --path . && \
-    rm -rf /rust/registry
+    rm -rf /rust/registry && \
+    apt-get remove -y git
 
 COPY "multiversx_sdk_rust_contract_builder" "/multiversx_sdk_rust_contract_builder"
 
