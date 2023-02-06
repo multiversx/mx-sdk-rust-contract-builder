@@ -54,7 +54,7 @@ def main(cli_args: List[str]):
         docker_general_args += ["--tty"]
 
     docker_general_args += ["--user", f"{str(os.getuid())}:{str(os.getgid())}"]
-    docker_general_args += ["--rm", image]
+    docker_general_args += ["--rm"]
 
     # Prepare docker arguments related to mounting volumes
     docker_mount_args: List[str] = ["--volume", f"{output_path}:/output"]
@@ -87,7 +87,7 @@ def main(cli_args: List[str]):
         entrypoint_args.extend(["--build-root", str(build_root)])
 
     # Run docker container
-    args = docker_general_args + docker_mount_args + entrypoint_args
+    args = docker_general_args + docker_mount_args + [image] + entrypoint_args
     logger.info(f"Running docker: {args}")
 
     result = subprocess.run(args)
@@ -101,5 +101,10 @@ def ensure_output_folder_is_empty(parent_output_folder: Path):
 
 
 if __name__ == "__main__":
-    return_code = main(sys.argv[1:])
-    exit(return_code)
+    try:
+        return_code = main(sys.argv[1:])
+        exit(return_code)
+    except Exception as err:
+        print("An error occurred.")
+        print(err)
+        exit(1)
