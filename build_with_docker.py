@@ -4,7 +4,7 @@ import subprocess
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import List, Union
+from typing import List
 
 logger = logging.getLogger("build-with-docker")
 
@@ -26,7 +26,9 @@ def main(cli_args: List[str]):
     # As of November 2022, both (a) and (b) are still open points.
     parser.add_argument("--cargo-target-dir", type=str)
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
+    parser.add_argument("--build-root", type=str, required=False, help="root path (within container) for the build (default: %(default)s)")
 
+    # Handle CLI arguments
     parsed_args = parser.parse_args(cli_args)
     image = parsed_args.image
     docker_interactive = not parsed_args.no_docker_interactive
@@ -37,35 +39,24 @@ def main(cli_args: List[str]):
     output_path = Path(parsed_args.output).expanduser().resolve()
     cargo_target_dir = Path(parsed_args.cargo_target_dir).expanduser().resolve() if parsed_args.cargo_target_dir else None
     no_wasm_opt = parsed_args.no_wasm_opt
+    build_root = Path(parsed_args.build_root) if parsed_args.build_root else None
 
+    # Prepare (and check) output folder
     output_path.mkdir(parents=True, exist_ok=True)
+    ensure_output_folder_is_empty(output_path)
 
-    return_code = run_docker(
-        image,
-        docker_interactive,
-        docker_tty,
-        project_path,
-        packaged_src_path,
-        contract_path,
-        output_path,
-        cargo_target_dir,
-        no_wasm_opt
-    )
+    # Prepare general docker arguments
+    docker_general_args = ["docker", "run"]
 
-    return return_code
+    if docker_interactive:
+        docker_general_args += ["--interactive"]
+    if docker_tty:
+        docker_general_args += ["--tty"]
 
+    docker_general_args += ["--user", f"{str(os.getuid())}:{str(os.getgid())}"]
+    docker_general_args += ["--rm"]
 
-def run_docker(
-    image: str,
-    docker_interactive: bool,
-    docker_tty: bool,
-    project_path: Union[Path, None],
-    packaged_src_path: Union[Path, None],
-    contract_path: str,
-    output_path: Path,
-    cargo_target_dir: Union[Path, None],
-    no_wasm_opt: bool
-):
+    # Prepare docker arguments related to mounting volumes
     docker_mount_args: List[str] = ["--volume", f"{output_path}:/output"]
 
     if project_path:
@@ -77,17 +68,7 @@ def run_docker(
     if cargo_target_dir:
         docker_mount_args += ["--volume", f"{cargo_target_dir}:/rust/cargo-target-dir"]
 
-    docker_args = ["docker", "run"]
-
-    if docker_interactive:
-        docker_args += ["--interactive"]
-    if docker_tty:
-        docker_args += ["--tty"]
-
-    docker_args += docker_mount_args
-    docker_args += ["--user", f"{str(os.getuid())}:{str(os.getgid())}"]
-    docker_args += ["--rm", image]
-
+    # Prepare entrypoint arguments
     entrypoint_args: List[str] = []
 
     if project_path:
@@ -102,13 +83,28 @@ def run_docker(
     if contract_path:
         entrypoint_args.extend(["--contract", contract_path])
 
-    args = docker_args + entrypoint_args
+    if build_root:
+        entrypoint_args.extend(["--build-root", str(build_root)])
+
+    # Run docker container
+    args = docker_general_args + docker_mount_args + [image] + entrypoint_args
     logger.info(f"Running docker: {args}")
 
     result = subprocess.run(args)
     return result.returncode
 
 
+def ensure_output_folder_is_empty(parent_output_folder: Path):
+    is_empty = len(os.listdir(parent_output_folder)) == 0
+    if not is_empty:
+        raise Exception(f"Output folder must be empty: {parent_output_folder}")
+
+
 if __name__ == "__main__":
-    return_code = main(sys.argv[1:])
-    exit(return_code)
+    try:
+        return_code = main(sys.argv[1:])
+        exit(return_code)
+    except Exception as err:
+        print("An error occurred.")
+        print(err)
+        exit(1)

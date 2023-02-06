@@ -18,8 +18,8 @@ def main(cli_args: List[str]):
 
     for contract in contracts:
         for package_whole_project_src in [True, False]:
-            output_using_project = parent_output_using_project / ("whole" if package_whole_project_src else "truncated")
-            output_using_packaged_src = parent_output_using_packaged_src / ("whole" if package_whole_project_src else "truncated")
+            output_using_project = parent_output_using_project / contract / ("whole" if package_whole_project_src else "truncated")
+            output_using_packaged_src = parent_output_using_packaged_src / contract / ("whole" if package_whole_project_src else "truncated")
 
             output_using_packaged_src.mkdir(parents=True, exist_ok=True)
             output_using_project.mkdir(parents=True, exist_ok=True)

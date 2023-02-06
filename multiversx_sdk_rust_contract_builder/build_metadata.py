@@ -1,0 +1,37 @@
+import os
+from typing import Dict
+
+
+class BuildMetadata:
+    def __init__(
+        self,
+        builder_name: str,
+        version_rust: str,
+        version_binaryen: str,
+        version_wabt: str,
+        version_sc_meta: str,
+    ):
+        self.builder_name = builder_name
+        self.version_rust = version_rust
+        self.version_binaryen = version_binaryen
+        self.version_wabt = version_wabt
+        self.version_sc_meta = version_sc_meta
+
+    @classmethod
+    def from_env(cls) -> 'BuildMetadata':
+        return BuildMetadata(
+            builder_name=os.environ["BUILD_METADATA_BUILDER_NAME"],
+            version_rust=os.environ["BUILD_METADATA_VERSION_RUST"],
+            version_binaryen=os.environ["BUILD_METADATA_VERSION_BINARYEN"],
+            version_wabt=os.environ["BUILD_METADATA_VERSION_WABT"],
+            version_sc_meta=os.environ["BUILD_METADATA_VERSION_SC_META"],
+        )
+
+    def to_dict(self) -> Dict[str, str]:
+        return {
+            "builderName": self.builder_name,
+            "versionRust": self.version_rust,
+            "versionBinaryen": self.version_binaryen,
+            "versionWabt": self.version_wabt,
+            "versionScTool": self.version_sc_meta,
+        }

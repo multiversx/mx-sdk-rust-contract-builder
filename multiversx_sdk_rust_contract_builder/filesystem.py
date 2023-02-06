@@ -1,19 +1,8 @@
 import logging
 from pathlib import Path
 from typing import Callable, Union
-from zipfile import ZIP_DEFLATED, ZipFile
 
 from multiversx_sdk_rust_contract_builder.errors import ErrKnown
-
-
-def archive_folder(archive_file: Path, folder: Path, should_include_file: Union[Callable[[Path], bool], None] = None):
-    files = get_all_files(folder, should_include_file)
-
-    with ZipFile(archive_file, "w", ZIP_DEFLATED) as archive:
-        for full_path in files:
-            archive.write(full_path, full_path.relative_to(folder))
-
-    logging.info(f"Created archive: file = {archive_file}, with size = {archive_file.stat().st_size} bytes")
 
 
 def get_all_files(folder: Path, should_include_file: Union[Callable[[Path], bool], None] = None):

@@ -48,13 +48,9 @@ python3 ./build_with_docker.py --image=sdk-rust-contract-builder:next \
     --output=~/contracts/output-from-docker
 ```
 
-## Run unit tests (without Docker)
+## Run unit tests
 
 ```
-export PATH=${HOME}/multiversx-sdk/vendor-rust/bin:${HOME}/multiversx-sdk/wabt/latest/bin:${PATH}
-export RUSTUP_HOME=${HOME}/multiversx-sdk/vendor-rust
-export CARGO_HOME=${HOME}/multiversx-sdk/vendor-rust
-
 pytest .
 ```
 
