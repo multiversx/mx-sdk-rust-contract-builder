@@ -18,8 +18,8 @@ from multiversx_sdk_rust_contract_builder.constants import (
     OLD_CONTRACT_CONFIG_FILENAME)
 from multiversx_sdk_rust_contract_builder.errors import ErrKnown
 from multiversx_sdk_rust_contract_builder.filesystem import find_file_in_folder
-from multiversx_sdk_rust_contract_builder.packaged_source_code import \
-    PackagedSourceCode
+from multiversx_sdk_rust_contract_builder.packaged_source_code import (
+    PackagedSourceCode, PackagedSourceMetadata)
 
 
 def build_project(
@@ -158,12 +158,12 @@ def create_packaged_source_code(
     )
 
     contract_name, contract_version = get_contract_name_and_version(contract_folder)
-    metadata = {
-        "contractName": contract_name,
-        "contractVersion": contract_version,
-        "buildMetadata": build_metadata,
-        "buildOptions": build_options
-    }
+    metadata = PackagedSourceMetadata(
+        contract_name=contract_name,
+        contract_version=contract_version,
+        build_metadata=build_metadata,
+        build_options=build_options,
+    )
 
     package = PackagedSourceCode.from_filesystem(metadata, parent_project_folder, source_code_files)
     package_path = output_folder / f"{contract_name}-{contract_version}.source.json"

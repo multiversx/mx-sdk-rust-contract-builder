@@ -68,7 +68,11 @@ def check_code_hashes(build: PreviousBuild, output_folder: Path):
     for contract_name, expected_code_hash in build.expected_code_hashs.items():
         print(f"For contract {contract_name}, expecting code hash {expected_code_hash} ...")
 
-        codehash = artifacts["contracts"][contract_name]["codehash"]
+        try:
+            codehash = artifacts["contracts"][contract_name]["codehash"]
+        except KeyError:
+            # Handle "artifacts.json" created by older images
+            codehash = artifacts[contract_name]["codehash"]
         if codehash != expected_code_hash:
             raise Exception(f"{build.name}: codehash mismatch for contract {contract_name}! Expected {expected_code_hash}, got {codehash}")
         print("OK, codehashes match:", codehash)

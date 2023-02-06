@@ -18,11 +18,51 @@ class ISourceCodeFile(Protocol):
     is_test_file: bool
 
 
+class PackagedSourceMetadata:
+    def __init__(
+        self,
+        contract_name: str,
+        contract_version: str,
+        build_metadata: Dict[str, Any],
+        build_options: Dict[str, Any]
+    ):
+        self.contract_name = contract_name
+        self.contract_version = contract_version
+        self.build_metadata = build_metadata
+        self.build_options = build_options
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "contractName": self.contract_name,
+            "contractVersion": self.contract_version,
+            "buildMetadata": self.build_metadata,
+            "buildOptions": self.build_options,
+        }
+
+    @classmethod
+    def from_dict_v1(cls, data: Dict[str, Any]) -> 'PackagedSourceMetadata':
+        return PackagedSourceMetadata(
+            contract_name=data.get("name", "untitled"),
+            contract_version=data.get("version", "0.0.0"),
+            build_metadata={},
+            build_options={}
+        )
+
+    @classmethod
+    def from_dict_v2(cls, data: Dict[str, Any]) -> 'PackagedSourceMetadata':
+        return PackagedSourceMetadata(
+            contract_name=data.get("contractName", "untitled"),
+            contract_version=data.get("contractVersion", "0.0.0"),
+            build_metadata=data.get("buildMetadata", {}),
+            build_options=data.get("buildOptions", {}),
+        )
+
+
 class PackagedSourceCode:
     def __init__(
             self,
             version: str,
-            metadata: Dict[str, Any],
+            metadata: PackagedSourceMetadata,
             entries: Sequence['PackagedSourceCodeEntry'],
     ) -> None:
         self.version = version
@@ -40,12 +80,11 @@ class PackagedSourceCode:
     def from_dict(cls, data: Dict[str, Any]) -> 'PackagedSourceCode':
         schema_version = data.get("schemaVersion", SCHEMA_VERSION_V1)
         if schema_version == SCHEMA_VERSION_V1:
-            metadata = {
-                "name": data.get("name", "untitled"),
-                "version": data.get("version", "0.0.0"),
-            }
+            metadata_raw = data
+            metadata = PackagedSourceMetadata.from_dict_v1(metadata_raw)
         elif schema_version == SCHEMA_VERSION_V2:
-            metadata = data.get("metadata", {})
+            metadata_raw = data.get("metadata", {})
+            metadata = PackagedSourceMetadata.from_dict_v2(metadata_raw)
         else:
             raise ErrKnown(f"Unknown schema version: {schema_version}")
 
@@ -58,7 +97,7 @@ class PackagedSourceCode:
     @classmethod
     def from_filesystem(
         cls,
-        metadata: Dict[str, Any],
+        metadata: PackagedSourceMetadata,
         project_folder: Path,
         source_code_files: Sequence[ISourceCodeFile]
     ) -> 'PackagedSourceCode':
@@ -89,7 +128,7 @@ class PackagedSourceCode:
 
         return {
             "schemaVersion": self.version,
-            "metadata": self.metadata,
+            "metadata": self.metadata.to_dict(),
             "entries": entries
         }
 
