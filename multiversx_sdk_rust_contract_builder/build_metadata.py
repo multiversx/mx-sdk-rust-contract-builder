@@ -10,12 +10,14 @@ class BuildMetadata:
         version_binaryen: str,
         version_wabt: str,
         version_sc_meta: str,
+        target_platform: str,
     ):
         self.builder_name = builder_name
         self.version_rust = version_rust
         self.version_binaryen = version_binaryen
         self.version_wabt = version_wabt
         self.version_sc_meta = version_sc_meta
+        self.target_platform = target_platform
 
     @classmethod
     def from_env(cls) -> 'BuildMetadata':
@@ -25,6 +27,7 @@ class BuildMetadata:
             version_binaryen=os.environ["BUILD_METADATA_VERSION_BINARYEN"],
             version_wabt=os.environ["BUILD_METADATA_VERSION_WABT"],
             version_sc_meta=os.environ["BUILD_METADATA_VERSION_SC_META"],
+            target_platform=os.environ["BUILD_METADATA_TARGET_PLATFORM"],
         )
 
     def to_dict(self) -> Dict[str, str]:
@@ -34,4 +37,5 @@ class BuildMetadata:
             "versionBinaryen": self.version_binaryen,
             "versionWabt": self.version_wabt,
             "versionScTool": self.version_sc_meta,
+            "targetPlatform": self.target_platform,
         }
