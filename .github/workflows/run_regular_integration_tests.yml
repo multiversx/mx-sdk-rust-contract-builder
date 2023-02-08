@@ -27,7 +27,7 @@ jobs:
       - name: Save artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: testdata_output
+          name: testdata_output_regular_integration_tests
           path: |
             ./testdata/output/**/*.*
           if-no-files-found: error
