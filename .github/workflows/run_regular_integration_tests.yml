@@ -23,3 +23,11 @@ jobs:
         run: |
           export PYTHONPATH=.
           python ./integration_tests/test_project_folder_and_packaged_src_are_equivalent.py
+
+      - name: Save artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: testdata_output
+          path: |
+            ./testdata/output/**/*.*
+          if-no-files-found: error
