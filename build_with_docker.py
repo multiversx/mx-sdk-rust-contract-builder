@@ -20,11 +20,7 @@ def main(cli_args: List[str]):
     parser.add_argument("--packaged-src", type=str, help="source code packaged in a JSON file")
     parser.add_argument("--contract", type=str)
     parser.add_argument("--output", type=str, default=Path(os.getcwd()) / "output")
-    # Providing this parameter
-    #   (a) *might* (should, but it doesn't) speed up (subsequent) builds, but
-    #   (b) *might* (with a *very low* probability) break build determinism.
-    # As of November 2022, both (a) and (b) are still open points.
-    parser.add_argument("--cargo-target-dir", type=str)
+    # TODO: add a verbose flag
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
     parser.add_argument("--build-root", type=str, required=False, help="root path (within container) for the build (default: %(default)s)")
 
@@ -37,7 +33,6 @@ def main(cli_args: List[str]):
     packaged_src_path = Path(parsed_args.packaged_src).expanduser().resolve() if parsed_args.packaged_src else None
     contract_path = parsed_args.contract
     output_path = Path(parsed_args.output).expanduser().resolve()
-    cargo_target_dir = Path(parsed_args.cargo_target_dir).expanduser().resolve() if parsed_args.cargo_target_dir else None
     no_wasm_opt = parsed_args.no_wasm_opt
     build_root = Path(parsed_args.build_root) if parsed_args.build_root else None
 
@@ -65,8 +60,17 @@ def main(cli_args: List[str]):
     if packaged_src_path:
         docker_mount_args.extend(["--volume", f"{packaged_src_path}:/packaged-src.json"])
 
-    if cargo_target_dir:
-        docker_mount_args += ["--volume", f"{cargo_target_dir}:/rust/cargo-target-dir"]
+    mounted_cargo_target_dir = Path("/tmp/multiversx_sdk_rust_contract_builder/cargo-target-dir")
+    mounted_cargo_registry = Path("/tmp/multiversx_sdk_rust_contract_builder/cargo-registry")
+    mounted_cargo_git = Path("/tmp/multiversx_sdk_rust_contract_builder/cargo-git")
+
+    mounted_cargo_target_dir.mkdir(parents=True, exist_ok=True)
+    mounted_cargo_registry.mkdir(parents=True, exist_ok=True)
+    mounted_cargo_git.mkdir(parents=True, exist_ok=True)
+
+    docker_mount_args += ["--volume", f"{mounted_cargo_target_dir}:/rust/cargo-target-dir"]
+    docker_mount_args += ["--volume", f"{mounted_cargo_registry}:/rust/registry"]
+    docker_mount_args += ["--volume", f"{mounted_cargo_git}:/rust/git"]
 
     # Prepare entrypoint arguments
     entrypoint_args: List[str] = []

@@ -135,6 +135,8 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
 
     custom_env = os.environ.copy()
     custom_env["RUST_BACKTRACE"] = "1"
+    custom_env["CARGO_NET_GIT_FETCH_WITH_CLI"] = "true"
+    custom_env["CARGO_TERM_VERBOSE"] = "true"
 
     logging.info(f"Building: {args}")
     return_code = subprocess.run(args, cwd=meta_folder, env=custom_env).returncode
