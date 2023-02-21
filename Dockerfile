@@ -1,8 +1,8 @@
 FROM ubuntu:22.04
 
 # Constants
-ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v4.1.3"
-ARG VERSION_RUST="nightly-2022-10-16"
+ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:next"
+ARG VERSION_RUST="nightly-2023-02-20"
 ARG VERSION_BINARYEN="105-1"
 ARG VERSION_WABT="1.0.27-1"
 ARG VERSION_SC_META="0.39.5"
