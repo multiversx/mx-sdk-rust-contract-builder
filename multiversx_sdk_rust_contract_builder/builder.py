@@ -133,8 +133,11 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
     if cargo_toml.does_cargo_build_support_locked(build_folder) and cargo_lock.exists():
         args.append("--locked")
 
+    custom_env = os.environ.copy()
+    custom_env["RUST_BACKTRACE"] = "1"
+
     logging.info(f"Building: {args}")
-    return_code = subprocess.run(args, cwd=meta_folder).returncode
+    return_code = subprocess.run(args, cwd=meta_folder, env=custom_env).returncode
     if return_code != 0:
         raise ErrKnown(f"Failed to build contract {build_folder}. Return code: {return_code}.")
 
