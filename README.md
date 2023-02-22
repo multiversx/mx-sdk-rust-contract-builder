@@ -22,7 +22,7 @@ docker buildx rm multiarch
 
 For the above to work properly, make sure to install `tonistiigi/binfmt` beforehand. Please follow the official Docker documentation [here](https://docs.docker.com/build/building/multi-platform/).
 
-Note that **we only build and publish the image for `linux/amd64`**. We recommend against using a `linux/arm64` image for performing reproducible contract builds. This is because a WASM binary generated on the `linux/arm64` image _might_ differ (at the bytecode level) from one generated on the `linux/amd64` image - probably due to distinct (unfortunate) bytecode-emitting logic in the Rust compiler.
+Note that **we only build and publish the image for `linux/amd64`**. We recommend against using a `linux/arm64` image for performing reproducible contract builds. This is because a WASM binary generated on a `linux/arm64` image _might_ differ (at the bytecode level) from one generated on the recommended `linux/amd64` image - probably due to distinct (unfortunate) bytecode-emitting logic in the Rust compiler.
 
 ## Build contract using the wrapper
 
