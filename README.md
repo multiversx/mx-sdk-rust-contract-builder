@@ -7,7 +7,7 @@ Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.m
 We use `docker buildx` to build the image:
 
 ```
-docker buildx build --output type=docker --no-cache . -t sdk-rust-contract-builder:next -f ./Dockerfile
+docker buildx build --output type=docker . -t sdk-rust-contract-builder:next -f ./Dockerfile
 ```
 
 Maintainers can publish the image as follows:
@@ -15,14 +15,14 @@ Maintainers can publish the image as follows:
 ```
 docker buildx create --name multiarch --use
 
-docker buildx build --no-cache --push --platform=linux/amd64,linux/arm64 . -t multiversx/sdk-rust-contract-builder:next -f ./Dockerfile
+docker buildx build --push --platform=linux/amd64 . -t multiversx/sdk-rust-contract-builder:next -f ./Dockerfile
 
 docker buildx rm multiarch
 ```
 
 For the above to work properly, make sure to install `tonistiigi/binfmt` beforehand. Please follow the official Docker documentation [here](https://docs.docker.com/build/building/multi-platform/).
 
-Though, note that currently (January 2023) we recommend against using the `linux/arm64` image for performing reproducible contract builds. This is because, in some (possibly rare) circumstances, a WASM binary generated on the `linux/amd64` image _might_ differ (at the bytecode level) from one generated on the `linux/arm64` image - probably due to distinct (unfortunate) bytecode-emitting logic in the Rust compiler.
+Note that **we only build and publish the image for `linux/amd64`**. We recommend against using a `linux/arm64` image for performing reproducible contract builds. This is because a WASM binary generated on the `linux/arm64` image _might_ differ (at the bytecode level) from one generated on the `linux/amd64` image - probably due to distinct (unfortunate) bytecode-emitting logic in the Rust compiler.
 
 ## Build contract using the wrapper
 

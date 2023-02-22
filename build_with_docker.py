@@ -20,9 +20,9 @@ def main(cli_args: List[str]):
     parser.add_argument("--packaged-src", type=str, help="source code packaged in a JSON file")
     parser.add_argument("--contract", type=str)
     parser.add_argument("--output", type=str, default=Path(os.getcwd()) / "output")
-    # TODO: add a verbose flag
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
     parser.add_argument("--build-root", type=str, required=False, help="root path (within container) for the build (default: %(default)s)")
+    parser.add_argument("--cargo-verbose", action="store_true", default=False, help="set CARGO_TERM_VERBOSE variable (default: %(default)s)")
 
     # Handle CLI arguments
     parsed_args = parser.parse_args(cli_args)
@@ -35,6 +35,7 @@ def main(cli_args: List[str]):
     output_path = Path(parsed_args.output).expanduser().resolve()
     no_wasm_opt = parsed_args.no_wasm_opt
     build_root = Path(parsed_args.build_root) if parsed_args.build_root else None
+    cargo_verbose = parsed_args.cargo_verbose
 
     # Prepare (and check) output folder
     output_path.mkdir(parents=True, exist_ok=True)
@@ -60,9 +61,10 @@ def main(cli_args: List[str]):
     if packaged_src_path:
         docker_mount_args.extend(["--volume", f"{packaged_src_path}:/packaged-src.json"])
 
-    mounted_cargo_target_dir = Path("/tmp/multiversx_sdk_rust_contract_builder/cargo-target-dir")
-    mounted_cargo_registry = Path("/tmp/multiversx_sdk_rust_contract_builder/cargo-registry")
-    mounted_cargo_git = Path("/tmp/multiversx_sdk_rust_contract_builder/cargo-git")
+    mounted_temporary_root = Path("/tmp/multiversx_sdk_rust_contract_builder")
+    mounted_cargo_target_dir = mounted_temporary_root / "cargo-target-dir"
+    mounted_cargo_registry = mounted_temporary_root / "cargo-registry"
+    mounted_cargo_git = mounted_temporary_root / "cargo-git"
 
     mounted_cargo_target_dir.mkdir(parents=True, exist_ok=True)
     mounted_cargo_registry.mkdir(parents=True, exist_ok=True)
@@ -71,6 +73,8 @@ def main(cli_args: List[str]):
     docker_mount_args += ["--volume", f"{mounted_cargo_target_dir}:/rust/cargo-target-dir"]
     docker_mount_args += ["--volume", f"{mounted_cargo_registry}:/rust/registry"]
     docker_mount_args += ["--volume", f"{mounted_cargo_git}:/rust/git"]
+
+    docker_env_args = ["--env", f"CARGO_TERM_VERBOSE={str(cargo_verbose).lower()}"]
 
     # Prepare entrypoint arguments
     entrypoint_args: List[str] = []
@@ -91,7 +95,7 @@ def main(cli_args: List[str]):
         entrypoint_args.extend(["--build-root", str(build_root)])
 
     # Run docker container
-    args = docker_general_args + docker_mount_args + [image] + entrypoint_args
+    args = docker_general_args + docker_mount_args + docker_env_args + [image] + entrypoint_args
     logger.info(f"Running docker: {args}")
 
     result = subprocess.run(args)

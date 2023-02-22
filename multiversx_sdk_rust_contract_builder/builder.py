@@ -133,9 +133,11 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
         args.append("--locked")
 
     custom_env = os.environ.copy()
-    custom_env["RUST_BACKTRACE"] = "1"
+    # Cargo will use the git executable to fetch registry indexes and git dependencies.
+    #  - https://doc.rust-lang.org/cargo/reference/config.html
+    # This is required to avoid high memory usage when fetching dependencies.
+    # - https://github.com/rust-lang/cargo/issues/10583
     custom_env["CARGO_NET_GIT_FETCH_WITH_CLI"] = "true"
-    custom_env["CARGO_TERM_VERBOSE"] = "true"
 
     logging.info(f"Building: {args}")
     return_code = subprocess.run(args, cwd=meta_folder, env=custom_env).returncode
