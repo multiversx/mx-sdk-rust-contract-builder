@@ -132,8 +132,15 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
     if cargo_toml.does_cargo_build_support_locked(build_folder) and cargo_lock.exists():
         args.append("--locked")
 
+    custom_env = os.environ.copy()
+    # Cargo will use the git executable to fetch registry indexes and git dependencies.
+    #  - https://doc.rust-lang.org/cargo/reference/config.html
+    # This is required to avoid high memory usage when fetching dependencies.
+    # - https://github.com/rust-lang/cargo/issues/10583
+    custom_env["CARGO_NET_GIT_FETCH_WITH_CLI"] = "true"
+
     logging.info(f"Building: {args}")
-    return_code = subprocess.run(args, cwd=meta_folder).returncode
+    return_code = subprocess.run(args, cwd=meta_folder, env=custom_env).returncode
     if return_code != 0:
         raise ErrKnown(f"Failed to build contract {build_folder}. Return code: {return_code}.")
 

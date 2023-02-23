@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 
 # Constants
-ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v4.1.3"
+ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v4.1.4"
 ARG VERSION_RUST="nightly-2022-10-16"
 ARG VERSION_BINARYEN="105-1"
 ARG VERSION_WABT="1.0.27-1"
@@ -14,6 +14,7 @@ RUN sed -i 's|http://archive.ubuntu.com|http://de.archive.ubuntu.com|g' /etc/apt
 RUN apt-get update --fix-missing && apt-get install -y \
     wget \ 
     build-essential \
+    git \
     python3.11 python-is-python3 python3-pip \
     binaryen=${VERSION_BINARYEN} \
     wabt=${VERSION_WABT}
