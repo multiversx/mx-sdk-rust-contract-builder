@@ -40,6 +40,7 @@ def build_project(
 
     outcome = BuildOutcome(metadata, options)
     contracts_folders = get_contracts_folders(project_folder)
+    ensure_distinct_contract_names(contracts_folders)
 
     # We copy the whole project folder to the build path, to ensure that all local dependencies are available.
     project_within_build_folder = copy_project_folder_to_build_folder(project_folder, build_root_folder)
@@ -98,6 +99,15 @@ def get_contracts_folders(project_path: Path) -> List[Path]:
     marker_files = old_markers + new_markers
     folders = [marker_file.parent for marker_file in marker_files]
     return sorted(folders)
+
+
+def ensure_distinct_contract_names(contracts_folders):
+    names = set()
+    for folder in sorted(contracts_folders):
+        name, = get_contract_name_and_version(folder)
+        if name in names:
+            raise Exception(f"Name \"{name}\" already associated to another contract.")
+        names.add(name)
 
 
 def copy_project_folder_to_build_folder(project_folder: Path, build_root_folder: Path):
