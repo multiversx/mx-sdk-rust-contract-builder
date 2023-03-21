@@ -104,7 +104,7 @@ def get_contracts_folders(project_path: Path) -> List[Path]:
 def ensure_distinct_contract_names(contracts_folders):
     names = set()
     for folder in sorted(contracts_folders):
-        name, = get_contract_name_and_version(folder)
+        name, _ = get_contract_name_and_version(folder)
         if name in names:
             raise Exception(f"Name \"{name}\" already associated to another contract.")
         names.add(name)
