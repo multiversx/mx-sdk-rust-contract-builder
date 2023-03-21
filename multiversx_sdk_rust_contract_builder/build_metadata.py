@@ -27,7 +27,7 @@ class BuildMetadata:
             version_binaryen=os.environ["BUILD_METADATA_VERSION_BINARYEN"],
             version_wabt=os.environ["BUILD_METADATA_VERSION_WABT"],
             version_sc_meta=os.environ["BUILD_METADATA_VERSION_SC_META"],
-            target_platform=os.environ["BUILD_METADATA_TARGET_PLATFORM"],
+            target_platform=os.environ["BUILD_METADATA_TARGETPLATFORM"],
         )
 
     def to_dict(self) -> Dict[str, str]:
