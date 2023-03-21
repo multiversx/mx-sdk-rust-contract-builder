@@ -98,7 +98,7 @@ def get_contracts_folders(project_path: Path) -> List[Path]:
     new_markers = list(project_path.glob(f"**/{CONTRACT_CONFIG_FILENAME}"))
     marker_files = old_markers + new_markers
     folders = [marker_file.parent for marker_file in marker_files]
-    return sorted(folders)
+    return sorted(set(folders))
 
 
 def ensure_distinct_contract_names(contracts_folders):
