@@ -6,13 +6,14 @@ ARG VERSION_RUST="nightly-2022-10-16"
 ARG VERSION_BINARYEN="105-1"
 ARG VERSION_WABT="1.0.27-1"
 ARG VERSION_SC_META="0.39.5"
+ARG TARGETPLATFORM
 
 # Temporary workaround. Default Ubuntu archive mirrors are down.
 RUN sed -i 's|http://archive.ubuntu.com|http://de.archive.ubuntu.com|g' /etc/apt/sources.list
 
 # Install dependencies
 RUN apt-get update --fix-missing && apt-get install -y \
-    wget \ 
+    wget \
     build-essential \
     git \
     python3.11 python-is-python3 python3-pip \
@@ -45,6 +46,7 @@ ENV BUILD_METADATA_VERSION_RUST=${VERSION_RUST}
 ENV BUILD_METADATA_VERSION_BINARYEN=${VERSION_BINARYEN}
 ENV BUILD_METADATA_VERSION_WABT=${VERSION_WABT}
 ENV BUILD_METADATA_VERSION_SC_META=${VERSION_SC_META}
+ENV BUILD_METADATA_TARGETPLATFORM=${TARGETPLATFORM}
 
 # Additional arguments (must be provided at "docker run"):
 # --project or --packaged-src
