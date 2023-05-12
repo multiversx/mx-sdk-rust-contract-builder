@@ -7,14 +7,15 @@ from integration_tests.shared import download_project_repository, run_docker
 
 
 def main(cli_args: List[str]):
-    project_path = download_project_repository("https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/main.zip", "mx-exchange-sc-main")
+    # TODO: when possible, use multiversx/mx-exchange-sc (as of May 2023, it references mx-sdk-rs < v0.41.0, thus cannot be used for testing reproducible builds v5).
+    project_path = download_project_repository("https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/heads/main.zip", "mx-exchange-sc-main")
     parent_output_using_project = PARENT_OUTPUT_FOLDER / "using-project"
     parent_output_using_packaged_src = PARENT_OUTPUT_FOLDER / "using-packaged-src"
 
     shutil.rmtree(parent_output_using_project, ignore_errors=True)
     shutil.rmtree(parent_output_using_packaged_src, ignore_errors=True)
 
-    contracts = ['distribution', 'energy-factory', 'energy-update', 'factory', 'farm', 'farm-staking', 'farm-staking-proxy', 'farm-with-locked-rewards', 'fees-collector', 'governance', 'governance-v2', 'lkmex-transfer', 'locked-token-wrapper', 'metabonding-staking', 'pair', 'pause-all', 'price-discovery', 'proxy-deployer', 'proxy_dex', 'router', 'simple-lock', 'simple-lock-whitelist', 'token-unstake']
+    contracts = ['adder']
 
     for contract in contracts:
         for package_whole_project_src in [True, False]:
