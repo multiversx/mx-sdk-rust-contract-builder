@@ -22,7 +22,7 @@ class PreviousBuild:
 previous_builds: List[PreviousBuild] = [
     PreviousBuild(
         name="a.1",
-        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.3.0-alpha.1.zip",
+        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.3.0.zip",
         project_relative_path_in_archive=None,
         packaged_src_url=None,
         contract_name=None,
