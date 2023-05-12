@@ -16,12 +16,12 @@ def download_project_repository(zip_archive_url: str, name: str) -> Path:
     EXTRACTED_FOLDER.mkdir(parents=True, exist_ok=True)
 
     download_to_path = DOWNLOADS_FOLDER / f"{name}.zip"
-    extract_to_path = EXTRACTED_FOLDER / name / "wrapper"
+    extract_to_path = EXTRACTED_FOLDER / name
 
     urllib.request.urlretrieve(zip_archive_url, download_to_path)
     shutil.rmtree(extract_to_path, ignore_errors=True)
     shutil.unpack_archive(download_to_path, extract_to_path)
-    return extract_to_path.parent
+    return extract_to_path
 
 
 def download_packaged_src(json_url: str, name: str) -> Path:
