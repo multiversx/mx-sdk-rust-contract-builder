@@ -1,4 +1,5 @@
 import json
+import logging
 import shutil
 import sys
 from argparse import ArgumentParser
@@ -13,6 +14,8 @@ from integration_tests.shared import (download_packaged_src,
 
 
 def main(cli_args: List[str]):
+    logging.basicConfig(level=logging.DEBUG)
+
     parser = ArgumentParser()
     parser.add_argument("--selected-builds", nargs='+')
     parsed_args = parser.parse_args(cli_args)

@@ -8,6 +8,8 @@ from integration_tests.shared import download_project_repository, run_docker
 
 
 def main(cli_args: List[str]):
+    logging.basicConfig(level=logging.DEBUG)
+
     # TODO: when possible, use multiversx/mx-exchange-sc (as of May 2023, it references mx-sdk-rs < v0.41.0, thus cannot be used for testing reproducible builds v5).
     project_path = download_project_repository("https://github.com/defralcoding/xBulk/archive/refs/heads/main.zip", "xBulk-main")
 
@@ -41,6 +43,11 @@ def main(cli_args: List[str]):
             packaged_src_path = output_using_project / f"{contract}/{contract}-0.0.0.source.json"
 
             logging.info(f"Running docker for {contract} with package_whole_project_src={package_whole_project_src}, using packaged src={packaged_src_path}")
+
+            logging.info("Checking src file...")
+
+            content = packaged_src_path.read_text()
+            print(content)
 
             run_docker(
                 project_path=None,
