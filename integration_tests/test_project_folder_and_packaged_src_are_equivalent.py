@@ -1,3 +1,4 @@
+import logging
 import shutil
 import sys
 from typing import List
@@ -9,6 +10,7 @@ from integration_tests.shared import download_project_repository, run_docker
 def main(cli_args: List[str]):
     # TODO: when possible, use multiversx/mx-exchange-sc (as of May 2023, it references mx-sdk-rs < v0.41.0, thus cannot be used for testing reproducible builds v5).
     project_path = download_project_repository("https://github.com/defralcoding/xBulk/archive/refs/heads/main.zip", "xBulk-main")
+
     parent_output_using_project = PARENT_OUTPUT_FOLDER / "using-project"
     parent_output_using_packaged_src = PARENT_OUTPUT_FOLDER / "using-packaged-src"
 
@@ -18,12 +20,14 @@ def main(cli_args: List[str]):
     contracts = ['xbulk']
 
     for contract in contracts:
-        for package_whole_project_src in [True, False]:
+        for package_whole_project_src in [True]:
             output_using_project = parent_output_using_project / contract / ("whole" if package_whole_project_src else "truncated")
             output_using_packaged_src = parent_output_using_packaged_src / contract / ("whole" if package_whole_project_src else "truncated")
 
             output_using_packaged_src.mkdir(parents=True, exist_ok=True)
             output_using_project.mkdir(parents=True, exist_ok=True)
+
+            logging.info(f"Running docker for {contract} with package_whole_project_src={package_whole_project_src}")
 
             run_docker(
                 project_path=project_path,
@@ -35,6 +39,8 @@ def main(cli_args: List[str]):
             )
 
             packaged_src_path = output_using_project / f"{contract}/{contract}-0.0.0.source.json"
+
+            logging.info(f"Running docker for {contract} with package_whole_project_src={package_whole_project_src}, using packaged src={packaged_src_path}")
 
             run_docker(
                 project_path=None,
