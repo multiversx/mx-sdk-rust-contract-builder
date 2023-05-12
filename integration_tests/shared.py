@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import subprocess
@@ -48,6 +49,7 @@ def run_docker(
         docker_mount_args.extend(["--volume", f"{project_path}:/project"])
 
     if packaged_src_path:
+        logging.info(f"Mounting packaged source code from {packaged_src_path}")
         docker_mount_args.extend(["--volume", f"{packaged_src_path}:/packaged-src.json"])
 
     docker_mount_args += ["--volume", f"{CARGO_TARGET_DIR}:/rust/cargo-target-dir"]

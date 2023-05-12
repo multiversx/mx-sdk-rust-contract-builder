@@ -1,6 +1,7 @@
 
 import base64
 import json
+import logging
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Protocol, Sequence
@@ -118,6 +119,7 @@ class PackagedSourceCode:
                 f.write(entry.content)
 
     def save_to_file(self, path: Path):
+        logging.info(f"Saving packaged source code to {path}")
         data = self.to_dict()
 
         with open(path, "w") as f:
