@@ -40,18 +40,9 @@ def main(cli_args: List[str]):
                 output_folder=output_using_project
             )
 
-            logging.info("Checking output content...")
-            output_using_project_files = sorted((output_using_project).rglob("*"))
-            print(output_using_project_files)
-
             packaged_src_path = output_using_project / f"{contract}/{contract}-2.0.0.source.json"
 
             logging.info(f"Running docker for {contract} with package_whole_project_src={package_whole_project_src}, using packaged src={packaged_src_path}")
-
-            logging.info("Checking src file...")
-
-            content = packaged_src_path.read_text()
-            print(content)
 
             run_docker(
                 project_path=None,
