@@ -44,7 +44,7 @@ def main(cli_args: List[str]):
             output_using_project_files = sorted((output_using_project).rglob("*"))
             print(output_using_project_files)
 
-            packaged_src_path = output_using_project / f"{contract}/{contract}-0.0.0.source.json"
+            packaged_src_path = output_using_project / f"{contract}/{contract}-2.0.0.source.json"
 
             logging.info(f"Running docker for {contract} with package_whole_project_src={package_whole_project_src}, using packaged src={packaged_src_path}")
 
