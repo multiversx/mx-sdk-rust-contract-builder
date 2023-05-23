@@ -5,7 +5,8 @@ from typing import Any, Dict, Protocol
 
 from multiversx_sdk_rust_contract_builder.cargo_toml import \
     get_contract_name_and_version
-from multiversx_sdk_rust_contract_builder.filesystem import find_file_in_folder
+from multiversx_sdk_rust_contract_builder.filesystem import (
+    find_file_in_folder, find_files_in_folder)
 
 
 class IWithToDict(Protocol):
@@ -18,8 +19,9 @@ class BuildOutcome:
         self.build_metadata = build_metadata
         self.build_options = build_options
 
-    def gather_artifacts(self, contract_name: str, build_folder: Path, output_subfolder: Path):
-        self.contracts[contract_name] = BuildOutcomeEntry.from_folders(build_folder, output_subfolder)
+    def gather_artifacts(self, build_folder: Path, output_subfolder: Path):
+        entries = BuildOutcomeEntry.many_from_folders(build_folder, output_subfolder)
+        self.contracts.update(entries)
 
     def get_entry(self, contract_name: str) -> 'BuildOutcomeEntry':
         return self.contracts[contract_name]
@@ -47,44 +49,37 @@ class BuildOutcomeEntry:
     def __init__(self) -> None:
         self.version = ""
         self.codehash = ""
-        self.artifacts = BunchOfBuildArtifacts()
+        self.bytecode_path = BuildArtifact(Path(""))
+        self.abi_path = BuildArtifact(Path(""))
+        self.src_package_path = BuildArtifact(Path(""))
 
     @classmethod
-    def from_folders(cls, build_folder: Path, output_folder: Path) -> 'BuildOutcomeEntry':
-        entry = BuildOutcomeEntry()
-        _, entry.version = get_contract_name_and_version(build_folder)
-        entry.codehash = find_file_in_folder(output_folder, "*.codehash.txt").read_text()
-        entry.artifacts = BunchOfBuildArtifacts.from_output_folder(output_folder)
-        return entry
+    def many_from_folders(cls, build_folder: Path, output_folder: Path) -> Dict[str, 'BuildOutcomeEntry']:
+        _, version = get_contract_name_and_version(build_folder)
+        wasm_files = find_files_in_folder(output_folder, "*.wasm")
+
+        result: Dict[str, BuildOutcomeEntry] = {}
+
+        for wasm_file in wasm_files:
+            contract_name = wasm_file.stem
+            entry = BuildOutcomeEntry()
+            entry.version = version
+            entry.codehash = find_file_in_folder(output_folder, f"{contract_name}.codehash.txt").read_text()
+            entry.bytecode_path = BuildArtifact.find_in_output(f"{contract_name}.wasm", output_folder)
+            entry.abi_path = BuildArtifact.find_in_output(f"{contract_name}.abi.json", output_folder)
+            entry.src_package_path = BuildArtifact.find_in_output("*.source.json", output_folder)
+
+        return result
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "version": self.version,
             "codehash": self.codehash,
-            "artifacts": self.artifacts.to_dict()
-        }
-
-
-class BunchOfBuildArtifacts:
-    def __init__(self) -> None:
-        self.bytecode = BuildArtifact(Path(""))
-        self.abi = BuildArtifact(Path(""))
-        self.src_package = BuildArtifact(Path(""))
-
-    @classmethod
-    def from_output_folder(cls, output_folder: Path) -> 'BunchOfBuildArtifacts':
-        artifacts = BunchOfBuildArtifacts()
-        artifacts.bytecode = BuildArtifact.find_in_output("*.wasm", output_folder)
-        artifacts.abi = BuildArtifact.find_in_output("*.abi.json", output_folder)
-        artifacts.src_package = BuildArtifact.find_in_output("*.source.json", output_folder)
-
-        return artifacts
-
-    def to_dict(self) -> Dict[str, str]:
-        return {
-            "bytecode": self.bytecode.path.name,
-            "abi": self.abi.path.name,
-            "srcPackage": self.src_package.path.name,
+            "artifacts": {
+                "bytecode": self.bytecode_path.path.name,
+                "abi": self.abi_path.path.name,
+                "srcPackage": self.src_package_path.path.name,
+            }
         }
 
 

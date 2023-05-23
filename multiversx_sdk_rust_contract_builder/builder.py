@@ -82,7 +82,7 @@ def build_project(
             build_options=options.to_dict(),
         )
 
-        outcome.gather_artifacts(contract_name, contract_build_subfolder, output_subfolder)
+        outcome.gather_artifacts(contract_build_subfolder, output_subfolder)
 
     return outcome
 
