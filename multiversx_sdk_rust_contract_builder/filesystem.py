@@ -18,11 +18,11 @@ def find_files_in_folder(folder: Path, pattern: str) -> List[Path]:
     if len(files) == 0:
         raise ErrKnown(f"No file matches pattern [{pattern}] in folder {folder}")
 
-    return [Path(file).resolve() for file in files]
+    return sorted([Path(file).resolve() for file in files])
 
 
 def find_file_in_folder(folder: Path, pattern: str) -> Path:
-    files = list(folder.rglob(pattern))
+    files = sorted(list(folder.rglob(pattern)))
 
     if len(files) == 0:
         raise ErrKnown(f"No file matches pattern [{pattern}] in folder {folder}")

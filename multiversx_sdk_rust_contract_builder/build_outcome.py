@@ -55,7 +55,10 @@ class BuildOutcomeEntry:
 
     @classmethod
     def many_from_folders(cls, build_folder: Path, output_folder: Path) -> Dict[str, 'BuildOutcomeEntry']:
+        # Note: sub-contracts of multi-contracts share the same version.
         _, version = get_contract_name_and_version(build_folder)
+
+        # We consider all *.wasm files in the output folder to be standalone contracts or sub-contracts of multi-contracts.
         wasm_files = find_files_in_folder(output_folder, "*.wasm")
 
         result: Dict[str, BuildOutcomeEntry] = {}
@@ -68,6 +71,8 @@ class BuildOutcomeEntry:
             entry.bytecode_path = BuildArtifact.find_in_output(f"{contract_name}.wasm", output_folder)
             entry.abi_path = BuildArtifact.find_in_output(f"{contract_name}.abi.json", output_folder)
             entry.src_package_path = BuildArtifact.find_in_output("*.source.json", output_folder)
+
+            result[contract_name] = entry
 
         return result
 
