@@ -63,7 +63,7 @@ def _is_source_code_file(path: Path) -> bool:
         return True
     if path.parent.name == "meta" and path.name == "Cargo.lock":
         return False
-    if path.name in ["Cargo.toml", "Cargo.lock", CONTRACT_CONFIG_FILENAME]:
+    if path.name in ["Cargo.toml", "Cargo.lock", "multicontract.toml", CONTRACT_CONFIG_FILENAME]:
         return True
     return False
 

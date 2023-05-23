@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Callable, Union
+from typing import Callable, List, Union
 
 from multiversx_sdk_rust_contract_builder.errors import ErrKnown
 
@@ -10,6 +10,15 @@ def get_all_files(folder: Path, should_include_file: Union[Callable[[Path], bool
     paths = list(folder.rglob("*"))
     paths = [path for path in paths if path.is_file() and should_include_file(path)]
     return paths
+
+
+def find_files_in_folder(folder: Path, pattern: str) -> List[Path]:
+    files = list(folder.rglob(pattern))
+
+    if len(files) == 0:
+        raise ErrKnown(f"No file matches pattern [{pattern}] in folder {folder}")
+
+    return [Path(file).resolve() for file in files]
 
 
 def find_file_in_folder(folder: Path, pattern: str) -> Path:
