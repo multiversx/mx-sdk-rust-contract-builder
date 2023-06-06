@@ -22,26 +22,16 @@ class PreviousBuild:
 previous_builds: List[PreviousBuild] = [
     PreviousBuild(
         name="a.1",
-        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.3.0.zip",
-        project_relative_path_in_archive=None,
+        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.4.0.zip",
+        project_relative_path_in_archive="mx-reproducible-contract-build-example-sc-0.4.0",
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
-            "adder": "9fd12f88f9474ba115fb75e9d18a8fdbc4f42147de005445048442d49c3aa725"
+            "adder": "9fd12f88f9474ba115fb75e9d18a8fdbc4f42147de005445048442d49c3aa725",
+            "multisig": "2101bc2a7a31ea42e5ffaadd86c1640009690e93b1cb46c3566ba5eac2984e36",
+            "multisig-full": "ef468403354b6d3a728f86101354359fe6864187d216f674d99b31fc05313a39",
+            "multisig-view": "3690af76be10c0520e3c3545cde8d9ef6a15c2d0af74dbd8704b4909644049c9"
         },
-        docker_image="sdk-rust-contract-builder:next"
-    ),
-    PreviousBuild(
-        name="a.2",
-        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/heads/add-multisig.zip",
-        project_relative_path_in_archive=None,
-        packaged_src_url=None,
-        contract_name=None,
-        expected_code_hashes={
-            "multisig": "5cc02a06d3c921a31ecbfe351a69ac2309c7c42a4a82152ee0df09cf8c4c73b6",
-            "multisig-full": "6a739f31c52fd2284ff77a8ef6f5c50f94ab8511fe1f772e5400d3c0e425a46b",
-            "multisig-view": "50da33a67b84a8b754ac8efdb30cb9424ff2173622a6d6083522c21f36bde8ac"
-        },
-        docker_image="sdk-rust-contract-builder:next"
+        docker_image="multiversx/sdk-rust-contract-builder:v5.1.0"
     )
 ]
