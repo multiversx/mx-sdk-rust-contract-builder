@@ -16,7 +16,8 @@ from multiversx_sdk_rust_contract_builder.codehash import \
 from multiversx_sdk_rust_contract_builder.constants import (
     CONTRACT_CONFIG_FILENAME, MAX_PACKAGED_SOURCE_CODE_SIZE)
 from multiversx_sdk_rust_contract_builder.errors import ErrKnown
-from multiversx_sdk_rust_contract_builder.filesystem import find_file_in_folder
+from multiversx_sdk_rust_contract_builder.filesystem import \
+    find_files_in_folder
 from multiversx_sdk_rust_contract_builder.packaged_source_code import (
     PackagedSourceCode, PackagedSourceMetadata)
 
@@ -81,7 +82,7 @@ def build_project(
             build_options=options.to_dict(),
         )
 
-        outcome.gather_artifacts(contract_name, contract_build_subfolder, output_subfolder)
+        outcome.gather_artifacts(contract_build_subfolder, output_subfolder)
 
     return outcome
 
@@ -153,8 +154,10 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
     if return_code != 0:
         raise ErrKnown(f"Failed to build contract {build_folder}. Return code: {return_code}.")
 
-    wasm_file = find_file_in_folder(cargo_output_folder, "*.wasm")
-    generate_code_hash_artifact(wasm_file)
+    # One or more WASM files should have been generated.
+    wasm_files = find_files_in_folder(cargo_output_folder, "*.wasm")
+    for wasm_file in wasm_files:
+        generate_code_hash_artifact(wasm_file)
 
     shutil.copytree(cargo_output_folder, output_folder, dirs_exist_ok=True)
 
