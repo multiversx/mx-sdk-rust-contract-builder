@@ -1,8 +1,8 @@
 FROM ubuntu:22.04
 
 # Constants
-ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v5.1.0"
-ARG VERSION_RUST="nightly-2023-04-24"
+ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v5.2.0"
+ARG VERSION_RUST="nightly-2023-05-26"
 ARG VERSION_BINARYEN="version_112"
 ARG DOWNLOAD_URL_BINARYEN="https://github.com/WebAssembly/binaryen/releases/download/${VERSION_BINARYEN}/binaryen-${VERSION_BINARYEN}-x86_64-linux.tar.gz"
 ARG VERSION_WABT="1.0.27-1"
