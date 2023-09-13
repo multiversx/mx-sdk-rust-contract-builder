@@ -1,12 +1,12 @@
 FROM ubuntu:22.04
 
 # Constants
-ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v5.2.0"
+ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v5.3.0"
 ARG VERSION_RUST="nightly-2023-05-26"
 ARG VERSION_BINARYEN="version_112"
 ARG DOWNLOAD_URL_BINARYEN="https://github.com/WebAssembly/binaryen/releases/download/${VERSION_BINARYEN}/binaryen-${VERSION_BINARYEN}-x86_64-linux.tar.gz"
 ARG VERSION_WABT="1.0.27-1"
-ARG VERSION_SC_META="0.41.0"
+ARG VERSION_SC_META="0.43.3"
 ARG TARGETPLATFORM
 
 # Install system dependencies
@@ -15,7 +15,9 @@ RUN apt-get update --fix-missing && apt-get install -y \
     build-essential \
     git \
     python3.11 python-is-python3 python3-pip \
-    wabt=${VERSION_WABT}
+    wabt=${VERSION_WABT} \
+    pkg-config \
+    libssl-dev
 
 # Install binaryen
 RUN wget -O binaryen.tar.gz ${DOWNLOAD_URL_BINARYEN} && \
