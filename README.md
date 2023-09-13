@@ -7,7 +7,7 @@ Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.m
 We use `docker buildx` to build the image:
 
 ```
-docker buildx build --output type=docker . -t sdk-rust-contract-builder:next -f ./Dockerfile
+docker buildx build --network host  --output type=docker . -t sdk-rust-contract-builder:next -f ./Dockerfile
 ```
 
 Maintainers can publish the image as follows:
@@ -15,7 +15,7 @@ Maintainers can publish the image as follows:
 ```
 docker buildx create --name multiarch --use
 
-docker buildx build --push --platform=linux/amd64 . -t multiversx/sdk-rust-contract-builder:next -f ./Dockerfile
+docker buildx build --network host --push --platform=linux/amd64 . -t multiversx/sdk-rust-contract-builder:next -f ./Dockerfile
 
 docker buildx rm multiarch
 ```
