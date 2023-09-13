@@ -37,7 +37,7 @@ previous_builds: List[PreviousBuild] = [
     PreviousBuild(
         name="a.2",
         project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.4.3.zip",
-        project_relative_path_in_archive="",
+        project_relative_path_in_archive="mx-reproducible-contract-build-example-sc-0.4.3",
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
