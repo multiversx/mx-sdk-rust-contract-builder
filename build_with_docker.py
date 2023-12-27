@@ -20,7 +20,7 @@ def main(cli_args: List[str]):
     parser.add_argument("--packaged-src", type=str, help="source code packaged in a JSON file")
     parser.add_argument("--contract", type=str)
     parser.add_argument("--output", type=str, default=Path(os.getcwd()) / "output")
-    parser.add_argument("--package-whole-project-src", type=bool, default=False, help="include all project files in *.source.json (default: %(default)s)")
+    parser.add_argument("--package-whole-project-src", action="store_true", default=False, help="include all project files in *.source.json (default: %(default)s)")
     parser.add_argument("--cargo-target-dir", help="deprecated parameter, not used anymore")
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
     parser.add_argument("--build-root", type=str, required=False, help="root path (within container) for the build (default: %(default)s)")
