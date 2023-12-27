@@ -47,5 +47,18 @@ previous_builds: List[PreviousBuild] = [
             "multisig-view": "ebaf987b041fcda297da71291d76736e4e98a1e449e5ec37908cdc0198e8be37"
         },
         docker_image="multiversx/sdk-rust-contract-builder:v5.3.0"
+    ),
+    PreviousBuild(
+        name="a.3",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/v2.4.1-pair-safe-price-v2-reproducible.zip",
+        project_relative_path_in_archive="mx-exchange-sc-2.4.1-pair-safe-price-v2-reproducible",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "pair": "e9f117971963cb3c24b14e2a7698d48c170335af2f5c8167774c48c3c1c654e3",
+            "pair-full": "f1af2b2bb42a9f035745777e4b2d4f72478569224f204d0d0103801faff9663a",
+            "safe-price-view": "b5a657445ae74423c60210c88a6fa89b0bd4bdd00d5f06e788e14495bccc34c9"
+        },
+        docker_image="sdk-rust-contract-builder:next"
     )
 ]
