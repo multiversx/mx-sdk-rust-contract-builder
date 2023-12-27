@@ -7,8 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from multiversx_sdk_rust_contract_builder.constants import (
-    CONTRACT_CONFIG_FILENAME, OLD_CONTRACT_CONFIG_FILENAME,
-    SC_META_LOCAL_DEPS_FILENAME)
+    CONTRACT_CONFIG_FILENAME, SC_META_LOCAL_DEPS_FILENAME)
 from multiversx_sdk_rust_contract_builder.errors import ErrKnown
 from multiversx_sdk_rust_contract_builder.filesystem import get_all_files
 from multiversx_sdk_rust_contract_builder.source_code_file import \
@@ -64,7 +63,7 @@ def _is_source_code_file(path: Path) -> bool:
         return True
     if path.parent.name == "meta" and path.name == "Cargo.lock":
         return False
-    if path.name in ["Cargo.toml", "Cargo.lock", CONTRACT_CONFIG_FILENAME, OLD_CONTRACT_CONFIG_FILENAME]:
+    if path.name in ["Cargo.toml", "Cargo.lock", "multicontract.toml", CONTRACT_CONFIG_FILENAME]:
         return True
     return False
 

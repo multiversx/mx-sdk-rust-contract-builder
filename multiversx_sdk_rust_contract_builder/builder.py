@@ -3,7 +3,7 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Set
 
 from multiversx_sdk_rust_contract_builder import cargo_toml, source_code
 from multiversx_sdk_rust_contract_builder.build_metadata import BuildMetadata
@@ -14,10 +14,10 @@ from multiversx_sdk_rust_contract_builder.cargo_toml import (
 from multiversx_sdk_rust_contract_builder.codehash import \
     generate_code_hash_artifact
 from multiversx_sdk_rust_contract_builder.constants import (
-    CONTRACT_CONFIG_FILENAME, MAX_PACKAGED_SOURCE_CODE_SIZE,
-    OLD_CONTRACT_CONFIG_FILENAME)
+    CONTRACT_CONFIG_FILENAME, MAX_PACKAGED_SOURCE_CODE_SIZE)
 from multiversx_sdk_rust_contract_builder.errors import ErrKnown
-from multiversx_sdk_rust_contract_builder.filesystem import find_file_in_folder
+from multiversx_sdk_rust_contract_builder.filesystem import \
+    find_files_in_folder
 from multiversx_sdk_rust_contract_builder.packaged_source_code import (
     PackagedSourceCode, PackagedSourceMetadata)
 
@@ -40,6 +40,7 @@ def build_project(
 
     outcome = BuildOutcome(metadata, options)
     contracts_folders = get_contracts_folders(project_folder)
+    ensure_distinct_contract_names(contracts_folders)
 
     # We copy the whole project folder to the build path, to ensure that all local dependencies are available.
     project_within_build_folder = copy_project_folder_to_build_folder(project_folder, build_root_folder)
@@ -81,7 +82,7 @@ def build_project(
             build_options=options.to_dict(),
         )
 
-        outcome.gather_artifacts(contract_name, contract_build_subfolder, output_subfolder)
+        outcome.gather_artifacts(contract_build_subfolder, output_subfolder)
 
     return outcome
 
@@ -93,11 +94,20 @@ def ensure_output_folder_is_empty(parent_output_folder: Path):
 
 
 def get_contracts_folders(project_path: Path) -> List[Path]:
-    old_markers = list(project_path.glob(f"**/{OLD_CONTRACT_CONFIG_FILENAME}"))
-    new_markers = list(project_path.glob(f"**/{CONTRACT_CONFIG_FILENAME}"))
-    marker_files = old_markers + new_markers
+    marker_files = list(project_path.glob(f"**/{CONTRACT_CONFIG_FILENAME}"))
     folders = [marker_file.parent for marker_file in marker_files]
-    return sorted(folders)
+    return sorted(set(folders))
+
+
+def ensure_distinct_contract_names(contracts_folders: List[Path]):
+    names: Set[str] = set()
+
+    for folder in sorted(contracts_folders):
+        name, _ = get_contract_name_and_version(folder)
+        if name in names:
+            raise Exception(f"""Name "{name}" already associated to another contract.""")
+
+        names.add(name)
 
 
 def copy_project_folder_to_build_folder(project_folder: Path, build_root_folder: Path):
@@ -129,7 +139,7 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
 
     # If the lock file is missing, or it needs to be updated, Cargo will exit with an error.
     # See: https://doc.rust-lang.org/cargo/commands/cargo-build.html
-    if cargo_toml.does_cargo_build_support_locked(build_folder) and cargo_lock.exists():
+    if cargo_lock.exists():
         args.append("--locked")
 
     custom_env = os.environ.copy()
@@ -144,8 +154,10 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
     if return_code != 0:
         raise ErrKnown(f"Failed to build contract {build_folder}. Return code: {return_code}.")
 
-    wasm_file = find_file_in_folder(cargo_output_folder, "*.wasm")
-    generate_code_hash_artifact(wasm_file)
+    # One or more WASM files should have been generated.
+    wasm_files = find_files_in_folder(cargo_output_folder, "*.wasm")
+    for wasm_file in wasm_files:
+        generate_code_hash_artifact(wasm_file)
 
     shutil.copytree(cargo_output_folder, output_folder, dirs_exist_ok=True)
 

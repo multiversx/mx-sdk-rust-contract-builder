@@ -54,6 +54,7 @@ def run_docker(
     docker_mount_args += ["--volume", f"{RUST_REGISTRY}:/rust/registry"]
     docker_mount_args += ["--volume", f"{RUST_GIT}:/rust/git"]
     docker_mount_args += ["--volume", f"{RUST_TMP}:/rust/tmp"]
+    docker_mount_args += ["--network", "host"]
 
     docker_args = ["docker", "run"]
     docker_args += docker_mount_args

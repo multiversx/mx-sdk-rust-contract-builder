@@ -1,25 +1,33 @@
 FROM ubuntu:22.04
 
 # Constants
-ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v4.1.4"
-ARG VERSION_RUST="nightly-2022-10-16"
-ARG VERSION_BINARYEN="105-1"
+ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v5.3.0"
+ARG VERSION_RUST="nightly-2023-05-26"
+ARG VERSION_BINARYEN="version_112"
+ARG DOWNLOAD_URL_BINARYEN="https://github.com/WebAssembly/binaryen/releases/download/${VERSION_BINARYEN}/binaryen-${VERSION_BINARYEN}-x86_64-linux.tar.gz"
 ARG VERSION_WABT="1.0.27-1"
-ARG VERSION_SC_META="0.39.5"
+ARG VERSION_SC_META="0.43.3"
+ARG TARGETPLATFORM
 
-# Temporary workaround. Default Ubuntu archive mirrors are down.
-RUN sed -i 's|http://archive.ubuntu.com|http://de.archive.ubuntu.com|g' /etc/apt/sources.list
-
-# Install dependencies
+# Install system dependencies
 RUN apt-get update --fix-missing && apt-get install -y \
-    wget \ 
+    wget \
     build-essential \
     git \
     python3.11 python-is-python3 python3-pip \
-    binaryen=${VERSION_BINARYEN} \
-    wabt=${VERSION_WABT}
+    wabt=${VERSION_WABT} \
+    pkg-config \
+    libssl-dev
 
+# Install binaryen
+RUN wget -O binaryen.tar.gz ${DOWNLOAD_URL_BINARYEN} && \
+    tar -xf binaryen.tar.gz && \
+    mkdir -p /binaryen && \
+    cp binaryen-${VERSION_BINARYEN}/bin/wasm-opt /binaryen && \
+    rm -rf binaryen.tar.gz binaryen-${VERSION_BINARYEN} && \
+    chmod -R 777 /binaryen
 
+# Install Python dependencies
 RUN pip3 install toml==0.10.2 semver==3.0.0-dev.4
 
 # Install rust
@@ -36,7 +44,7 @@ RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install mu
 
 COPY "multiversx_sdk_rust_contract_builder" "/multiversx_sdk_rust_contract_builder"
 
-ENV PATH="/rust/bin:${PATH}"
+ENV PATH="/rust/bin:/binaryen:${PATH}"
 ENV CARGO_HOME="/rust"
 ENV RUSTUP_HOME="/rust"
 ENV PYTHONPATH=/
@@ -45,6 +53,7 @@ ENV BUILD_METADATA_VERSION_RUST=${VERSION_RUST}
 ENV BUILD_METADATA_VERSION_BINARYEN=${VERSION_BINARYEN}
 ENV BUILD_METADATA_VERSION_WABT=${VERSION_WABT}
 ENV BUILD_METADATA_VERSION_SC_META=${VERSION_SC_META}
+ENV BUILD_METADATA_TARGETPLATFORM=${TARGETPLATFORM}
 
 # Additional arguments (must be provided at "docker run"):
 # --project or --packaged-src
