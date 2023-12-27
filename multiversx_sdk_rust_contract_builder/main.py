@@ -52,6 +52,9 @@ def main(cli_args: List[str]):
         packaged = PackagedSourceCode.from_file(packaged_src_path)
         packaged.unwrap_to_filesystem(HARDCODED_UNWRAP_FOLDER)
 
+        if not specific_contract:
+            specific_contract = packaged.metadata.contract_name
+
     metadata = BuildMetadata.from_env()
 
     options = BuildOptions(
