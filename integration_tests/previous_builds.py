@@ -51,7 +51,7 @@ previous_builds: List[PreviousBuild] = [
     PreviousBuild(
         name="a.3",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/v2.4.1-pair-safe-price-v2-reproducible.zip",
-        project_relative_path_in_archive="mx-exchange-sc-2.4.1-pair-safe-price-v2-reproducible",
+        project_relative_path_in_archive="reproducible-v2.4.1-pair-safe-price-v2",
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
