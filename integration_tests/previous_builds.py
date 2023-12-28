@@ -75,5 +75,58 @@ previous_builds: List[PreviousBuild] = [
             "safe-price-view": "b5a657445ae74423c60210c88a6fa89b0bd4bdd00d5f06e788e14495bccc34c9"
         },
         docker_image="sdk-rust-contract-builder:next"
+    ),
+    PreviousBuild(
+        name="a.5",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v1.10.4-backwards-comp-proxy-dex.zip",
+        project_relative_path_in_archive="mx-exchange-sc-reproducible-v1.10.4-backwards-comp-proxy-dex",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "farm-staking-proxy": "ee61abb8e639df4696900c5efdac6bec747679c149be26476ee7e384e35b1ff2",
+            "proxy_dex": "8bab3716a1a92bad1b5cb77b97a09cce1ffabd56b954d881b93e1b480984c3d2",
+            "factory": "b75f481df42c076f51cd7af04b914bc581e51784b31136ae27db368b37bd87b1",
+            "farm_with_lock": "6b9d9a0f6bba6004c7c1163890ea0794cc61ab16c967e1c5c2cd2b8a7c19ebbf",
+        },
+        docker_image="sdk-rust-contract-builder:next"
+    ),
+    PreviousBuild(
+        name="a.6",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.1.1-staking-upgrade.zip",
+        project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.1.1-staking-upgrade",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "farm-staking": "6dc7c587b2cc4b177a192b709c092f3752b3dcf9ce1b484e69fe64dc333a9e0a",
+            "farm": "931ca233826ff9dacd889967365db1cde9ed8402eb553de2a3b9d58b6ff1098d",
+            "factory": "df06465b651594605466e817bfe9d8d7c68eef0f87df4a8d3266bcfb1bef6d83",
+            "pair": "f3f08ebd758fada871c113c18017d9761f157d00b19c4d3beaba530e6c53afc2",
+            "energy-factory": "241600c055df605cafd85b75d40b21316a6b35713485201b156d695b23c66a2f"
+        },
+        docker_image="sdk-rust-contract-builder:next"
+    ),
+    PreviousBuild(
+        name="a.7",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.0-rc6-reproducible.zip",
+        project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.0-rc6-reproducible",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "pair": "23ce1e8910c105410b4a417153e4b38c550ab78b38b899ea786f0c78500caf21",
+            "simple-lock": "303290b7a08b091c29315dd6979c1f745fc05467467d7de64e252592074890a7",
+            "farm-staking-proxy": "56468a6ae726693a71edcf96cf44673466dd980412388e1e4b073a0b4ee592d7"
+        },
+        docker_image="sdk-rust-contract-builder:next"
+    ),
+    PreviousBuild(
+        name="a.8",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v1.10.2-legacy-farm-stripdown.zip",
+        project_relative_path_in_archive="mx-exchange-sc-reproducible-v1.10.2-legacy-farm-stripdown",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "farm": "bac43c58b865f55f303ae2d4100c5fe2d4492bc50cfb131d8206200039808242"
+        },
+        docker_image="sdk-rust-contract-builder:next"
     )
 ]
