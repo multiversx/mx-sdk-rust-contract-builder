@@ -128,5 +128,16 @@ previous_builds: List[PreviousBuild] = [
             "farm": "bac43c58b865f55f303ae2d4100c5fe2d4492bc50cfb131d8206200039808242"
         },
         docker_image="sdk-rust-contract-builder:next"
+    ),
+    PreviousBuild(
+        name="a.9",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v1.10.3-backwards-comp-contracts.zip",
+        project_relative_path_in_archive="mx-exchange-sc-reproducible-v1.10.3-backwards-comp-contracts",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "factory": "70ef785d7574746cadfb7eec0e52cc68d6807ddbb54cb1365b3942cf903c12d2"
+        },
+        docker_image="sdk-rust-contract-builder:next"
     )
 ]
