@@ -60,5 +60,20 @@ previous_builds: List[PreviousBuild] = [
             "safe-price-view": "b5a657445ae74423c60210c88a6fa89b0bd4bdd00d5f06e788e14495bccc34c9"
         },
         docker_image="sdk-rust-contract-builder:next"
+    ),
+    PreviousBuild(
+        name="a.4",
+        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.5.2-governance-merkle-tree.zip",
+        project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.5.2-governance-merkle-tree",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "lkmex-transfer": "49809df9f07839f965f8197721083cf403c3db969ddc47b5940b4ee8b464af92",
+            "router": "3257d57945736298c96aa23f99ea0fba3b6da01f9d2103d81230d05cff62cb5a",
+            "pair": "e9f117971963cb3c24b14e2a7698d48c170335af2f5c8167774c48c3c1c654e3",
+            "locked-token-wrapper": "1d317cfa2bbe22ea1f878f8a32f90712d49f68a01665b86657d36910b430522f",
+            "safe-price-view": "b5a657445ae74423c60210c88a6fa89b0bd4bdd00d5f06e788e14495bccc34c9"
+        },
+        docker_image="sdk-rust-contract-builder:next"
     )
 ]
