@@ -44,7 +44,7 @@ previous_builds: List[PreviousBuild] = [
         expected_code_hashes={
             "metabonding": "897b19e1990f7c487c99c12f50722febe1ee4468bcd3a7405641966dfff2791d"
         },
-        docker_image="sdk-rust-contract-builder:v4.2.1"
+        docker_image="multiversx/sdk-rust-contract-builder:v4.2.1"
     ),
     PreviousBuild(
         name="a.3",
