@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 
 # Constants
-ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v6.0.0-beta.0"
+ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v6.0.0"
 ARG VERSION_RUST="nightly-2023-12-11"
 ARG VERSION_BINARYEN="version_112"
 ARG DOWNLOAD_URL_BINARYEN="https://github.com/WebAssembly/binaryen/releases/download/${VERSION_BINARYEN}/binaryen-${VERSION_BINARYEN}-x86_64-linux.tar.gz"
@@ -39,7 +39,7 @@ RUN wget -O rustup.sh https://sh.rustup.rs && \
     rm -rf /rust/registry
 
 # Install sc-tool
-RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install multiversx-sc-meta --locked --version ${VERSION_SC_META} && \
+RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install multiversx-sc-meta --version ${VERSION_SC_META} --locked && \
     rm -rf /rust/registry
 
 COPY "multiversx_sdk_rust_contract_builder" "/multiversx_sdk_rust_contract_builder"
