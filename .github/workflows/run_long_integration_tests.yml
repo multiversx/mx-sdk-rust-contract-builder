@@ -22,7 +22,7 @@ jobs:
       - name: Build
         run: |
           export PYTHONPATH=.
-          python ./integration_tests/test_previous_builds_are_reproducible.py --selected-builds "a.1" "a.2" "a.3"
+          python ./integration_tests/test_previous_builds_are_reproducible.py --selected-builds "a.1" "a.2" "a.3" "a.4"
 
       - name: Save artifacts
         uses: actions/upload-artifact@v3
