@@ -20,6 +20,7 @@ def main(cli_args: List[str]):
     parser.add_argument("--packaged-src", type=str, help="source code packaged in a JSON file")
     parser.add_argument("--contract", type=str)
     parser.add_argument("--output", type=str, default=Path(os.getcwd()) / "output")
+    parser.add_argument("--package-whole-project-src", action="store_true", default=False, help="include all project files in *.source.json (default: %(default)s)")
     parser.add_argument("--cargo-target-dir", help="deprecated parameter, not used anymore")
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
     parser.add_argument("--build-root", type=str, required=False, help="root path (within container) for the build (default: %(default)s)")
@@ -34,6 +35,7 @@ def main(cli_args: List[str]):
     packaged_src_path = Path(parsed_args.packaged_src).expanduser().resolve() if parsed_args.packaged_src else None
     contract_path = parsed_args.contract
     output_path = Path(parsed_args.output).expanduser().resolve()
+    package_whole_project_src = parsed_args.package_whole_project_src
     no_wasm_opt = parsed_args.no_wasm_opt
     build_root = Path(parsed_args.build_root) if parsed_args.build_root else None
     cargo_verbose = parsed_args.cargo_verbose
@@ -94,6 +96,9 @@ def main(cli_args: List[str]):
 
     if build_root:
         entrypoint_args.extend(["--build-root", str(build_root)])
+
+    if package_whole_project_src:
+        entrypoint_args.append("--package-whole-project-src")
 
     # Run docker container
     args = docker_general_args + docker_mount_args + docker_env_args + [image] + entrypoint_args
