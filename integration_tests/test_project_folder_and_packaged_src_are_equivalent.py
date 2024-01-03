@@ -9,7 +9,7 @@ from integration_tests.shared import download_project_repository, run_docker
 
 def main(cli_args: List[str]):
     repository_url = "https://github.com/multiversx/mx-reproducible-contract-build-example-sc"
-    tag = "0.4.7"
+    tag = "0.5.0-beta.0"
     archve_subfolder = f"mx-reproducible-contract-build-example-sc-{tag}"
     project_path = download_project_repository(f"{repository_url}/archive/refs/tags/v{tag}.zip", archve_subfolder)
     project_path = project_path / archve_subfolder

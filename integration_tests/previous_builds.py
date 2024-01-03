@@ -60,5 +60,20 @@ previous_builds: List[PreviousBuild] = [
             "lottery-esdt": "e06b1a5c7fb71181a79e9be6b86d8ad154e5c2def4da6d2f0aa5266163823291"
         },
         docker_image="multiversx/sdk-rust-contract-builder:v5.4.0"
+    ),
+    PreviousBuild(
+        name="a.4",
+        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.5.0-beta.0.zip",
+        project_relative_path_in_archive="mx-reproducible-contract-build-example-sc-0.5.0-beta.0",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "adder": "384b680df7a95ebceca02ffb3e760a2fc288dea1b802685ef15df22ae88ba15b",
+            "multisig": "d1453017d1fcac43f3b54c390b112b37af38ae840a2464d8ff68e3981da9972d",
+            "multisig-full": "e7fd6d118639e4b4381b3a667435948cd70f1f06b6ef39e227bd88349f7e7979",
+            "multisig-view": "290c9b3e374dffa33649ed46bd0b626c66f933eff9437f11f3559372d7538f85",
+            "lottery-esdt": "d4d4b6d2d797749435a4127a12d5ea16b911d6783e00cbc9faf4bace7d655c7a"
+        },
+        docker_image="sdk-rust-contract-builder:next"
     )
 ]
