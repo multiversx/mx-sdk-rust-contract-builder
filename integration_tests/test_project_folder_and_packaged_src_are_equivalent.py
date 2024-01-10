@@ -14,11 +14,8 @@ def main(cli_args: List[str]):
     project_path = download_project_repository(f"{repository_url}/archive/refs/tags/v{tag}.zip", archve_subfolder)
     project_path = project_path / archve_subfolder
 
-    # Only package_whole_project_src = True works.
-    # package_whole_project_src = False does not work, since a missing Cargo.lock at the workspace level leads to build errors.
     check_project_folder_and_packaged_src_are_equivalent(
         project_path=project_path,
-        package_whole_project_src=True,
         parent_output_folder=PARENT_OUTPUT_FOLDER,
         contracts=["adder", "multisig"],
     )
@@ -26,12 +23,11 @@ def main(cli_args: List[str]):
 
 def check_project_folder_and_packaged_src_are_equivalent(
         project_path: Path,
-        package_whole_project_src: bool,
         parent_output_folder: Path,
         contracts: List[str]):
     for contract in contracts:
-        output_using_project = parent_output_folder / "using-project" / contract / ("whole" if package_whole_project_src else "truncated")
-        output_using_packaged_src = parent_output_folder / "using-packaged-src" / contract / ("whole" if package_whole_project_src else "truncated")
+        output_using_project = parent_output_folder / "using-project" / contract
+        output_using_packaged_src = parent_output_folder / "using-packaged-src" / contract
 
         shutil.rmtree(output_using_project, ignore_errors=True)
         shutil.rmtree(output_using_packaged_src, ignore_errors=True)
@@ -41,7 +37,6 @@ def check_project_folder_and_packaged_src_are_equivalent(
 
         run_docker(
             project_path=project_path,
-            package_whole_project_src=package_whole_project_src,
             packaged_src_path=None,
             contract_name=contract,
             image="sdk-rust-contract-builder:next",
@@ -52,7 +47,6 @@ def check_project_folder_and_packaged_src_are_equivalent(
 
         run_docker(
             project_path=None,
-            package_whole_project_src=package_whole_project_src,
             packaged_src_path=packaged_src_path,
             contract_name=contract,
             image="sdk-rust-contract-builder:next",

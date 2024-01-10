@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Dict, List, Set
 
-from multiversx_sdk_rust_contract_builder import cargo_toml, source_code
+from multiversx_sdk_rust_contract_builder import source_code
 from multiversx_sdk_rust_contract_builder.build_metadata import BuildMetadata
 from multiversx_sdk_rust_contract_builder.build_options import BuildOptions
 from multiversx_sdk_rust_contract_builder.build_outcome import BuildOutcome
@@ -31,7 +31,6 @@ def build_project(
     project_folder = project_folder.expanduser().resolve()
     parent_output_folder = parent_output_folder.expanduser().resolve()
     cargo_target_dir = options.cargo_target_dir.expanduser().resolve()
-    package_whole_project_src = options.package_whole_project_src
     no_wasm_opt = options.no_wasm_opt
     specific_contract = options.specific_contract
     build_root_folder = options.build_root_folder
@@ -44,9 +43,6 @@ def build_project(
 
     # We copy the whole project folder to the build path, to ensure that all local dependencies are available.
     project_within_build_folder = copy_project_folder_to_build_folder(project_folder, build_root_folder)
-
-    if not package_whole_project_src:
-        cargo_toml.remove_dev_dependencies_sections_from_all(project_within_build_folder)
 
     for contract_folder in sorted(contracts_folders):
         contract_name, contract_version = get_contract_name_and_version(contract_folder)
