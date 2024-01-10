@@ -70,6 +70,7 @@ class BuildOutcomeEntry:
             entry.codehash = find_file_in_folder(output_folder, f"{contract_name}.codehash.txt").read_text()
             entry.bytecode_path = BuildArtifact.find_in_output(f"{contract_name}.wasm", output_folder)
             entry.abi_path = BuildArtifact.find_in_output(f"{contract_name}.abi.json", output_folder)
+            # This is the whole project source code. The file *.partial.source.json is not listed here - so that it's advertised as little as possible.
             entry.src_package_path = BuildArtifact.find_in_output("*.source.json", output_folder)
 
             result[contract_name] = entry

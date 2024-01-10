@@ -75,13 +75,23 @@ def build_project(
         # The bundle (packaged source code) is created after build, so that Cargo.lock files are included (if previously missing).
         create_packaged_source_code(
             parent_project_folder=project_within_build_folder,
-            package_whole_project_src=package_whole_project_src,
+            package_whole_project_src=True,
             contract_folder=contract_build_subfolder,
             output_folder=output_subfolder,
             build_metadata=metadata.to_dict(),
             build_options=options.to_dict(),
+            package_filename=f"{contract_name}-{contract_version}.source.json"
         )
 
+        create_packaged_source_code(
+            parent_project_folder=project_within_build_folder,
+            package_whole_project_src=False,
+            contract_folder=contract_build_subfolder,
+            output_folder=output_subfolder,
+            build_metadata=metadata.to_dict(),
+            build_options=options.to_dict(),
+            package_filename=f"{contract_name}-{contract_version}.partial.source.json"
+        )
         outcome.gather_artifacts(contract_build_subfolder, output_subfolder)
 
     return outcome
@@ -168,7 +178,8 @@ def create_packaged_source_code(
         contract_folder: Path,
         output_folder: Path,
         build_metadata: Dict[str, Any],
-        build_options: Dict[str, Any]
+        build_options: Dict[str, Any],
+        package_filename: str
 ):
     source_code_files = source_code.get_source_code_files(
         project_folder=parent_project_folder,
@@ -185,7 +196,7 @@ def create_packaged_source_code(
     )
 
     package = PackagedSourceCode.from_filesystem(metadata, parent_project_folder, source_code_files)
-    package_path = output_folder / f"{contract_name}-{contract_version}.source.json"
+    package_path = output_folder / package_filename
     package.save_to_file(package_path)
 
     size_of_file = package_path.stat().st_size
