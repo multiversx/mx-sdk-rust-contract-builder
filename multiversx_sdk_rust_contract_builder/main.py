@@ -24,7 +24,7 @@ def main(cli_args: List[str]):
 
     parser = ArgumentParser()
     parser.add_argument("--project", type=str, required=False, help="source code folder (project)")
-    parser.add_argument("--package-whole-project-src", action="store_true", default=False, help="include all project files in *.source.json (default: %(default)s)")
+    parser.add_argument("--package-whole-project-src", action="store_true", default=False, help="deprecated parameter, not used anymore")
     parser.add_argument("--packaged-src", type=str, required=False, help="source code packaged in a JSON file")
     parser.add_argument("--contract", type=str, required=False, help="contract to build from within the source code folder; should be relative to the project path")
     parser.add_argument("--output", type=str, required=True)
@@ -34,7 +34,6 @@ def main(cli_args: List[str]):
 
     parsed_args = parser.parse_args(cli_args)
     project_path = Path(parsed_args.project).expanduser().resolve() if parsed_args.project else None
-    package_whole_project_src = parsed_args.package_whole_project_src
     packaged_src_path = Path(parsed_args.packaged_src).expanduser().resolve() if parsed_args.packaged_src else None
     parent_output_folder = Path(parsed_args.output)
     specific_contract = parsed_args.contract
@@ -55,7 +54,6 @@ def main(cli_args: List[str]):
     metadata = BuildMetadata.from_env()
 
     options = BuildOptions(
-        package_whole_project_src=package_whole_project_src,
         specific_contract=specific_contract,
         cargo_target_dir=cargo_target_dir,
         no_wasm_opt=no_wasm_opt,
