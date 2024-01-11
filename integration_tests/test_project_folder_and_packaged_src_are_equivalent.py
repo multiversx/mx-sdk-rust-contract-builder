@@ -8,16 +8,16 @@ from integration_tests.shared import download_project_repository, run_docker
 
 
 def main(cli_args: List[str]):
-    repository_url = "https://github.com/multiversx/mx-reproducible-contract-build-example-sc"
-    tag = "0.4.7"
-    archve_subfolder = f"mx-reproducible-contract-build-example-sc-{tag}"
+    repository_url = "https://github.com/multiversx/mx-contracts-rs"
+    tag = "0.45.2.1-reproducible"
+    archve_subfolder = f"mx-contracts-rs-{tag}"
     project_path = download_project_repository(f"{repository_url}/archive/refs/tags/v{tag}.zip", archve_subfolder)
     project_path = project_path / archve_subfolder
 
     check_project_folder_and_packaged_src_are_equivalent(
         project_path=project_path,
         parent_output_folder=PARENT_OUTPUT_FOLDER,
-        contracts=["adder", "multisig"],
+        contracts=["adder", "multisig", "lottery-esdt"],
     )
 
 
@@ -43,7 +43,7 @@ def check_project_folder_and_packaged_src_are_equivalent(
             output_folder=output_using_project
         )
 
-        packaged_src_path = output_using_project / f"{contract}/{contract}-0.0.0.source.json"
+        packaged_src_path = next((output_using_project / contract).glob("*.source.json"))
 
         run_docker(
             project_path=None,
