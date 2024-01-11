@@ -22,34 +22,6 @@ class PreviousBuild:
 previous_builds: List[PreviousBuild] = [
     PreviousBuild(
         name="a.1",
-        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.4.0.zip",
-        project_relative_path_in_archive="mx-reproducible-contract-build-example-sc-0.4.0",
-        packaged_src_url=None,
-        contract_name=None,
-        expected_code_hashes={
-            "adder": "9fd12f88f9474ba115fb75e9d18a8fdbc4f42147de005445048442d49c3aa725",
-            "multisig": "2101bc2a7a31ea42e5ffaadd86c1640009690e93b1cb46c3566ba5eac2984e36",
-            "multisig-full": "ef468403354b6d3a728f86101354359fe6864187d216f674d99b31fc05313a39",
-            "multisig-view": "3690af76be10c0520e3c3545cde8d9ef6a15c2d0af74dbd8704b4909644049c9"
-        },
-        docker_image="multiversx/sdk-rust-contract-builder:v5.1.0"
-    ),
-    PreviousBuild(
-        name="a.2",
-        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.4.3.zip",
-        project_relative_path_in_archive="mx-reproducible-contract-build-example-sc-0.4.3",
-        packaged_src_url=None,
-        contract_name=None,
-        expected_code_hashes={
-            "adder": "9fd12f88f9474ba115fb75e9d18a8fdbc4f42147de005445048442d49c3aa725",
-            "multisig": "b73050629c11b1f1a20ca6232abcef07897624195691552e3f2e2fce47822166",
-            "multisig-full": "37c3b90bdaa7d8d203385c91b0b5cb4d3c444ab9ec5263351978046a545854e3",
-            "multisig-view": "ebaf987b041fcda297da71291d76736e4e98a1e449e5ec37908cdc0198e8be37"
-        },
-        docker_image="multiversx/sdk-rust-contract-builder:v5.3.0"
-    ),
-    PreviousBuild(
-        name="a.3",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.4.1-pair-safe-price-v2.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.4.1-pair-safe-price-v2",
         packaged_src_url=None,
@@ -62,7 +34,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.4",
+        name="a.2",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.5.2-governance-merkle-tree.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.5.2-governance-merkle-tree",
         packaged_src_url=None,
@@ -77,7 +49,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.5",
+        name="a.3",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v1.10.4-backwards-comp-proxy-dex.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v1.10.4-backwards-comp-proxy-dex",
         packaged_src_url=None,
@@ -91,7 +63,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.6",
+        name="a.4",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.1.1-staking-upgrade.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.1.1-staking-upgrade",
         packaged_src_url=None,
@@ -106,7 +78,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.7",
+        name="a.5",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.0-rc6-reproducible.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.0-rc6-reproducible",
         packaged_src_url=None,
@@ -119,7 +91,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.8",
+        name="a.6",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v1.10.2-legacy-farm-stripdown.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v1.10.2-legacy-farm-stripdown",
         packaged_src_url=None,
@@ -130,7 +102,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.9",
+        name="a.7",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v1.10.3-backwards-comp-contracts.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v1.10.3-backwards-comp-contracts",
         packaged_src_url=None,
@@ -141,7 +113,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.10",
+        name="a.8",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.1.3-price-discovery-comp-upgrade.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.1.3-price-discovery-comp-upgrade",
         packaged_src_url=None,
@@ -152,7 +124,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.11",
+        name="a.9",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v1.9.1-governance-lkmex.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v1.9.1-governance-lkmex",
         packaged_src_url=None,
@@ -163,7 +135,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.12",
+        name="a.10",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v1.5.4-metabonding-unbond.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v1.5.4-metabonding-unbond",
         packaged_src_url=None,
@@ -174,7 +146,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.13",
+        name="a.11",
         project_archive_url="https://github.com/multiversx/mx-metabonding-sc/archive/refs/heads/reproducible-v1.1.1.zip",
         project_relative_path_in_archive="mx-metabonding-sc-reproducible-v1.1.1",
         packaged_src_url=None,
@@ -185,7 +157,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.14",
+        name="a.12",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v1.8.1-simple-lock-role.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v1.8.1-simple-lock-role",
         packaged_src_url=None,
@@ -196,7 +168,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="sdk-rust-contract-builder:next"
     ),
     PreviousBuild(
-        name="a.15",
+        name="a.13",
         project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v1.8.2-simple-lock-whitelist-old-farms.zip",
         project_relative_path_in_archive="mx-exchange-sc-reproducible-v1.8.2-simple-lock-whitelist-old-farms",
         packaged_src_url=None,
