@@ -86,7 +86,7 @@ def build_project(
             output_folder=output_subfolder,
             build_metadata=metadata.to_dict(),
             build_options=options.to_dict(),
-            package_filename=f"{contract_name}-{contract_version}.partial.source.json"
+            package_filename=f"{contract_name}-{contract_version}.partial-source.json"
         )
         outcome.gather_artifacts(contract_build_subfolder, output_subfolder)
 
