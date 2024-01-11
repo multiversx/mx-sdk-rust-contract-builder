@@ -17,7 +17,6 @@ def main(cli_args: List[str]):
 
     check_project_folder_and_packaged_src_are_equivalent(
         project_path=project_path,
-        package_whole_project_src=True,
         parent_output_folder=PARENT_OUTPUT_FOLDER,
         contracts=["pair", "farm"],
     )
@@ -25,12 +24,11 @@ def main(cli_args: List[str]):
 
 def check_project_folder_and_packaged_src_are_equivalent(
         project_path: Path,
-        package_whole_project_src: bool,
         parent_output_folder: Path,
         contracts: List[str]):
     for contract in contracts:
-        output_using_project = parent_output_folder / "using-project" / contract / ("whole" if package_whole_project_src else "truncated")
-        output_using_packaged_src = parent_output_folder / "using-packaged-src" / contract / ("whole" if package_whole_project_src else "truncated")
+        output_using_project = parent_output_folder / "using-project" / contract
+        output_using_packaged_src = parent_output_folder / "using-packaged-src" / contract
 
         shutil.rmtree(output_using_project, ignore_errors=True)
         shutil.rmtree(output_using_packaged_src, ignore_errors=True)
@@ -40,18 +38,16 @@ def check_project_folder_and_packaged_src_are_equivalent(
 
         run_docker(
             project_path=project_path,
-            package_whole_project_src=package_whole_project_src,
             packaged_src_path=None,
             contract_name=contract,
             image="sdk-rust-contract-builder:next",
             output_folder=output_using_project
         )
 
-        packaged_src_path = output_using_project / f"{contract}/{contract}-0.0.0.source.json"
+        packaged_src_path = next((output_using_project / contract).glob("*.source.json"))
 
         run_docker(
             project_path=None,
-            package_whole_project_src=package_whole_project_src,
             packaged_src_path=packaged_src_path,
             contract_name=contract,
             image="sdk-rust-contract-builder:next",
@@ -64,14 +60,21 @@ def check_project_folder_and_packaged_src_are_equivalent(
 
         assert len(using_project_output_files) == len(using_packaged_src_output_files)
 
-        for index, file in enumerate(using_project_output_files):
-            if not file.is_file() or file.suffix == ".zip":
-                continue
-            using_project_file_content = file.read_bytes()
-            using_packaged_src_file_content = using_packaged_src_output_files[index].read_bytes()
+        for index, file_using_project in enumerate(using_project_output_files):
+            file_using_packaged_src = using_packaged_src_output_files[index]
 
-            if using_project_file_content != using_packaged_src_file_content:
-                raise Exception(f"Files differ ({contract}): {file.name}")
+            if not file_using_project.is_file() or file_using_project.suffix == ".zip":
+                continue
+            file_content_using_project = file_using_project.read_bytes()
+            file_content_using_packaged_src = file_using_packaged_src.read_bytes()
+
+            if file_content_using_project == file_content_using_packaged_src:
+                print(f"Files are identical ({contract}): {file_using_project.name}")
+            else:
+                print(f"Files differ ({contract}):")
+                print(f"  {file_using_project}")
+                print(f"  {file_using_packaged_src}")
+                raise Exception(f"Files differ ({contract}): {file_using_project.name}")
 
 
 if __name__ == "__main__":
