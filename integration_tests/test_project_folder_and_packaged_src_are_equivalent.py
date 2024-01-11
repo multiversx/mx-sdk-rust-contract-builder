@@ -8,30 +8,26 @@ from integration_tests.shared import download_project_repository, run_docker
 
 
 def main(cli_args: List[str]):
-    repository_url = "https://github.com/multiversx/mx-reproducible-contract-build-example-sc"
-    tag = "0.5.0-beta.0"
-    archve_subfolder = f"mx-reproducible-contract-build-example-sc-{tag}"
+    repository_url = "https://github.com/multiversx/mx-contracts-rs"
+    tag = "0.45.2.1-reproducible"
+    archve_subfolder = f"mx-contracts-rs-{tag}"
     project_path = download_project_repository(f"{repository_url}/archive/refs/tags/v{tag}.zip", archve_subfolder)
     project_path = project_path / archve_subfolder
 
-    # Only package_whole_project_src = True works.
-    # package_whole_project_src = False does not work, since a missing Cargo.lock at the workspace level leads to build errors.
     check_project_folder_and_packaged_src_are_equivalent(
         project_path=project_path,
-        package_whole_project_src=True,
         parent_output_folder=PARENT_OUTPUT_FOLDER,
-        contracts=["adder", "multisig"],
+        contracts=["adder", "multisig", "lottery-esdt"],
     )
 
 
 def check_project_folder_and_packaged_src_are_equivalent(
         project_path: Path,
-        package_whole_project_src: bool,
         parent_output_folder: Path,
         contracts: List[str]):
     for contract in contracts:
-        output_using_project = parent_output_folder / "using-project" / contract / ("whole" if package_whole_project_src else "truncated")
-        output_using_packaged_src = parent_output_folder / "using-packaged-src" / contract / ("whole" if package_whole_project_src else "truncated")
+        output_using_project = parent_output_folder / "using-project" / contract
+        output_using_packaged_src = parent_output_folder / "using-packaged-src" / contract
 
         shutil.rmtree(output_using_project, ignore_errors=True)
         shutil.rmtree(output_using_packaged_src, ignore_errors=True)
@@ -41,18 +37,16 @@ def check_project_folder_and_packaged_src_are_equivalent(
 
         run_docker(
             project_path=project_path,
-            package_whole_project_src=package_whole_project_src,
             packaged_src_path=None,
             contract_name=contract,
             image="sdk-rust-contract-builder:next",
             output_folder=output_using_project
         )
 
-        packaged_src_path = output_using_project / f"{contract}/{contract}-0.0.0.source.json"
+        packaged_src_path = next((output_using_project / contract).glob("*.source.json"))
 
         run_docker(
             project_path=None,
-            package_whole_project_src=package_whole_project_src,
             packaged_src_path=packaged_src_path,
             contract_name=contract,
             image="sdk-rust-contract-builder:next",

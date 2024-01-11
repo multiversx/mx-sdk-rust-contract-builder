@@ -48,32 +48,34 @@ previous_builds: List[PreviousBuild] = [
     ),
     PreviousBuild(
         name="a.3",
-        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.4.7.zip",
-        project_relative_path_in_archive="mx-reproducible-contract-build-example-sc-0.4.7",
-        packaged_src_url=None,
-        contract_name=None,
-        expected_code_hashes={
-            "adder": "9fd12f88f9474ba115fb75e9d18a8fdbc4f42147de005445048442d49c3aa725",
-            "multisig": "9600fc699c85fd5a24ecf28f0b8cf01dc281c81399fb018d5ad8405b7d401041",
-            "multisig-full": "9eed9c35113209fc69631cf29aac6e81f0e331132bf6e46198e679259075ad49",
-            "multisig-view": "3993cf3fb5cd18102e2b8946ea1997f6f1cc512537f453265ba1afd7378fc0c6",
-            "lottery-esdt": "e06b1a5c7fb71181a79e9be6b86d8ad154e5c2def4da6d2f0aa5266163823291"
-        },
-        docker_image="multiversx/sdk-rust-contract-builder:v5.4.0"
-    ),
-    PreviousBuild(
-        name="a.4",
-        project_archive_url="https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.5.0-beta.0.zip",
-        project_relative_path_in_archive="mx-reproducible-contract-build-example-sc-0.5.0-beta.0",
+        project_archive_url="https://github.com/multiversx/mx-contracts-rs/archive/refs/tags/v0.45.2.1-reproducible.zip",
+        project_relative_path_in_archive="mx-contracts-rs-0.45.2.1-reproducible",
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
             "adder": "384b680df7a95ebceca02ffb3e760a2fc288dea1b802685ef15df22ae88ba15b",
-            "multisig": "d1453017d1fcac43f3b54c390b112b37af38ae840a2464d8ff68e3981da9972d",
-            "multisig-full": "e7fd6d118639e4b4381b3a667435948cd70f1f06b6ef39e227bd88349f7e7979",
-            "multisig-view": "290c9b3e374dffa33649ed46bd0b626c66f933eff9437f11f3559372d7538f85",
-            "lottery-esdt": "d4d4b6d2d797749435a4127a12d5ea16b911d6783e00cbc9faf4bace7d655c7a"
+            "multisig": "b82f074c02e308b80cfb7144d7dc959bfac73e14dc3291837fdd8b042a7739cf",
+            "multisig-full": "44a0eafb3bedfd671d1df586313f716924e2e4ef00ae7bf26df2c11eb4291389",
+            "multisig-view": "d3e8328d525fcf196bb5bb4ce0741d9146dccb475461a693c407cdfa02334789",
+            "lottery-esdt": "e06b1a5c7fb71181a79e9be6b86d8ad154e5c2def4da6d2f0aa5266163823291",
+            "ping-pong-egld": "9283ca2f077edf2704053f0973fdd1eb90ee871ddcd672f962de4ba4422df84b"
+        },
+        docker_image="multiversx/sdk-rust-contract-builder:v5.4.1"
+    ),
+    PreviousBuild(
+        name="a.4",
+        project_archive_url="https://github.com/multiversx/mx-contracts-rs/archive/refs/tags/v0.45.2.1-reproducible.zip",
+        project_relative_path_in_archive="mx-contracts-rs-0.45.2.1-reproducible",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "adder": "384b680df7a95ebceca02ffb3e760a2fc288dea1b802685ef15df22ae88ba15b",
+            "multisig": "87cb62542c9b2d0b5a791cb35f7e44e71bb6d768d6ddb93155be61ad76267475",
+            "multisig-full": "f6b5457682b39ea1bd52fd6fe293257a3d5a5bb931c9e404c9ba24617cd51438",
+            "multisig-view": "1904fe0bfd12cb90fda87e5cf2d2f211d9eed8b48c296e6d858547bfe39bec0c",
+            "lottery-esdt": "a54bd4278b12cc93fedd6ca0addf6aad4043528c33e54ce43cf92d4d2dd755ee",
+            "ping-pong-egld": "8b107da10aef0d9610a939c4ca07c666674c465d0266fb28d5f981861f084f62"
         },
         docker_image="sdk-rust-contract-builder:next"
-    )
+    ),
 ]
