@@ -74,7 +74,7 @@ previous_builds: List[PreviousBuild] = [
             "multisig-full": "f6b5457682b39ea1bd52fd6fe293257a3d5a5bb931c9e404c9ba24617cd51438",
             "multisig-view": "1904fe0bfd12cb90fda87e5cf2d2f211d9eed8b48c296e6d858547bfe39bec0c",
             "lottery-esdt": "a54bd4278b12cc93fedd6ca0addf6aad4043528c33e54ce43cf92d4d2dd755ee",
-            "ping-pong-egld": "9283ca2f077edf2704053f0973fdd1eb90ee871ddcd672f962de4ba4422df84b"
+            "ping-pong-egld": "8b107da10aef0d9610a939c4ca07c666674c465d0266fb28d5f981861f084f62"
         },
         docker_image="sdk-rust-contract-builder:next"
     ),
