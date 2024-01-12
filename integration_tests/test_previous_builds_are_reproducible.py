@@ -41,7 +41,6 @@ def main(cli_args: List[str]):
 
         run_docker(
             project_path=project_path,
-            package_whole_project_src=False,
             packaged_src_path=packaged_src_path,
             contract_name=build.contract_name,
             image=build.docker_image,
