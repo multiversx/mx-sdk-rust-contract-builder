@@ -19,7 +19,11 @@ jobs:
         run: |
           docker buildx build --output type=docker --no-cache . -t sdk-rust-contract-builder:next -f ./Dockerfile
 
-      - name: Build
+      - name: Install dependencies
+        run: |
+          pip install pytest
+
+      - name: Run tests
         run: |
           export PYTHONPATH=.
           pytest .
