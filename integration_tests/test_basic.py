@@ -15,8 +15,11 @@ def test_with_symlinks():
 
     # In the workspace, create a symlink towards something outside it:
     dummy_file = workspace_parent / "dummy"
-    dummy_file.touch()
+    dummy_file.write_text("dummy")
     os.symlink(dummy_file, workspace / "dummy")
+
+    # But also a symlink towards something inside the workspace:
+    os.symlink(workspace / ".github", workspace / "github_symlink", target_is_directory=True)
 
     # Symlinks should be ignored, and the build should succeed.
     run_docker(

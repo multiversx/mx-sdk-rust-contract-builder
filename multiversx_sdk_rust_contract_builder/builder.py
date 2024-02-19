@@ -119,7 +119,12 @@ def ensure_distinct_contract_names(contracts_folders: List[Path]):
 def copy_project_folder_to_build_folder(project_folder: Path, build_root_folder: Path):
     shutil.rmtree(build_root_folder, ignore_errors=True)
     build_root_folder.mkdir()
-    shutil.copytree(project_folder, build_root_folder, dirs_exist_ok=True, ignore_dangling_symlinks=True)
+
+    shutil.copytree(
+        project_folder, build_root_folder,
+        dirs_exist_ok=True, symlinks=True, ignore_dangling_symlinks=True
+    )
+
     return build_root_folder
 
 
