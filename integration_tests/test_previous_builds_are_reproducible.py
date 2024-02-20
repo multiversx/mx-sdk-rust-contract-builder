@@ -45,6 +45,7 @@ def main(cli_args: List[str]):
             contract_name=build.contract_name,
             image=build.docker_image,
             output_folder=output_folder)
+
         check_code_hashes(build, output_folder)
 
 

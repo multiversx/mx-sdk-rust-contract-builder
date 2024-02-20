@@ -1,4 +1,4 @@
-name: Long integration tests
+name: Tests
 
 on:
   workflow_dispatch:
@@ -19,15 +19,21 @@ jobs:
         run: |
           docker buildx build --output type=docker --no-cache . -t sdk-rust-contract-builder:next -f ./Dockerfile
 
-      - name: Build
+      - name: Install dependencies
+        run: |
+          pip install pytest
+
+      - name: Run tests
         run: |
           export PYTHONPATH=.
+          pytest .
+          python ./integration_tests/test_project_folder_and_packaged_src_are_equivalent.py
           python ./integration_tests/test_previous_builds_are_reproducible.py --selected-builds "a.1" "a.2" "a.3" "a.4"
 
       - name: Save artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: testdata_output_long_integration_tests
+          name: testdata_output
           path: |
             ./testdata/output/**/*.*
           if-no-files-found: error
