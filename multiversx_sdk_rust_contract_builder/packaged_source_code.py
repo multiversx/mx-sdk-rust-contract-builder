@@ -152,8 +152,8 @@ class PackagedSourceCodeEntry:
         path = Path(dict.get("path", ""))
         content = base64.b64decode(dict.get("content", ""))
         module = Path(dict.get("module", ""))
-        dependency_depth = dict.get("dependency_depth", sys.maxsize)
-        is_test_file = dict.get("is_test_file", False)
+        dependency_depth = dict.get("dependencyDepth", sys.maxsize)
+        is_test_file = dict.get("isTestFile", False)
 
         return PackagedSourceCodeEntry(path, content, module, dependency_depth, is_test_file)
 

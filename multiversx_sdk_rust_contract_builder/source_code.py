@@ -27,7 +27,7 @@ def get_source_code_files(
     source_code_files: List[SourceCodeFile] = []
 
     # First, add the contract itself
-    files = get_all_files(contract_folder, _is_source_code_file)
+    files = _get_source_code_files(contract_folder)
     for file in files:
         source_code_files.append(SourceCodeFile(file, contract_folder, 0))
 
@@ -42,7 +42,7 @@ def get_source_code_files(
         if not dependency_folder.exists():
             raise ErrKnown(f"Dependency does not exist: {dependency_folder}")
 
-        files = get_all_files(dependency_folder, _is_source_code_file)
+        files = _get_source_code_files(dependency_folder)
         for file in files:
             source_code_files.append(SourceCodeFile(file, dependency_folder, dependency_depth))
 
@@ -50,7 +50,7 @@ def get_source_code_files(
     files_related_to_contract = set(file.path for file in source_code_files)
 
     if include_unrelated_to_contract:
-        all_files = get_all_files(project_folder, _is_source_code_file)
+        all_files = _get_source_code_files(project_folder)
         for file in all_files:
             if file not in files_related_to_contract:
                 source_code_files.append(SourceCodeFile(file, contract_folder, sys.maxsize))
@@ -58,12 +58,21 @@ def get_source_code_files(
     return source_code_files
 
 
-def _is_source_code_file(path: Path) -> bool:
-    if path.suffix == ".rs":
-        return True
-    if path.name in ["Cargo.toml", "Cargo.lock", "multicontract.toml", "sc-config.toml", CONTRACT_CONFIG_FILENAME]:
-        return True
-    return False
+def _get_source_code_files(project_folder: Path) -> List[Path]:
+    all_files = get_all_files(project_folder)
+    source_code_files: List[Path] = []
+
+    for path in all_files:
+        if path.is_relative_to(project_folder / "target"):
+            continue
+        if path.suffix == ".rs":
+            continue
+        if path.name in ["Cargo.toml", "Cargo.lock", "multicontract.toml", "sc-config.toml", CONTRACT_CONFIG_FILENAME]:
+            continue
+
+        source_code_files.append(path)
+
+    return source_code_files
 
 
 def _get_local_dependencies(project_folder: Path, contract_folder: Path) -> List[Dict[str, Any]]:
