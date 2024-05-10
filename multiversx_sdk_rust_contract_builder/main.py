@@ -50,6 +50,7 @@ def main(cli_args: List[str]):
         shutil.rmtree(HARDCODED_UNWRAP_FOLDER, ignore_errors=True)
         packaged = PackagedSourceCode.from_file(packaged_src_path)
         packaged.unwrap_to_filesystem(HARDCODED_UNWRAP_FOLDER)
+        build_root = packaged.metadata.build_options.get("buildRootFolder", build_root)
 
     metadata = BuildMetadata.from_env()
 
