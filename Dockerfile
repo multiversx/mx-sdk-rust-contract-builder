@@ -1,12 +1,12 @@
 FROM ubuntu:22.04
 
 # Constants
-ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v6.1.2"
-ARG VERSION_RUST="nightly-2023-12-11"
+ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v6.2.0"
+ARG VERSION_RUST="stable"
 ARG VERSION_BINARYEN="version_112"
 ARG DOWNLOAD_URL_BINARYEN="https://github.com/WebAssembly/binaryen/releases/download/${VERSION_BINARYEN}/binaryen-${VERSION_BINARYEN}-x86_64-linux.tar.gz"
 ARG VERSION_WABT="1.0.27-1"
-ARG VERSION_SC_META="0.43.3"
+ARG VERSION_SC_META="0.50.3"
 ARG TARGETPLATFORM
 
 # Install system dependencies
