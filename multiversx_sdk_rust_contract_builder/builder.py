@@ -33,7 +33,7 @@ def build_project(
     cargo_target_dir = options.cargo_target_dir.expanduser().resolve()
     no_wasm_opt = options.no_wasm_opt
     specific_contract = options.specific_contract
-    build_root_folder = options.build_root_folder
+    build_root_folder = options.build_root_folder.expanduser().resolve()
 
     ensure_output_folder_is_empty(parent_output_folder)
 
