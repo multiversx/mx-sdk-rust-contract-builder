@@ -54,17 +54,13 @@ previous_builds: List[PreviousBuild] = [
     ),
     PreviousBuild(
         name="a.3",
-        project_archive_url="https://github.com/multiversx/mx-contracts-rs/archive/9da0c4abe7aba6ae109c167be655b2ce80ca4b08.zip",
-        project_relative_path_in_archive="mx-contracts-rs-9da0c4abe7aba6ae109c167be655b2ce80ca4b08",
+        project_archive_url="https://github.com/multiversx/mx-sovereign-sc/archive/80599388b9358842b50ea216a622d514e15df374.zip",
+        project_relative_path_in_archive="mx-sovereign-sc-80599388b9358842b50ea216a622d514e15df374",
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
-            "adder": "384b680df7a95ebceca02ffb3e760a2fc288dea1b802685ef15df22ae88ba15b",
-            "multisig": "30cc24a9a8f271f27db44952a54c311ca54487f5a19533806ad213312a055ff8",
-            "multisig-full": "b4b9e11213e616564b2b4bd60eeee1bae295f51b14736f24fce64759e7d82295",
-            "multisig-view": "429a43e843a098dd3d8e5e882e0b0708a91e53ed41949017f4b732020fcb033d",
-            "lottery-esdt": "f53b8d157010a35e344d3c2b82606d3c38ad183faeac37e126c32d89349d3e8d",
-            "ping-pong-egld": "a3b146ec3d7d23101f3ab35e9a5e3d967e71709f20263d018a6af3b117cf28bf"
+            "esdt-safe": "08d0ba0f0931b9aa71946a543efc29da6e66d5247e911ce6595bea6a13a62cb4",
+            "fee-market": "e6efffc7723e1b38c9cdc41f3c2827acbcaed86c73795d09635d78b685c45576"
         },
         docker_image="sdk-rust-contract-builder:next"
     ),
