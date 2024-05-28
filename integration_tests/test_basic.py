@@ -82,7 +82,3 @@ def test_fail_if_any_cargo_lock_is_missing():
 
     assert code != 0
     assert "Cargo.lock needs to be updated but --locked was passed to prevent this" in stderr
-
-
-if __name__ == "__main__":
-    test_fail_if_any_cargo_lock_is_missing()
