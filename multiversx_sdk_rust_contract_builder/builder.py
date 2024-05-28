@@ -9,8 +9,8 @@ from multiversx_sdk_rust_contract_builder import source_code
 from multiversx_sdk_rust_contract_builder.build_metadata import BuildMetadata
 from multiversx_sdk_rust_contract_builder.build_options import BuildOptions
 from multiversx_sdk_rust_contract_builder.build_outcome import BuildOutcome
-from multiversx_sdk_rust_contract_builder.cargo_toml import (
-    get_contract_name_and_version, promote_cargo_lock_to_contract_folder)
+from multiversx_sdk_rust_contract_builder.cargo_toml import \
+    get_contract_name_and_version
 from multiversx_sdk_rust_contract_builder.codehash import \
     generate_code_hash_artifact
 from multiversx_sdk_rust_contract_builder.constants import (
@@ -65,10 +65,7 @@ def build_project(
         # We do not clean the "output" folder, since it will be included in one of the generated archives.
         clean_contract(contract_build_subfolder, clean_output=False)
 
-        # If this is the first build of the contract, Cargo.lock will be missing. We need to copy it from the container to host folder.
-        promote_cargo_lock_to_contract_folder(contract_build_subfolder, contract_folder)
-
-        # The bundle (packaged source code) is created after build, so that Cargo.lock files are included (if previously missing).
+        # We create the source code bundle (packaged source code) - could have been created before the build, as well.
         create_packaged_source_code(
             parent_project_folder=project_within_build_folder,
             contract_folder=contract_build_subfolder,
@@ -132,7 +129,6 @@ def clean_contract(folder: Path, clean_output: bool = True):
 def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Path, no_wasm_opt: bool):
     cargo_output_folder = build_folder / "output"
     meta_folder = build_folder / "meta"
-    cargo_lock = build_folder / "wasm" / "Cargo.lock"
 
     args = ["cargo", "run", "build"]
     args.extend(["--target-dir", str(cargo_target_dir)])
@@ -140,8 +136,7 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
 
     # If the lock file is missing, or it needs to be updated, Cargo will exit with an error.
     # See: https://doc.rust-lang.org/cargo/commands/cargo-build.html
-    if cargo_lock.exists():
-        args.append("--locked")
+    args.append("--locked")
 
     custom_env = os.environ.copy()
     # Cargo will use the git executable to fetch registry indexes and git dependencies.
