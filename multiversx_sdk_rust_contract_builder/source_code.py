@@ -17,12 +17,9 @@ from multiversx_sdk_rust_contract_builder.source_code_file import \
 def get_source_code_files(
         project_folder: Path,
         contract_folder: Path,
-        include_unrelated_to_contract: bool
 ) -> List[SourceCodeFile]:
     """
     Returns the source code files of the specified contract.
-
-    If `include_unrelated_to_contract` is True, also returns project files that are not strictly related to the specified contract.
     """
     source_code_files: List[SourceCodeFile] = []
 
@@ -46,14 +43,13 @@ def get_source_code_files(
         for file in files:
             source_code_files.append(SourceCodeFile(file, dependency_folder, dependency_depth))
 
-    # Finally, add remaining files (unrelated to contract), if desired
-    files_related_to_contract = set(file.path for file in source_code_files)
+    # Finally, add remaining files from the project
+    already_added_files = set(file.path for file in source_code_files)
 
-    if include_unrelated_to_contract:
-        all_files = _get_source_code_files(project_folder)
-        for file in all_files:
-            if file not in files_related_to_contract:
-                source_code_files.append(SourceCodeFile(file, contract_folder, sys.maxsize))
+    all_files = _get_source_code_files(project_folder)
+    for file in all_files:
+        if file not in already_added_files:
+            source_code_files.append(SourceCodeFile(file, contract_folder, sys.maxsize))
 
     return source_code_files
 
