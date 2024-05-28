@@ -35,7 +35,7 @@ def check_project_folder_and_packaged_src_are_equivalent(
         output_using_project.mkdir(parents=True, exist_ok=True)
         output_using_packaged_src.mkdir(parents=True, exist_ok=True)
 
-        run_docker(
+        (code, _, _) = run_docker(
             project_path=project_path,
             packaged_src_path=None,
             contract_name=contract,
@@ -43,15 +43,19 @@ def check_project_folder_and_packaged_src_are_equivalent(
             output_folder=output_using_project
         )
 
+        assert code == 0
+
         packaged_src_path = next((output_using_project / contract).glob("*.source.json"))
 
-        run_docker(
+        (code, _, _) = run_docker(
             project_path=None,
             packaged_src_path=packaged_src_path,
             contract_name=contract,
             image="sdk-rust-contract-builder:next",
             output_folder=output_using_packaged_src
         )
+
+        assert code == 0
 
         # Check that output folders are identical
         using_project_output_files = sorted((output_using_project / contract).rglob("*"))
