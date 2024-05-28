@@ -3,7 +3,7 @@ import shutil
 import subprocess
 import urllib.request
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from integration_tests.config import (CARGO_TARGET_DIR, DOWNLOADS_FOLDER,
                                       EXTRACTED_FOLDER, RUST_GIT,
@@ -35,7 +35,7 @@ def run_docker(
     contract_name: Optional[str],
     image: str,
     output_folder: Path,
-):
+) -> Tuple[int, str, str]:
     CARGO_TARGET_DIR.mkdir(parents=True, exist_ok=True)
     RUST_REGISTRY.mkdir(parents=True, exist_ok=True)
     RUST_GIT.mkdir(parents=True, exist_ok=True)
@@ -72,7 +72,19 @@ def run_docker(
         entrypoint_args.extend(["--contract", contract_name])
 
     args = docker_args + entrypoint_args
-    result = subprocess.run(args)
-    returncode = result.returncode
-    if returncode != 0:
-        raise Exception(f"Docker exited with return code {returncode}.")
+
+    result = subprocess.run(
+        args,
+        capture_output=True,
+        text=True
+    )
+
+    print("# command:")
+    print(" ".join(args))
+    print("# returncode:", result.returncode)
+    print("# stdout:")
+    print(result.stdout)
+    print("# stderr:")
+    print(result.stderr)
+
+    return result.returncode, result.stdout, result.stderr
