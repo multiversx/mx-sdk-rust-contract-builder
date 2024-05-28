@@ -79,11 +79,12 @@ def run_docker(
         text=True
     )
 
-    print("stdout:")
-    print("=======")
+    print("# command:")
+    print(" ".join(args))
+    print("# returncode:", result.returncode)
+    print("# stdout:")
     print(result.stdout)
-    print("stderr:")
-    print("=======")
+    print("# stderr:")
     print(result.stderr)
 
     return result.returncode, result.stdout, result.stderr
