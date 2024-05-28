@@ -6,10 +6,14 @@ from integration_tests.shared import download_project_repository, run_docker
 from multiversx_sdk_rust_contract_builder.packaged_source_code import \
     PackagedSourceCode
 
+DEFAULT_PROJECT_ARCHIVE_URL = "https://github.com/multiversx/mx-sovereign-sc/archive/80599388b9358842b50ea216a622d514e15df374.zip"
+DEFAULT_PROJECT_ARCHIVE_PAYLOAD = "mx-sovereign-sc-80599388b9358842b50ea216a622d514e15df374"
+DEFAULT_CONTRACT_NAME = "esdt-safe"
+
 
 def test_with_symlinks():
-    workspace_parent = download_project_repository("https://github.com/multiversx/mx-contracts-rs/archive/refs/tags/v0.45.4.zip", "test_with_symlinks")
-    workspace = workspace_parent / "mx-contracts-rs-0.45.4"
+    workspace_parent = download_project_repository(DEFAULT_PROJECT_ARCHIVE_URL, "test_with_symlinks")
+    workspace = workspace_parent / DEFAULT_PROJECT_ARCHIVE_PAYLOAD
 
     output_folder = PARENT_OUTPUT_FOLDER / "test_with_symlinks"
     shutil.rmtree(output_folder, ignore_errors=True)
@@ -27,7 +31,7 @@ def test_with_symlinks():
     (code, _, _) = run_docker(
         project_path=workspace,
         packaged_src_path=None,
-        contract_name="adder",
+        contract_name=DEFAULT_CONTRACT_NAME,
         image="sdk-rust-contract-builder:next",
         output_folder=output_folder
     )
@@ -37,8 +41,8 @@ def test_with_symlinks():
 
 
 def test_has_correct_packaged_source():
-    workspace_parent = download_project_repository("https://github.com/multiversx/mx-contracts-rs/archive/refs/tags/v0.45.4.zip", "test_has_correct_packaged_source")
-    workspace = workspace_parent / "mx-contracts-rs-0.45.4"
+    workspace_parent = download_project_repository(DEFAULT_PROJECT_ARCHIVE_URL, "test_has_correct_packaged_source")
+    workspace = workspace_parent / DEFAULT_PROJECT_ARCHIVE_PAYLOAD
 
     output_folder = PARENT_OUTPUT_FOLDER / "test_has_correct_packaged_source"
     shutil.rmtree(output_folder, ignore_errors=True)
@@ -47,14 +51,14 @@ def test_has_correct_packaged_source():
     (code, _, _) = run_docker(
         project_path=workspace,
         packaged_src_path=None,
-        contract_name="adder",
+        contract_name=DEFAULT_CONTRACT_NAME,
         image="sdk-rust-contract-builder:next",
         output_folder=output_folder
     )
 
     assert code == 0
 
-    packaged_source_code = PackagedSourceCode.from_file(output_folder / "adder" / "adder-0.0.0.source.json")
+    packaged_source_code = PackagedSourceCode.from_file(output_folder / DEFAULT_CONTRACT_NAME / f"{DEFAULT_CONTRACT_NAME}-0.0.0.source.json")
 
     for entry in packaged_source_code.entries:
         assert not str(entry.path).startswith("target"), f"Unexpected file: {entry.path}"
@@ -62,20 +66,20 @@ def test_has_correct_packaged_source():
 
 
 def test_fail_if_contract_cargo_lock_is_missing():
-    workspace_parent = download_project_repository("https://github.com/multiversx/mx-contracts-rs/archive/refs/tags/v0.45.4.zip", "test_fail_if_contract_cargo_lock_is_missing")
-    workspace = workspace_parent / "mx-contracts-rs-0.45.4"
+    workspace_parent = download_project_repository(DEFAULT_PROJECT_ARCHIVE_URL, "test_fail_if_contract_cargo_lock_is_missing")
+    workspace = workspace_parent / DEFAULT_PROJECT_ARCHIVE_PAYLOAD
 
     output_folder = PARENT_OUTPUT_FOLDER / "test_fail_if_contract_cargo_lock_is_missing"
     shutil.rmtree(output_folder, ignore_errors=True)
     output_folder.mkdir(parents=True, exist_ok=True)
 
     # Remove a (required) Cargo.lock file
-    (workspace / "contracts" / "adder" / "wasm" / "Cargo.lock").unlink()
+    (workspace / DEFAULT_CONTRACT_NAME / "wasm" / "Cargo.lock").unlink()
 
     (code, _, stderr) = run_docker(
         project_path=workspace,
         packaged_src_path=None,
-        contract_name="adder",
+        contract_name=DEFAULT_CONTRACT_NAME,
         image="sdk-rust-contract-builder:next",
         output_folder=output_folder
     )
@@ -85,8 +89,8 @@ def test_fail_if_contract_cargo_lock_is_missing():
 
 
 def test_fail_if_workspace_cargo_lock_is_missing():
-    workspace_parent = download_project_repository("https://github.com/multiversx/mx-contracts-rs/archive/refs/tags/v0.45.4.zip", "test_fail_if_workspace_cargo_lock_is_missing")
-    workspace = workspace_parent / "mx-contracts-rs-0.45.4"
+    workspace_parent = download_project_repository(DEFAULT_PROJECT_ARCHIVE_URL, "test_fail_if_workspace_cargo_lock_is_missing")
+    workspace = workspace_parent / DEFAULT_PROJECT_ARCHIVE_PAYLOAD
 
     output_folder = PARENT_OUTPUT_FOLDER / "test_fail_if_workspace_cargo_lock_is_missing"
     shutil.rmtree(output_folder, ignore_errors=True)
@@ -98,7 +102,7 @@ def test_fail_if_workspace_cargo_lock_is_missing():
     (code, stdout, _) = run_docker(
         project_path=workspace,
         packaged_src_path=None,
-        contract_name="adder",
+        contract_name=DEFAULT_CONTRACT_NAME,
         image="sdk-rust-contract-builder:next",
         output_folder=output_folder
     )
