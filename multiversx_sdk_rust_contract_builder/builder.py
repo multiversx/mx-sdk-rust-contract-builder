@@ -9,8 +9,9 @@ from multiversx_sdk_rust_contract_builder import source_code
 from multiversx_sdk_rust_contract_builder.build_metadata import BuildMetadata
 from multiversx_sdk_rust_contract_builder.build_options import BuildOptions
 from multiversx_sdk_rust_contract_builder.build_outcome import BuildOutcome
-from multiversx_sdk_rust_contract_builder.cargo_toml import \
-    get_contract_name_and_version
+from multiversx_sdk_rust_contract_builder.cargo_toml import (
+    ensure_no_change_within_cargo_lock_files, gather_cargo_lock_files,
+    get_contract_name_and_version)
 from multiversx_sdk_rust_contract_builder.codehash import \
     generate_code_hash_artifact
 from multiversx_sdk_rust_contract_builder.constants import (
@@ -44,6 +45,8 @@ def build_project(
     # We copy the whole project folder to the build path, to ensure that all local dependencies are available.
     project_within_build_folder = copy_project_folder_to_build_folder(project_folder, build_root_folder)
 
+    cargo_lock_files_before_build = gather_cargo_lock_files(project_within_build_folder)
+
     for contract_folder in sorted(contracts_folders):
         contract_name, contract_version = get_contract_name_and_version(contract_folder)
         logging.info(f"Contract = {contract_name}, version = {contract_version}")
@@ -76,6 +79,13 @@ def build_project(
         )
 
         outcome.gather_artifacts(contract_build_subfolder, output_subfolder)
+
+    cargo_lock_files_after_build = gather_cargo_lock_files(project_within_build_folder)
+
+    ensure_no_change_within_cargo_lock_files(
+        files_before_build=cargo_lock_files_before_build,
+        files_after_build=cargo_lock_files_after_build
+    )
 
     return outcome
 

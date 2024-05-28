@@ -61,11 +61,11 @@ def test_has_correct_packaged_source():
         assert entry.is_test_file == ("test" in str(entry.path)), f"Unexpected is_test_file marker for: {entry.path}"
 
 
-def test_fail_if_any_cargo_lock_is_missing():
-    workspace_parent = download_project_repository("https://github.com/multiversx/mx-contracts-rs/archive/refs/tags/v0.45.4.zip", "test_fail_if_any_cargo_lock_is_missing")
+def test_fail_if_contract_cargo_lock_is_missing():
+    workspace_parent = download_project_repository("https://github.com/multiversx/mx-contracts-rs/archive/refs/tags/v0.45.4.zip", "test_fail_if_contract_cargo_lock_is_missing")
     workspace = workspace_parent / "mx-contracts-rs-0.45.4"
 
-    output_folder = PARENT_OUTPUT_FOLDER / "test_fail_if_any_cargo_lock_is_missing"
+    output_folder = PARENT_OUTPUT_FOLDER / "test_fail_if_contract_cargo_lock_is_missing"
     shutil.rmtree(output_folder, ignore_errors=True)
     output_folder.mkdir(parents=True, exist_ok=True)
 
@@ -82,3 +82,26 @@ def test_fail_if_any_cargo_lock_is_missing():
 
     assert code != 0
     assert "Cargo.lock needs to be updated but --locked was passed to prevent this" in stderr
+
+
+def test_fail_if_workspace_cargo_lock_is_missing():
+    workspace_parent = download_project_repository("https://github.com/multiversx/mx-contracts-rs/archive/refs/tags/v0.45.4.zip", "test_fail_if_workspace_cargo_lock_is_missing")
+    workspace = workspace_parent / "mx-contracts-rs-0.45.4"
+
+    output_folder = PARENT_OUTPUT_FOLDER / "test_fail_if_workspace_cargo_lock_is_missing"
+    shutil.rmtree(output_folder, ignore_errors=True)
+    output_folder.mkdir(parents=True, exist_ok=True)
+
+    # Remove a (required) Cargo.lock file
+    (workspace / "Cargo.lock").unlink()
+
+    (code, stdout, _) = run_docker(
+        project_path=workspace,
+        packaged_src_path=None,
+        contract_name="adder",
+        image="sdk-rust-contract-builder:next",
+        output_folder=output_folder
+    )
+
+    assert code != 0
+    assert "Cargo.lock file(s) have been created during build: ['/tmp/project/Cargo.lock']" in stdout
