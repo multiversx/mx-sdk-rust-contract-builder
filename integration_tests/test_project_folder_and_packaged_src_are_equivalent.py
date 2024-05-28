@@ -10,7 +10,7 @@ from integration_tests.shared import download_project_repository, run_docker
 def main(cli_args: List[str]):
     repository_url = "https://github.com/multiversx/mx-sovereign-sc"
     commit = "80599388b9358842b50ea216a622d514e15df374"
-    archve_subfolder = f"mx-contracts-rs-{commit}"
+    archve_subfolder = f"mx-sovereign-sc-{commit}"
     project_path = download_project_repository(f"{repository_url}/archive/{commit}.zip", archve_subfolder)
     project_path = project_path / archve_subfolder
 
