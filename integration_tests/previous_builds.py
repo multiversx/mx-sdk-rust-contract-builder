@@ -22,32 +22,6 @@ class PreviousBuild:
 previous_builds: List[PreviousBuild] = [
     PreviousBuild(
         name="a.1",
-        project_archive_url="https://github.com/multiversx/mx-exchange-sc/archive/refs/heads/reproducible-v2.1.1-staking-upgrade.zip",
-        project_relative_path_in_archive="mx-exchange-sc-reproducible-v2.1.1-staking-upgrade",
-        packaged_src_url=None,
-        contract_name=None,
-        expected_code_hashes={
-            "farm-staking": "6dc7c587b2cc4b177a192b709c092f3752b3dcf9ce1b484e69fe64dc333a9e0a",
-            "farm": "931ca233826ff9dacd889967365db1cde9ed8402eb553de2a3b9d58b6ff1098d",
-            "factory": "df06465b651594605466e817bfe9d8d7c68eef0f87df4a8d3266bcfb1bef6d83",
-            "pair": "f3f08ebd758fada871c113c18017d9761f157d00b19c4d3beaba530e6c53afc2",
-            "energy-factory": "241600c055df605cafd85b75d40b21316a6b35713485201b156d695b23c66a2f"
-        },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.2.1"
-    ),
-    PreviousBuild(
-        name="a.2",
-        project_archive_url="https://github.com/multiversx/mx-metabonding-sc/archive/refs/heads/reproducible-v1.1.1.zip",
-        project_relative_path_in_archive="mx-metabonding-sc-reproducible-v1.1.1",
-        packaged_src_url=None,
-        contract_name=None,
-        expected_code_hashes={
-            "metabonding": "897b19e1990f7c487c99c12f50722febe1ee4468bcd3a7405641966dfff2791d"
-        },
-        docker_image="multiversx/sdk-rust-contract-builder:v4.2.1"
-    ),
-    PreviousBuild(
-        name="a.3",
         project_archive_url="https://github.com/multiversx/mx-contracts-rs/archive/refs/tags/v0.45.2.1-reproducible.zip",
         project_relative_path_in_archive="mx-contracts-rs-0.45.2.1-reproducible",
         packaged_src_url=None,
@@ -63,7 +37,7 @@ previous_builds: List[PreviousBuild] = [
         docker_image="multiversx/sdk-rust-contract-builder:v5.4.1"
     ),
     PreviousBuild(
-        name="a.4",
+        name="a.2",
         project_archive_url="https://github.com/multiversx/mx-contracts-rs/archive/refs/tags/v0.45.2.1-reproducible.zip",
         project_relative_path_in_archive="mx-contracts-rs-0.45.2.1-reproducible",
         packaged_src_url=None,
@@ -75,6 +49,22 @@ previous_builds: List[PreviousBuild] = [
             "multisig-view": "1904fe0bfd12cb90fda87e5cf2d2f211d9eed8b48c296e6d858547bfe39bec0c",
             "lottery-esdt": "a54bd4278b12cc93fedd6ca0addf6aad4043528c33e54ce43cf92d4d2dd755ee",
             "ping-pong-egld": "8b107da10aef0d9610a939c4ca07c666674c465d0266fb28d5f981861f084f62"
+        },
+        docker_image="multiversx/sdk-rust-contract-builder:v6.1.2"
+    ),
+    PreviousBuild(
+        name="a.3",
+        project_archive_url="https://github.com/multiversx/mx-contracts-rs/archive/9da0c4abe7aba6ae109c167be655b2ce80ca4b08.zip",
+        project_relative_path_in_archive="mx-contracts-rs-9da0c4abe7aba6ae109c167be655b2ce80ca4b08",
+        packaged_src_url=None,
+        contract_name=None,
+        expected_code_hashes={
+            "adder": "384b680df7a95ebceca02ffb3e760a2fc288dea1b802685ef15df22ae88ba15b",
+            "multisig": "30cc24a9a8f271f27db44952a54c311ca54487f5a19533806ad213312a055ff8",
+            "multisig-full": "b4b9e11213e616564b2b4bd60eeee1bae295f51b14736f24fce64759e7d82295",
+            "multisig-view": "429a43e843a098dd3d8e5e882e0b0708a91e53ed41949017f4b732020fcb033d",
+            "lottery-esdt": "f53b8d157010a35e344d3c2b82606d3c38ad183faeac37e126c32d89349d3e8d",
+            "ping-pong-egld": "a3b146ec3d7d23101f3ab35e9a5e3d967e71709f20263d018a6af3b117cf28bf"
         },
         docker_image="sdk-rust-contract-builder:next"
     ),

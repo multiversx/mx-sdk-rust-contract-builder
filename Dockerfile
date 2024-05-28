@@ -1,12 +1,11 @@
 FROM ubuntu:22.04
 
 # Constants
-ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v6.1.2"
-ARG VERSION_RUST="nightly-2023-12-11"
+ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v7.0.0"
+ARG VERSION_RUST="nightly-2024-05-22"
 ARG VERSION_BINARYEN="version_112"
 ARG DOWNLOAD_URL_BINARYEN="https://github.com/WebAssembly/binaryen/releases/download/${VERSION_BINARYEN}/binaryen-${VERSION_BINARYEN}-x86_64-linux.tar.gz"
-ARG VERSION_WABT="1.0.27-1"
-ARG VERSION_SC_META="0.43.3"
+ARG VERSION_SC_META="0.50.3"
 ARG TARGETPLATFORM
 
 # Install system dependencies
@@ -15,7 +14,6 @@ RUN apt-get update --fix-missing && apt-get install -y \
     build-essential \
     git \
     python3.11 python-is-python3 python3-pip \
-    wabt=${VERSION_WABT} \
     pkg-config \
     libssl-dev
 
@@ -51,7 +49,6 @@ ENV PYTHONPATH=/
 ENV BUILD_METADATA_BUILDER_NAME=${BUILDER_NAME}
 ENV BUILD_METADATA_VERSION_RUST=${VERSION_RUST}
 ENV BUILD_METADATA_VERSION_BINARYEN=${VERSION_BINARYEN}
-ENV BUILD_METADATA_VERSION_WABT=${VERSION_WABT}
 ENV BUILD_METADATA_VERSION_SC_META=${VERSION_SC_META}
 ENV BUILD_METADATA_TARGETPLATFORM=${TARGETPLATFORM}
 
@@ -66,5 +63,4 @@ ENTRYPOINT ["python", "/multiversx_sdk_rust_contract_builder/main.py", \
 LABEL frozen="yes"
 LABEL rust=${VERSION_RUST}
 LABEL wasm-opt-binaryen=${VERSION_BINARYEN}
-LABEL wabt=${VERSION_WABT}
 LABEL sc_meta=${VERSION_SC_META}
