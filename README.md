@@ -4,25 +4,16 @@ Docker image (and wrappers) for reproducible contract builds (Rust). See [docs.m
 
 ## Build the Docker image
 
-We use `docker buildx` to build the image:
-
 ```
-docker buildx build --network host  --output type=docker . -t sdk-rust-contract-builder:next -f ./Dockerfile
+docker build --network host . -t sdk-rust-contract-builder:next -f ./Dockerfile
 ```
 
 Maintainers can publish the image as follows:
 
 ```
-docker buildx create --name multiarch --use
-
-docker buildx build --network host --push --platform=linux/amd64 . -t multiversx/sdk-rust-contract-builder:next -f ./Dockerfile
-
-docker buildx rm multiarch
+docker build --network host . -t multiversx/sdk-rust-contract-builder:next -f ./Dockerfile
+docker push multiversx/sdk-rust-contract-builder:next
 ```
-
-For the above to work properly, make sure to install `tonistiigi/binfmt` beforehand. Please follow the official Docker documentation [here](https://docs.docker.com/build/building/multi-platform/).
-
-Note that **we only build and publish the image for `linux/amd64`**. We recommend against using a `linux/arm64` image for performing reproducible contract builds. This is because a WASM binary generated on a `linux/arm64` image _might_ differ (at the bytecode level) from one generated on the recommended `linux/amd64` image - probably due to distinct (unfortunate) bytecode-emitting logic in the Rust compiler.
 
 ## Build contract using the wrapper
 

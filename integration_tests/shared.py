@@ -36,6 +36,14 @@ def run_docker(
     image: str,
     output_folder: Path,
 ) -> Tuple[int, str, str]:
+    print(f"""Running docker...
+    project_path: {project_path},
+    packaged_src_path: {packaged_src_path},
+    contract_name: {contract_name},
+    image: {image},
+    output_folder: {output_folder}
+""")
+
     CARGO_TARGET_DIR.mkdir(parents=True, exist_ok=True)
     RUST_REGISTRY.mkdir(parents=True, exist_ok=True)
     RUST_GIT.mkdir(parents=True, exist_ok=True)
