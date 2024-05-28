@@ -71,7 +71,6 @@ def build_project(
         # The bundle (packaged source code) is created after build, so that Cargo.lock files are included (if previously missing).
         create_packaged_source_code(
             parent_project_folder=project_within_build_folder,
-            package_whole_project_src=True,
             contract_folder=contract_build_subfolder,
             output_folder=output_subfolder,
             build_metadata=metadata.to_dict(),
@@ -79,15 +78,6 @@ def build_project(
             package_filename=f"{contract_name}-{contract_version}.source.json"
         )
 
-        create_packaged_source_code(
-            parent_project_folder=project_within_build_folder,
-            package_whole_project_src=False,
-            contract_folder=contract_build_subfolder,
-            output_folder=output_subfolder,
-            build_metadata=metadata.to_dict(),
-            build_options=options.to_dict(),
-            package_filename=f"{contract_name}-{contract_version}.partial-source.json"
-        )
         outcome.gather_artifacts(contract_build_subfolder, output_subfolder)
 
     return outcome
@@ -175,7 +165,6 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
 
 def create_packaged_source_code(
         parent_project_folder: Path,
-        package_whole_project_src: bool,
         contract_folder: Path,
         output_folder: Path,
         build_metadata: Dict[str, Any],
@@ -185,7 +174,6 @@ def create_packaged_source_code(
     source_code_files = source_code.get_source_code_files(
         project_folder=parent_project_folder,
         contract_folder=contract_folder,
-        include_unrelated_to_contract=package_whole_project_src
     )
 
     contract_name, contract_version = get_contract_name_and_version(contract_folder)
