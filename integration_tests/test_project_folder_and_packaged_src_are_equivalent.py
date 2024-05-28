@@ -9,9 +9,9 @@ from integration_tests.shared import download_project_repository, run_docker
 
 def main(cli_args: List[str]):
     repository_url = "https://github.com/multiversx/mx-contracts-rs"
-    tag = "0.45.2.1-reproducible"
-    archve_subfolder = f"mx-contracts-rs-{tag}"
-    project_path = download_project_repository(f"{repository_url}/archive/refs/tags/v{tag}.zip", archve_subfolder)
+    commit = "9da0c4abe7aba6ae109c167be655b2ce80ca4b08"
+    archve_subfolder = f"mx-contracts-rs-{commit}"
+    project_path = download_project_repository(f"{repository_url}/archive/{commit}.zip", archve_subfolder)
     project_path = project_path / archve_subfolder
 
     check_project_folder_and_packaged_src_are_equivalent(
