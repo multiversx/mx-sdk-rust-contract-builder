@@ -26,7 +26,7 @@ def main(cli_args: List[str]):
     parser.add_argument("--project", type=str, required=False, help="source code folder (project)")
     parser.add_argument("--package-whole-project-src", action="store_true", default=False, help="deprecated parameter, not used anymore")
     parser.add_argument("--packaged-src", type=str, required=False, help="source code packaged in a JSON file")
-    parser.add_argument("--contract", type=str, required=False, help="contract to build from within the source code folder; should be relative to the project path")
+    parser.add_argument("--contract", type=str, required=False, help="contract to build (contract name, as found in Cargo.toml)")
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--no-wasm-opt", action="store_true", default=False, help="do not optimize wasm files after the build (default: %(default)s)")
     parser.add_argument("--cargo-target-dir", type=str, required=True, help="Cargo's target-dir")
