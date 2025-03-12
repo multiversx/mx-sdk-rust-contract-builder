@@ -54,13 +54,13 @@ previous_builds: List[PreviousBuild] = [
     ),
     PreviousBuild(
         name="a.3",
-        project_archive_url="https://github.com/multiversx/mx-sovereign-sc/archive/80599388b9358842b50ea216a622d514e15df374.zip",
-        project_relative_path_in_archive="mx-sovereign-sc-80599388b9358842b50ea216a622d514e15df374",
+        project_archive_url="https://github.com/multiversx/mx-sovereign-sc/archive/e9a4f1fc8d963d48cbce0fb0cf673621cc0832ac.zip",
+        project_relative_path_in_archive="mx-sovereign-sc-e9a4f1fc8d963d48cbce0fb0cf673621cc0832ac",
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
-            "esdt-safe": "08d0ba0f0931b9aa71946a543efc29da6e66d5247e911ce6595bea6a13a62cb4",
-            "fee-market": "e6efffc7723e1b38c9cdc41f3c2827acbcaed86c73795d09635d78b685c45576"
+            "sov-esdt-safe": "34f6479356b2621328bbfac0f0e0833a55a8bd1948b5a0e2500fd66291f0ad88",
+            "fee-market": "0b81078e61efd692ebb3f83b437da9cf83ffff7843aeb0a66a71b5ddff3b2fb2"
         },
         docker_image="sdk-rust-contract-builder:next"
     ),

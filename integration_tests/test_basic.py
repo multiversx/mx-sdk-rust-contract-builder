@@ -1,14 +1,15 @@
 import os
 import shutil
+import re
 
 from integration_tests.config import PARENT_OUTPUT_FOLDER
 from integration_tests.shared import download_project_repository, run_docker
 from multiversx_sdk_rust_contract_builder.packaged_source_code import \
     PackagedSourceCode
 
-DEFAULT_PROJECT_ARCHIVE_URL = "https://github.com/multiversx/mx-sovereign-sc/archive/87f1e57978190cb7fff805fea6ed194aa8411567.zip"
-DEFAULT_PROJECT_ARCHIVE_PAYLOAD = "mx-sovereign-sc-87f1e57978190cb7fff805fea6ed194aa8411567"
-DEFAULT_CONTRACT_NAME = "esdt-safe"
+DEFAULT_PROJECT_ARCHIVE_URL = "https://github.com/multiversx/mx-sovereign-sc/archive/e9a4f1fc8d963d48cbce0fb0cf673621cc0832ac.zip"
+DEFAULT_PROJECT_ARCHIVE_PAYLOAD = "mx-sovereign-sc-e9a4f1fc8d963d48cbce0fb0cf673621cc0832ac"
+DEFAULT_CONTRACT_NAME = "sov-esdt-safe"
 
 
 def test_with_symlinks():
@@ -62,7 +63,9 @@ def test_has_correct_packaged_source():
 
     for entry in packaged_source_code.entries:
         assert not str(entry.path).startswith("target"), f"Unexpected file: {entry.path}"
-        assert entry.is_test_file == ("test" in str(entry.path)), f"Unexpected is_test_file marker for: {entry.path}"
+
+        is_test_file = ("tests" in str(entry.path)) or ("test_" in str(entry.path)) or ("_test" in str(entry.path))
+        assert entry.is_test_file == is_test_file, f"Unexpected is_test_file marker for: {entry.path}"
 
 
 def test_fail_if_contract_cargo_lock_is_missing():
@@ -74,7 +77,7 @@ def test_fail_if_contract_cargo_lock_is_missing():
     output_folder.mkdir(parents=True, exist_ok=True)
 
     # Remove a (required) Cargo.lock file
-    (workspace / DEFAULT_CONTRACT_NAME / "wasm" / "Cargo.lock").unlink()
+    (workspace / DEFAULT_CONTRACT_NAME / f"wasm-{DEFAULT_CONTRACT_NAME}" / "Cargo.lock").unlink()
 
     (code, _, stderr) = run_docker(
         project_path=workspace,
