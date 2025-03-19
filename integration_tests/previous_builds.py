@@ -59,7 +59,7 @@ previous_builds: List[PreviousBuild] = [
         packaged_src_url=None,
         contract_name=None,
         expected_code_hashes={
-            "sov-esdt-safe": "34f6479356b2621328bbfac0f0e0833a55a8bd1948b5a0e2500fd66291f0ad88",
+            "sov-esdt-safe": "adc4e4f69b15153919c0bcf88df6436d4fcfacbc2da6a39e6bcc3f30927c80ad",
             "fee-market": "0b81078e61efd692ebb3f83b437da9cf83ffff7843aeb0a66a71b5ddff3b2fb2"
         },
         docker_image="sdk-rust-contract-builder:next"
