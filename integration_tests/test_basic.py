@@ -6,8 +6,8 @@ from integration_tests.shared import download_project_repository, run_docker
 from multiversx_sdk_rust_contract_builder.packaged_source_code import \
     PackagedSourceCode
 
-DEFAULT_PROJECT_ARCHIVE_URL = "https://github.com/multiversx/mx-sovereign-sc/archive/e9a4f1fc8d963d48cbce0fb0cf673621cc0832ac.zip"
-DEFAULT_PROJECT_ARCHIVE_PAYLOAD = "mx-sovereign-sc-e9a4f1fc8d963d48cbce0fb0cf673621cc0832ac"
+DEFAULT_PROJECT_ARCHIVE_URL = "https://github.com/multiversx/mx-sovereign-sc/archive/d2eb20ad608b9f5d2e9e76ae8950901d9b8b2ff1.zip"
+DEFAULT_PROJECT_ARCHIVE_PAYLOAD = "mx-sovereign-sc-d2eb20ad608b9f5d2e9e76ae8950901d9b8b2ff1"
 DEFAULT_CONTRACT_NAME = "sov-esdt-safe"
 
 
