@@ -9,15 +9,15 @@ from integration_tests.shared import download_project_repository, run_docker
 
 def main(cli_args: List[str]):
     repository_url = "https://github.com/multiversx/mx-sovereign-sc"
-    commit = "80599388b9358842b50ea216a622d514e15df374"
-    archve_subfolder = f"mx-sovereign-sc-{commit}"
-    project_path = download_project_repository(f"{repository_url}/archive/{commit}.zip", archve_subfolder)
-    project_path = project_path / archve_subfolder
+    commit = "e9a4f1fc8d963d48cbce0fb0cf673621cc0832ac"
+    archive_subfolder = f"mx-sovereign-sc-{commit}"
+    project_path = download_project_repository(f"{repository_url}/archive/{commit}.zip", archive_subfolder)
+    project_path = project_path / archive_subfolder
 
     check_project_folder_and_packaged_src_are_equivalent(
         project_path=project_path,
         parent_output_folder=PARENT_OUTPUT_FOLDER,
-        contracts=["esdt-safe", "fee-market"],
+        contracts=["sov-esdt-safe", "fee-market"],
     )
 
 

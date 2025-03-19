@@ -138,9 +138,8 @@ def clean_contract(folder: Path, clean_output: bool = True):
 
 def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Path, no_wasm_opt: bool):
     cargo_output_folder = build_folder / "output"
-    meta_folder = build_folder / "meta"
 
-    args = ["cargo", "run", "build"]
+    args = ["sc-meta", "all", "build"]
     args.extend(["--target-dir", str(cargo_target_dir)])
     args.extend(["--no-wasm-opt"] if no_wasm_opt else [])
 
@@ -156,7 +155,7 @@ def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Pa
     custom_env["CARGO_NET_GIT_FETCH_WITH_CLI"] = "true"
 
     logging.info(f"Building: {args}")
-    return_code = subprocess.run(args, cwd=meta_folder, env=custom_env).returncode
+    return_code = subprocess.run(args, cwd=build_folder, env=custom_env).returncode
     if return_code != 0:
         raise ErrKnown(f"Failed to build contract {build_folder}. Return code: {return_code}.")
 
