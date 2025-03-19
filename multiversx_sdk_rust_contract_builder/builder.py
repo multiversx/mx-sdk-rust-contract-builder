@@ -27,7 +27,7 @@ def build_project(
     project_folder: Path,
     parent_output_folder: Path,
     metadata: BuildMetadata,
-    options: BuildOptions      
+    options: BuildOptions
 ) -> BuildOutcome:
     project_folder = project_folder.expanduser().resolve()
     parent_output_folder = parent_output_folder.expanduser().resolve()
@@ -134,6 +134,7 @@ def clean_contract(folder: Path, clean_output: bool = True):
 
     if clean_output:
         shutil.rmtree(folder / "output", ignore_errors=True)
+
 
 def build_contract(build_folder: Path, output_folder: Path, cargo_target_dir: Path, no_wasm_opt: bool):
     cargo_output_folder = build_folder / "output"

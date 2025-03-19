@@ -1,6 +1,5 @@
 import os
 import shutil
-import re
 
 from integration_tests.config import PARENT_OUTPUT_FOLDER
 from integration_tests.shared import download_project_repository, run_docker

@@ -1,7 +1,8 @@
 FROM ubuntu:22.04
 
 # Constants
-ARG BUILDER_NAME="multiversx/sdk-rust-contract-builder:v8.0.1"
+ARG VERSION_RUST="1.85.0"
+ARG VERSION_SC_META="0.57.0"
 ARG TARGETPLATFORM
 
 # Install system dependencies
@@ -19,13 +20,13 @@ RUN pip3 install toml==0.10.2 semver==3.0.0-dev.4
 # Install rust
 RUN wget -O rustup.sh https://sh.rustup.rs && \
     chmod +x rustup.sh && \
-    CARGO_HOME=/rust RUSTUP_HOME=/rust ./rustup.sh --verbose --default-toolchain stable --profile minimal --target wasm32-unknown-unknown -y && \
+    CARGO_HOME=/rust RUSTUP_HOME=/rust ./rustup.sh --verbose --default-toolchain ${VERSION_RUST} --profile minimal --target wasm32-unknown-unknown -y && \
     rm rustup.sh && \
     chmod -R 777 /rust && \
     rm -rf /rust/registry
 
-# Install sc-tool
-RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install multiversx-sc-meta --locked && \
+# Install sc-meta tool
+RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install multiversx-sc-meta --version ${VERSION_SC_META} --locked && \
     rm -rf /rust/registry
 
 COPY "multiversx_sdk_rust_contract_builder" "/multiversx_sdk_rust_contract_builder"
@@ -34,7 +35,6 @@ ENV PATH="/rust/bin:${PATH}"
 ENV CARGO_HOME="/rust"
 ENV RUSTUP_HOME="/rust"
 ENV PYTHONPATH=/
-ENV BUILD_METADATA_BUILDER_NAME=${BUILDER_NAME}
 ENV BUILD_METADATA_TARGETPLATFORM=${TARGETPLATFORM}
 
 # Additional arguments (must be provided at "docker run"):
@@ -46,3 +46,5 @@ ENTRYPOINT ["python", "/multiversx_sdk_rust_contract_builder/main.py", \
     "--cargo-target-dir", "/rust/cargo-target-dir"]
 
 LABEL frozen="yes"
+LABEL rust=${VERSION_RUST}
+LABEL sc_meta=${VERSION_SC_META}
