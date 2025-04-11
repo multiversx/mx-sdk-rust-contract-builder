@@ -1,8 +1,9 @@
 FROM ubuntu:22.04
 
 # Constants
-ARG VERSION_RUST="1.85.0"
-ARG VERSION_SC_META="0.57.0"
+ARG VERSION_RUST="1.86.0"
+ARG VERSION_SC_META="0.57.1"
+ARG VERSION_WASM_OPT="0.116.1"
 ARG TARGETPLATFORM
 
 # Install system dependencies
@@ -29,6 +30,10 @@ RUN wget -O rustup.sh https://sh.rustup.rs && \
 RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install multiversx-sc-meta --version ${VERSION_SC_META} --locked && \
     rm -rf /rust/registry
 
+# Install wasm-opt
+RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install wasm-opt --version ${VERSION_WASM_OPT} --locked && \
+    rm -rf /rust/registry
+
 COPY "multiversx_sdk_rust_contract_builder" "/multiversx_sdk_rust_contract_builder"
 
 ENV PATH="/rust/bin:${PATH}"
@@ -37,6 +42,7 @@ ENV RUSTUP_HOME="/rust"
 ENV PYTHONPATH=/
 ENV BUILD_METADATA_VERSION_RUST=${VERSION_RUST}
 ENV BUILD_METADATA_VERSION_SC_META=${VERSION_SC_META}
+ENV BUILD_METADATA_VERSION_WASM_OPT=${VERSION_WASM_OPT}
 ENV BUILD_METADATA_TARGETPLATFORM=${TARGETPLATFORM}
 
 # Additional arguments (must be provided at "docker run"):
@@ -50,3 +56,4 @@ ENTRYPOINT ["python", "/multiversx_sdk_rust_contract_builder/main.py", \
 LABEL frozen="yes"
 LABEL rust=${VERSION_RUST}
 LABEL sc_meta=${VERSION_SC_META}
+LABEL wasm_opt=${VERSION_WASM_OPT}
