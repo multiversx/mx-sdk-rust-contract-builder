@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 # Constants
 ARG VERSION_RUST="1.86.0"
-ARG VERSION_SC_META="0.57.1"
+ARG VERSION_SC_META="0.59.0"
 ARG VERSION_WASM_OPT="0.116.1"
 ARG TARGETPLATFORM
 
@@ -21,14 +21,20 @@ RUN pip3 install toml==0.10.2 semver==3.0.0-dev.4
 # Install rust
 RUN wget -O rustup.sh https://sh.rustup.rs && \
     chmod +x rustup.sh && \
-    CARGO_HOME=/rust RUSTUP_HOME=/rust ./rustup.sh --verbose --default-toolchain ${VERSION_RUST} --profile minimal --target wasm32-unknown-unknown -y && \
+    CARGO_HOME=/rust RUSTUP_HOME=/rust ./rustup.sh --verbose --default-toolchain ${VERSION_RUST} --profile minimal -y && \
     rm rustup.sh && \
     chmod -R 777 /rust && \
     rm -rf /rust/registry
 
+# Set the default Rust toolchain
+RUN PATH="/rust/bin:${PATH}" rustup default ${VERSION_RUST}
+
 # Install sc-meta tool
 RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install multiversx-sc-meta --version ${VERSION_SC_META} --locked && \
     rm -rf /rust/registry
+
+# Install wasm32 target
+RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust sc-meta install wasm32
 
 # Install wasm-opt
 RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install wasm-opt --version ${VERSION_WASM_OPT} --locked && \
