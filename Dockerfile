@@ -26,9 +26,6 @@ RUN wget -O rustup.sh https://sh.rustup.rs && \
     chmod -R 777 /rust && \
     rm -rf /rust/registry
 
-# Set the default Rust toolchain
-RUN PATH="/rust/bin:${PATH}" rustup default ${VERSION_RUST}
-
 # Install sc-meta tool
 RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust cargo install multiversx-sc-meta --version ${VERSION_SC_META} --locked && \
     rm -rf /rust/registry
