@@ -77,7 +77,7 @@ def test_fail_if_contract_cargo_lock_is_missing():
     output_folder.mkdir(parents=True, exist_ok=True)
 
     # Remove a (required) Cargo.lock file
-    (workspace / DEFAULT_CONTRACT_NAME / f"wasm-{DEFAULT_CONTRACT_NAME}" / "Cargo.lock").unlink()
+    (workspace / DEFAULT_CONTRACT_NAME / "wasm" / "Cargo.lock").unlink()
 
     (code, _, stderr) = run_docker(
         project_path=workspace,
