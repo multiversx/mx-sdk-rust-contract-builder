@@ -6,8 +6,8 @@ from integration_tests.shared import download_project_repository, run_docker
 from multiversx_sdk_rust_contract_builder.packaged_source_code import \
     PackagedSourceCode
 
-DEFAULT_PROJECT_ARCHIVE_URL = "https://github.com/multiversx/mx-sovereign-sc/archive/068151049f75aafa3e92aa87bbb69a95bf009316.zip"
-DEFAULT_PROJECT_ARCHIVE_PAYLOAD = "mx-sovereign-sc-068151049f75aafa3e92aa87bbb69a95bf009316"
+DEFAULT_PROJECT_ARCHIVE_URL = "https://github.com/multiversx/mx-sovereign-sc/archive/cf9affc2d62f07ce5567d8019bf1c507f54b90a8.zip"
+DEFAULT_PROJECT_ARCHIVE_PAYLOAD = "mx-sovereign-sc-cf9affc2d62f07ce5567d8019bf1c507f54b90a8"
 DEFAULT_CONTRACT_NAME = "sov-esdt-safe"
 DEFAULT_CONTRACT_VERSION = "0.1.0"
 
@@ -77,7 +77,7 @@ def test_fail_if_contract_cargo_lock_is_missing():
     output_folder.mkdir(parents=True, exist_ok=True)
 
     # Remove a (required) Cargo.lock file
-    (workspace / DEFAULT_CONTRACT_NAME / f"wasm-{DEFAULT_CONTRACT_NAME}" / "Cargo.lock").unlink()
+    (workspace / DEFAULT_CONTRACT_NAME / "wasm" / "Cargo.lock").unlink()
 
     (code, _, stderr) = run_docker(
         project_path=workspace,
